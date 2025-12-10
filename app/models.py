@@ -56,7 +56,7 @@ class Loan(Base):
 
     id = Column(Integer, primary_key=True)
     book_copy_id = Column(String, ForeignKey('users.id'))
-    user_id = Column(String, ForeignKey('book_copies.copy_id'))
+    user_id = Column(String, ForeignKey('book_copies.copy_id'), index=True)
     status = Column(Enum(LoanStatus), default=LoanStatus.ACTIVE)
     checked_out_at = Column(DateTime(timezone=True), server_default=func.now())
     due_at = Column(DateTime(timezone=True), default=14)
@@ -69,9 +69,10 @@ class BookCopy(Base):
     __tablename__ = 'book_copies'
 
     copy_id = Column(Integer, primary_key=True)
-    book_isbn = Column(String(50), ForeignKey('books.isbn'), nullable=False)
+    book_isbn = Column(String(50), ForeignKey('books.isbn'), nullable=False, index=True)
     serial = Column(Integer, nullable=False)
     copy_barcode = Column(String(50), nullable=False)
+    is_available = Column(Boolean, default=True)
 
 class Audit(Base):
     __tablename__ = 'audit'
