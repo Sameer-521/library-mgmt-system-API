@@ -28,12 +28,13 @@ async def get_bk_copy_by_barcode(db: AsyncSession, barcode: str):
     return result.scalar_one_or_none()
 
 async def get_active_schedule(db: AsyncSession, isbn: int, user_id: int):
-    stmt = select(BkCopySchedule).where(
+    stmt = select(BkCopySchedule).join(
+        BookCopy, 
+        BkCopySchedule.bk_copy_barcode == BookCopy.copy_barcode).where(
         BkCopySchedule.status == 'ACTIVE',
-        BkCopySchedule.user_id == user_id
+        BkCopySchedule.user_id == user_id,
+        BookCopy.book_isbn == isbn
         )
-
-    stmt = stmt.join(BookCopy, BkCopySchedule.bk_copy_barcode == BookCopy.copy_barcode)
     result = await db.execute(stmt)
     return result.scalars().first()
 
