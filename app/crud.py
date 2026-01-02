@@ -1,6 +1,6 @@
 from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models import Book, BookCopy, User, Loan, BkCopySchedule, Audit
+from app.models import Book, BookCopy, User, Loan, BkCopySchedule, Audit, LoanStatus
 from typing import List
 
 async def get_book_by_id(db: AsyncSession, book_id: int):
@@ -34,12 +34,12 @@ async def get_reserved_bk_copy_by_barcode(db: AsyncSession, barcode: str):
     result = await db.execute(stmt)
     return result.scalar_one_or_none()
 
-async def get_active_schedule(db: AsyncSession, isbn: int, user_id: int):
+async def get_active_schedule(db: AsyncSession, isbn: int, user_uid: str):
     stmt = select(BkCopySchedule).join(
         BookCopy, 
         BkCopySchedule.bk_copy_barcode == BookCopy.copy_barcode).where(
         BkCopySchedule.status == 'ACTIVE',
-        BkCopySchedule.user_id == user_id,
+        BkCopySchedule.user_uid == user_uid,
         BookCopy.book_isbn == isbn
         )
     result = await db.execute(stmt)
@@ -54,8 +54,8 @@ async def update_bk_schedule(
         setattr(bk_copy_schedule, key, value)
     await db.flush()
 
-async def get_user_active_loans(db: AsyncSession, user_id):
-    stmt = select(Loan).where(Loan.user_id == user_id, Loan.status == 'ACTIVE')
+async def get_user_active_loans(db: AsyncSession, user_uid: str):
+    stmt = select(Loan).where(Loan.user_uid == user_uid, Loan.status == LoanStatus.ACTIVE)
     result = await db.execute(stmt)
     return result.scalars().all()
 
@@ -115,7 +115,7 @@ async def update_loan(
     return loan
 
 async def get_user_by_email(db: AsyncSession, _email: str):
-    stmt = select(User).where(User.email == _email)
+    stmt = select(User).where(User.email == _email, User.is_superuser == False)
     result = await db.execute(stmt)
     return result.scalar_one_or_none()
 
@@ -162,9 +162,32 @@ async def get_default_superuser(db: AsyncSession, email: str):
     result = await db.execute(stmt)
     return result.scalar_one_or_none()
 
-async def get_user_by_id(db: AsyncSession, user_id):
+async def get_admin_by_uid_email(db: AsyncSession, email: str, admin_uid: str):
+    stmt = select(User).where(
+        User.is_staff==True, 
+        User.is_superuser==True, 
+        User.email == email,
+        User.user_uid == admin_uid
+        )
+    result = await db.execute(stmt)
+    return result.scalar_one_or_none()
+
+async def get_user_by_uid_email(db: AsyncSession, email: str, uid: str):
+    stmt = select(User).where(
+        User.email == email,
+        User.user_uid == uid
+        )
+    result = await db.execute(stmt)
+    return result.scalar_one_or_none()
+
+async def get_user_by_id(db: AsyncSession, user_id: int):
     user = await db.get(User, user_id)
     return user
+
+async def get_user_by_uid(db: AsyncSession, user_uid: str):
+    stmt = select(User).where(User.user_uid == user_uid)
+    result = await db.execute(stmt)
+    return result.scalar_one_or_none()
 
 async def create_schedule(db: AsyncSession, schedule: BkCopySchedule):
     db.add(schedule)

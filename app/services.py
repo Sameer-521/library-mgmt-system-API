@@ -3,13 +3,14 @@ from fastapi import HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from app import crud
-from app.utils import (generate_book_copy_barcode, 
+from app.utils import (generate_book_copy_barcode, generate_staff_id,
                        reraise_exceptions, safe_datetime_compare)
-from app.models import (BkCopySchedule, Book, BookCopy, 
+from app.models import (BkCopySchedule, Book, BookCopy,
                         User, BkCopyStatus, Loan, ScheduleStatus, 
-                        Audit, Event)
-from app.core.auth import authenticate_user, create_access_token, hash_password
+                        Audit, Event, LoanStatus)
+from app.core.auth import authenticate_user, create_access_token, hash_password, authenticate_admin
 from app.core.config import Settings
+from typing import Optional
 from logging import Logger
 
 logger = Logger(__name__)
@@ -19,6 +20,11 @@ settings=Settings()
 loan_eligibility_exception = HTTPException(
     status.HTTP_403_FORBIDDEN,
     detail='User is not eligble for anymore loans'
+)
+
+schd_eligibility_exception = HTTPException(
+    status.HTTP_403_FORBIDDEN,
+    detail='User is not eligble for anymore schedules'
 )
 
 book_not_found_exception = HTTPException(
@@ -128,7 +134,7 @@ async def update_book_service(
 
 # tested
 async def add_book_copies_service(
-        request: Request, 
+        request: Request,
         db: AsyncSession, 
         quantity: int, 
         isbn: int,
@@ -175,21 +181,20 @@ async def loan_book_service(
     request: Request,
     db: AsyncSession,
     isbn: int,
-    user_id: int
+    user_uid: str
     ):
     created_loan = None
     updated_bk_copy = None
     try:
-        user = await crud.get_user_by_id(db, user_id)
+        user = await crud.get_user_by_uid(db, user_uid)
         if not user:
             raise user_not_found_exception
         bk_schedule_is_available = False # determines which return is used depending on if bk_schedule is None
-        request.state.event_type = Event.CHECKOUT
-        user_loans = await crud.get_user_active_loans(db, user.id)
+        user_loans = await crud.get_user_active_loans(db, user.user_uid)
         if (len(user_loans) >= 3) or (user.fine_balance >= 10): # been a bit easy here
             raise loan_eligibility_exception
         
-        bk_schedule = await crud.get_active_schedule(db, isbn, user.id) # returns first record
+        bk_schedule = await crud.get_active_schedule(db, isbn, user.user_uid) # returns first record
         if bk_schedule:
             reserved_bk_copy = await crud.get_reserved_bk_copy_by_barcode(db, bk_schedule.bk_copy_barcode)
             if not reserved_bk_copy:
@@ -203,7 +208,7 @@ async def loan_book_service(
                     detail='Scheduled book copy is not available'
                 )
             loan_data = {
-            'user_id': user.id,
+            'user_uid': user.user_uid,
             'bk_copy_barcode': reserved_bk_copy.copy_barcode
             }
             loan = Loan(**loan_data)
@@ -222,7 +227,7 @@ async def loan_book_service(
                     detail=f'There are no available copies of ISBN-{isbn} currently and user does not have any active schedules'
                 )
             loan_data = {
-                'user_id': user.id,
+                'user_uid': user.user_uid,
                 'bk_copy_barcode': book_copy.copy_barcode
             }
 
@@ -252,7 +257,9 @@ async def loan_book_service(
                 'loan': created_loan,
                 'book_copy': updated_bk_copy, 
                 'was_scheduled': True}
-        return {'loan': created_loan, 'book_copy': updated_bk_copy}
+        return {'loan': created_loan, 
+                'book_copy': updated_bk_copy,
+                'was_scheduled': False}
 
 # tested 
 async def create_user_service(
@@ -279,25 +286,31 @@ async def create_user_service(
         raise internal_error_exception # update exceptions
     else:
         await db.commit()
-        return {'message': 'User created successfully'}
+        return {'message': 'User created successfully',
+                'user_uid': user.user_uid}
 
 # tested  
 async def login_user_service(
     request: Request,
     db: AsyncSession,
     user_data: dict,
+    is_admin: Optional[bool] = False
     ):
     try:
         token = None
         ACCESS_TOKEN_EXPIRE_MINUTES = timedelta(minutes=settings.access_token_expire_minutes)
-        user, exc = await authenticate_user(user_data, db)
+        if is_admin:
+            user, exc = await authenticate_admin(user_data, db)
+        else:
+            user, exc = await authenticate_user(user_data, db)
         request.state.actor = user
         if exc:
             raise exc[0]
         if user:
-            data = {'sub': user.email, 'user_id': user.id, 'is_staff': user.is_staff}
+            data = {'sub': user.email, 'user_uid': user.user_uid, 'is_staff': user.is_staff}
             token = create_access_token(data, ACCESS_TOKEN_EXPIRE_MINUTES) 
     except HTTPException:
+        await db.rollback()
         raise
     except SQLAlchemyError as e:
         await db.rollback()
@@ -305,7 +318,6 @@ async def login_user_service(
         raise internal_error_exception
     else:
         await db.commit()
-        #if token:
         return {'access_token': token, 'token_type': 'bearer'}
     
 async def get_all_non_staff_users_service(
@@ -313,11 +325,11 @@ async def get_all_non_staff_users_service(
     db: AsyncSession,
     ):
     try:
-        request.state.event_type = Event.FETCH_USER
         reraise_exceptions(request)
         users = await crud.get_all_non_staff_users(db)
         return users
     except HTTPException:
+        await db.rollback()
         raise
     except SQLAlchemyError as e:
         await db.rollback() # is rollback even necessary here?
@@ -364,9 +376,9 @@ async def return_book_loan_service(
             db, book_returned, {'status': BkCopyStatus.IN_CHECK})
         
         returned_at = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0) # + timedelta(days=14)
-        loan_status = 'RETURNED'
+        loan_status = LoanStatus.RETURNED
         if safe_datetime_compare(returned_at, loan.due_at): # overdue
-            loan_status = 'RETURNED_LATE'
+            loan_status = LoanStatus.RETURNED_LATE
             days_deltas = (returned_at.date() - loan.due_at.date()).days
             fine = 100 * days_deltas
             fine_fee = fine
@@ -381,8 +393,9 @@ async def return_book_loan_service(
             'status': loan_status,
             'returned_at': returned_at
             }
-        updated_loan = await crud.update_loan(db, loan, loan_data) 
+        await crud.update_loan(db, loan, loan_data) 
     except HTTPException:
+        await db.rollback()
         raise
     except SQLAlchemyError as e:
         await db.rollback()
@@ -406,12 +419,17 @@ async def schedule_book_copy_service(
     ):
     try:
         reraise_exceptions(request)
+        user_loans = await crud.get_user_active_loans(db, current_user.user_uid)
+        if (len(user_loans) >= 3) or (current_user.fine_balance >= 10):
+            raise schd_eligibility_exception
+        
         book_copy = await crud.get_book_copy(db, isbn)
         if not book_copy:
             raise book_not_found_exception
+        
         await crud.update_bk_copy(db, book_copy, update_data={'status': BkCopyStatus.RESERVED})
         schedule_data = {
-            'user_id': current_user.id,
+            'user_uid': current_user.user_uid,
             'bk_copy_barcode': book_copy.copy_barcode
         }
         schedule = await crud.create_schedule(db, BkCopySchedule(**schedule_data))
@@ -423,6 +441,7 @@ async def schedule_book_copy_service(
             detail='Integrity error creating schedule'
         )
     except HTTPException:
+        await db.rollback()
         raise
     except SQLAlchemyError as e:
         await db.rollback()
@@ -444,6 +463,7 @@ async def create_audit_service(
         audit = Audit(**details)
         await crud.add_audit(db, audit)
     except HTTPException:
+        await db.rollback()
         raise
     except SQLAlchemyError as e:
         await db.rollback()
@@ -451,3 +471,32 @@ async def create_audit_service(
         raise internal_error_exception
     else:
         await db.commit()
+
+async def create_staff_user_service(
+    request: Request,
+    db: AsyncSession,
+    user_data: dict,
+    ):
+    try:
+        reraise_exceptions(request)
+        data = user_data.copy()
+        data['password'] = hash_password(data['password'])
+        data['user_uid'] = generate_staff_id()
+        user = await crud.create_new_user(db, User(**data))
+        logger.info('Created new staff user successfully')
+        
+    except IntegrityError as e:
+        logger.warning(f'Integrity error creating new staff user: {e}')
+        raise user_integrity_exception
+    except HTTPException:
+        raise
+    except SQLAlchemyError as e:
+        logger.error(f'DataBase error creating staff user: {e}')
+        await db.rollback()
+        raise internal_error_exception # update exceptions
+    else:
+        await db.commit()
+        msg = {'message': 'Staff user created successfully',
+                'user_uid': user.user_uid}
+        request.state.msg = msg
+        return msg

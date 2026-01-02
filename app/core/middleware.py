@@ -7,7 +7,8 @@ from jwt.exceptions import InvalidSignatureError
 from jose.exceptions import JWTError
 from datetime import datetime
 from starlette.middleware.base import BaseHTTPMiddleware
-from fastapi import Request, BackgroundTasks
+from fastapi import Request, BackgroundTasks, status
+from fastapi.responses import JSONResponse
 from typing import Any, Callable, Awaitable
 from starlette.responses import Response
 from app.services import create_audit_service
@@ -49,12 +50,11 @@ def actor_is_staff(actor, claims):
 def actor_id(actor, claims):
     try:
         if isinstance(actor, User):
-            return getattr(actor, 'id', -401)
+            return getattr(actor, 'user_uid', -401)
         if isinstance(claims, dict):
-            return claims.get('user_id', -1)
+            return claims.get('user_uid', -1)
         if isinstance(actor, dict):
-            print('wtf?')
-            return actor.get('user_id', -401)
+            return actor.get('user_uid', -401)
     except Exception as e:
         logger.error(f'Error getting actor is_staff: {e}')
     return -1
@@ -63,20 +63,18 @@ def get_actor_claims(token: str):
     try:
         payload = decode_token(token, False)
         email = payload.get('sub')
-        user_id = payload.get('user_id')
+        user_uid = payload.get('user_uid')
         is_staff = payload.get('is_staff')
         return {
             'email': email, 
-            'user_id': user_id,
+            'user_uid': user_uid,
             'is_staff': is_staff,
             }
     except (InvalidSignatureError, JWTError) as e:
         logger.error(f'Token decode error: {e}')
-        print('this i')
         return None
     except Exception as e:
         logger.error(f'Unexpected token error: {e}')
-        print('this 2')
         return None
     
 async def extract_form_data(request: Request) -> Dict[str, Any]:
@@ -150,6 +148,8 @@ def detect_event_from_request(request: Request) -> Event:
         return Event.CREATE_USER
     if path.startswith("/users/login") and method == "POST":
         return Event.LOGIN_USER
+    if path.startswith("/users/admin-login") and method == "POST":
+        return Event.LOGIN_ADMIN_USER
     if path == "/users" and method == "GET":
         return Event.FETCH_USER
 
@@ -164,6 +164,8 @@ class AuditMiddleware(BaseHTTPMiddleware):
         event_type = detect_event_from_request(request)
 
         form_data = await extract_form_data(request)
+        if 'password' in form_data.keys():
+            del form_data['password']
 
         auth_header = request.headers.get('Authorization')
         if auth_header and auth_header.startswith('Bearer '):

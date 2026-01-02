@@ -30,12 +30,12 @@ class BookCopyForm(BaseModel):
     quantity: PositiveInt
 
 class LoanForm(BaseModel):
-    user_id: int
-    isbn: int
+    user_uid: str
+    isbn: PositiveInt
     
 class LoanBase(BaseModel):
     loan_id: str
-    user_id: str
+    user_uid: str
     bk_copy_barcode: str
 
 class LoanCreate(LoanBase):
@@ -68,7 +68,7 @@ class BkCopyLoanResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class BkCopyScheduleInfo(BaseModel):
-    user_id: int
+    user_uid: str
     bk_copy_barcode: str
     schedule_id: str
     status: str

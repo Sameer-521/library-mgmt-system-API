@@ -1,6 +1,4 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
-from fastapi.exceptions import RequestValidationError
+from fastapi import FastAPI
 from app.core.config import Settings
 from contextlib import asynccontextmanager
 from functools import lru_cache
@@ -32,13 +30,13 @@ app.include_router(users.users_router)
 
 @app.get('/')
 async def root():
-    await get_settings()
-    return {'message': 'This is the root page'}
+    #await get_settings()
+    return {'message': 'This is the root page'} # protect endpoint!
 
 # TODO:
 
-# Implement soft delete functionality
+# Implement staff user creation
 # Implement book copy clearance: check book status and mark them accordingly e.g lost
 # Implement book clearance via external worker
 # Add maintenance utilities
-# seperate admin login from public user login endpoint
+# Implement soft delete functionality

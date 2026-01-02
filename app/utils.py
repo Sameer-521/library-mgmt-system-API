@@ -32,6 +32,18 @@ def generate_random_id():
     num_part = ''.join([secrets.choice(digits) for _ in range(8)])
     return f'{letter_part}-{num_part}'
 
+def generate_admin_id():
+    id = generate_random_id()
+    return f'ADMIN-{id}'
+
+def generate_user_id():
+    id = generate_random_id()
+    return f'USER-{id}'
+
+def generate_staff_id():
+    id = generate_random_id()
+    return f'STAFF-{id}'
+
 def generate_library_cardnumber():
     id = generate_random_id()
     return f'LB-{id}'
