@@ -70,7 +70,8 @@ def reraise_exceptions(request: Request):
     if hasattr(request.state, 'exceptions'):
         exc: list | None = getattr(request.state, 'exceptions')
         if exc:
-            raise exc[0]
+            for exception in exc:
+                raise exception
         
 def map_bk_copy_status(value: str):
     if value == 'available':

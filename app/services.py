@@ -1,3 +1,4 @@
+import logging
 from datetime import timedelta, datetime, timezone
 from fastapi import HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -8,12 +9,11 @@ from app.utils import (generate_book_copy_barcode, generate_staff_id,
 from app.models import (BkCopySchedule, Book, BookCopy,
                         User, BkCopyStatus, Loan, ScheduleStatus, 
                         Audit, Event, LoanStatus)
-from app.core.auth import authenticate_user, create_access_token, hash_password, authenticate_admin
+from app.core.auth import authenticate_user, create_access_token, hash_password
 from app.core.config import Settings
 from typing import Optional, List
-from logging import Logger
 
-logger = Logger(__name__)
+logger = logging.getLogger(__name__)
 
 settings=Settings()
 
@@ -67,7 +67,7 @@ async def create_new_book_service(
         reraise_exceptions(request)
         book = Book(**book_data)
         await crud.create_new_book(db, book)
-        logger.info(f'New book created: {book_data['title']}')
+        logger.info(f"New book created: {book_data['title']}")
     except IntegrityError as e:
         logger.warning(f'Integrity error creating book: {e}')
         raise book_integrity_exception
@@ -294,21 +294,18 @@ async def login_user_service(
     request: Request,
     db: AsyncSession,
     user_data: dict,
-    is_admin: Optional[bool] = False
     ):
     try:
         token = None
         ACCESS_TOKEN_EXPIRE_MINUTES = timedelta(minutes=settings.access_token_expire_minutes)
-        if is_admin:
-            user, exc = await authenticate_admin(user_data, db)
-        else:
-            user, exc = await authenticate_user(user_data, db)
+        user, exc = await authenticate_user(user_data, db)
         request.state.actor = user
         if exc:
-            raise exc[0]
+            for exception in exc:
+                raise exception
         if user:
             data = {'sub': user.email, 'user_uid': user.user_uid, 'is_staff': user.is_staff}
-            token = create_access_token(data, ACCESS_TOKEN_EXPIRE_MINUTES) 
+            token = create_access_token(data, user, ACCESS_TOKEN_EXPIRE_MINUTES)
     except HTTPException:
         await db.rollback()
         raise

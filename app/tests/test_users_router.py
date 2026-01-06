@@ -13,12 +13,12 @@ async def test_signup(client):
     response = await client.post(f'{client.base_url}/users/sign-up', data=form_data)
     assert response.status_code == 409
 
-# assumes user creation first
 @pytest.mark.anyio
-async def test_login(client):
+async def test_login(client, mock_user):
+
     form_data = {
-        'email': 'mock@gmail.com',
-        'password': '12345678'
+        'email': mock_user.email,
+        'password': 'mockuser123' # cant use password tied to db user, its hashed
     }
     response = await client.post(f'{client.base_url}/users/login', data=form_data)
     assert response.status_code == 200

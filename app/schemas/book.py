@@ -20,7 +20,7 @@ class BookUpdate(BaseModel):
 
 class BookResponse(BookBase):
     id: PositiveInt
-    isbn: PositiveInt
+    isbn: str
     library_barcode: str
     created_at: datetime
     updated_at: Optional[datetime] = None

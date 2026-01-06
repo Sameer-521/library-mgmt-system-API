@@ -5,7 +5,7 @@ from app.core.config import Settings
 from app.core.database import get_session, AsyncSession
 from typing import Annotated
 from app.schemas.token import TokenResponse, Token
-from app.schemas.user import UserCreate, UserLogin, UserListResponse, AdminLogin
+from app.schemas.user import UserCreate, UserLogin, UserListResponse
 from app.models import User
 
 
@@ -30,7 +30,7 @@ async def create_new_staff_user(
     admin_user_exc: tuple=Depends(get_current_admin_user),
     db: AsyncSession=Depends(get_session)
     ):
-    admin_user, exc = admin_user_exc
+    admin_user, role, exc = admin_user_exc
     request.state.exceptions = exc
 
     data = form_data.model_dump()
@@ -64,17 +64,17 @@ async def login_for_access_token(
     token = await services.login_user_service(request, db, form_data.model_dump()) 
     return token
 
-@users_router.post('/admin-login', response_model=TokenResponse)
+@users_router.post('/admin/login', response_model=TokenResponse)
 async def admin_login_for_access_token(
     request: Request,
-    form_data: Annotated[AdminLogin, Form()],
+    form_data: Annotated[UserLogin, Form()],
     db: AsyncSession=Depends(get_session)
     ):
 
     data = form_data.model_dump()
     request.state.actor = {'email': data['email']} #safety net
 
-    token = await services.login_user_service(request, db, form_data.model_dump(), is_admin=True) 
+    token = await services.login_user_service(request, db, form_data.model_dump()) 
     return token
 
 # Note: You can inject request object in dependency signature

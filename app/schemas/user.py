@@ -16,10 +16,6 @@ class UserCreate(UserBase):
 class UserLogin(UserBase):
     password: str #= Field(pattern=r'^[a-zA-Z0-9_@!]*$')
 
-class AdminLogin(UserBase):
-    password: str
-    admin_uid: str = Field(pattern=r'^ADMIN-[\w-]+')
-
 class UserResponse(UserBase):
     id: PositiveInt
     card_number: str

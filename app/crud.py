@@ -115,7 +115,7 @@ async def update_loan(
     return loan
 
 async def get_user_by_email(db: AsyncSession, _email: str):
-    stmt = select(User).where(User.email == _email, User.is_superuser == False)
+    stmt = select(User).where(User.email == _email)
     result = await db.execute(stmt)
     return result.scalar_one_or_none()
 

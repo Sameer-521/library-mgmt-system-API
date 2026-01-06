@@ -20,11 +20,11 @@ async def get_all_books(request: Request):
 async def get_book_by_ISBN(
     request: Request,
     isbn: Annotated[int, Query()],
-    current_user_exc: tuple=Depends(get_current_active_user),
+    user_role_exc: tuple=Depends(get_current_active_user),
     db: AsyncSession=Depends(get_session), 
     ):
 
-    current_user, exc = current_user_exc
+    current_user, role, exc = user_role_exc
     request.state.exceptions = exc
     book = await services.get_book_by_isbn_service(request, db, isbn)
     return book
@@ -38,7 +38,7 @@ async def create_book(
     db: AsyncSession=Depends(get_session),
     ):
 
-    staff_user, exc = staff_user_exc
+    staff_user, role, exc = staff_user_exc
     request.state.exceptions = exc
     book_data = book_create.model_dump()
     await services.create_new_book_service(request, db, book_data)
@@ -54,7 +54,7 @@ async def update_book(
     db: AsyncSession=Depends(get_session),
     ):
 
-    staff_user, exc = staff_user_exc
+    staff_user, role, exc = staff_user_exc
     request.state.exceptions = exc
     book_update_data = update_data.model_dump(exclude_unset=True)
     await services.update_book_service(request, db, book_update_data, isbn, staff_user)
@@ -68,7 +68,7 @@ async def add_book_copies(
     db: AsyncSession=Depends(get_session),
     ):
 
-    staff_user, exc = staff_user_exc
+    staff_user, role, exc = staff_user_exc
     request.state.exceptions = exc
     data = add_copies_form.model_dump()
     message = await services.add_book_copies_service(
@@ -87,7 +87,7 @@ async def return_book_loan(
     db: AsyncSession=Depends(get_session),
     ):
 
-    staff_user, exc = staff_user_exc
+    staff_user, role, exc = staff_user_exc
     request.state.exceptions = exc
     data = return_loan_form.model_dump()
     message = await services.return_book_loan_service(
@@ -103,7 +103,7 @@ async def loan_book(
     db: AsyncSession=Depends(get_session),
     ):
 
-    staff_user, exc = staff_user_exc
+    staff_user, role, exc = staff_user_exc
     request.state.exceptions = exc
     data = form_data.model_dump()
     loan_info = await services.loan_book_service(request, db, **data)
@@ -114,11 +114,11 @@ response_model=FullScheduleInfo, status_code=status.HTTP_201_CREATED)
 async def schedule_book(
     request: Request,
     isbn: int,
-    current_user_exc: tuple=Depends(get_current_active_user),
+    user_role_exc: tuple=Depends(get_current_active_user),
     db: AsyncSession=Depends(get_session),
     ):
 
-    current_user, exc = current_user_exc
+    current_user, role, exc = user_role_exc
     request.state.exceptions = exc
     schedule_info = await services.schedule_book_copy_service(
         request, db, isbn, current_user)
@@ -132,7 +132,7 @@ async def update_bk_copies(
     db: AsyncSession=Depends(get_session)
     ):
 
-    staff_user, exc = staff_user_exc
+    staff_user, role, exc = staff_user_exc
     request.state.exceptions = exc
 
     parsed = data.model_dump()
