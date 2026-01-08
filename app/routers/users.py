@@ -1,12 +1,10 @@
-from fastapi import APIRouter, status, Depends, Query, Form, BackgroundTasks, Request
+from fastapi import APIRouter, status, Depends, Form, Request
 from app import services
 from app.core.auth import get_current_staff_user, get_current_admin_user
-from app.core.config import Settings
 from app.core.database import get_session, AsyncSession
 from typing import Annotated
-from app.schemas.token import TokenResponse, Token
+from app.schemas.token import TokenResponse
 from app.schemas.user import UserCreate, UserLogin, UserListResponse
-from app.models import User
 
 
 users_router = APIRouter(prefix='/users')

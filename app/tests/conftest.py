@@ -1,19 +1,21 @@
+# ruff: noqa: E402
 import os
 
 import pytest
 from dotenv import load_dotenv
 from httpx import ASGITransport, AsyncClient
+from typing import List
 
 load_dotenv()
 
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine  # noqa: E402
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from app.core.auth import hash_password  # noqa: E402
-from app.core.config import Settings  # noqa: E402
-from app.core.database import Base, get_session  # noqa: E402
-from app.main import app  # noqa: E402
-from app.models import Book, User, BookCopy  # noqa: E402
-from app.utils import generate_book_copy_barcode  # noqa: E402
+from app.core.auth import hash_password
+from app.core.config import Settings
+from app.core.database import Base, get_session
+from app.main import app
+from app.models import Book, User, BookCopy
+from app.utils import generate_book_copy_barcode
 
 settings = Settings()
 
@@ -108,26 +110,48 @@ async def mock_book(test_session, book_creation_data):
     await test_session.refresh(book)
     return book
 
-@pytest.fixture(scope='function')
-async def mock_book_copies(test_session, mock_book) -> int:
-    '''
-    Adds `number_of_bk_copies`of mock book_copies and returns the original isbn used
-    '''
+
+# @pytest.fixture(scope="function")
+# async def mock_schedule(
+#     test_session, mock_user, mock_book_copies
+# ) -> (BkCopySchedule, str):
+#     isbn, bk_copies = mock_book_copies
+#     schedule_data = {
+#         "user_uid": mock_user.user_uid,
+#         "bk_copy_barcode": bk_copy.copy_barcode,
+#     }
+#     schedule = BkCopySchedule(**schedule_data)
+#     test_session.add(schedule)
+#     await test_session.flush()
+#     await test_session.refresh(schedule)
+#     return schedule, isbn
+
+
+@pytest.fixture(scope="function")
+async def mock_book_copies(test_session, mock_book) -> (str, List[BookCopy]):
+    """
+    Adds `number_of_bk_copies`of mock book_copies and returns the original isbn used and a list of book copy instances
+    """
     number_of_bk_copies = 5
     isbn = mock_book.isbn
     org_book_barcode = mock_book.library_barcode
     bk_copies = []
+    refreshed_bk_copies = []
     last_serial = 0
     for i in range(number_of_bk_copies):
         bk_copy_serial = last_serial + 1
         cp_barcode = generate_book_copy_barcode(org_book_barcode, bk_copy_serial)
         book_copy = BookCopy(
-                book_isbn=isbn, serial=bk_copy_serial, copy_barcode=cp_barcode
-            )
+            book_isbn=isbn, serial=bk_copy_serial, copy_barcode=cp_barcode
+        )
         bk_copies.append(book_copy)
     test_session.add_all(bk_copies)
     await test_session.flush()
-    return isbn
+    for bk in bk_copies:
+        await test_session.refresh(bk)
+        refreshed_bk_copies.append(bk)
+    return isbn, refreshed_bk_copies
+
 
 @pytest.fixture(scope="function")
 def book_creation_data():

@@ -54,7 +54,7 @@ async def test_add_book_copies(admin_auth_client, mock_book):
 
 @pytest.mark.anyio
 async def test_loan_book_no_schedule(admin_auth_client, mock_book_copies, mock_user):
-    isbn = mock_book_copies
+    isbn, _ = mock_book_copies
     form_data = {"user_uid": mock_user.user_uid, "isbn": isbn}
     response = await admin_auth_client.post(
         f"{admin_auth_client.base_url}/books/loan-book", data=form_data
@@ -67,3 +67,33 @@ async def test_loan_book_no_schedule(admin_auth_client, mock_book_copies, mock_u
         f"{admin_auth_client.base_url}/books/loan-book", data=form_data
     )
     assert response_2.status_code == 404
+
+
+@pytest.mark.anyio
+async def test_schedule_bk_copy(auth_client, mock_book_copies):
+    isbn, _ = mock_book_copies
+    response = await auth_client.post(
+        f"{auth_client.base_url}/books/book-schedule/{isbn}"
+    )
+    assert response.status_code == 201
+    assert response.json()["message"] == "Schedule has been successfuly created"
+
+
+@pytest.mark.anyio
+async def test_update_bk_copies(admin_auth_client, mock_book_copies):
+    _, bk_copies = mock_book_copies
+
+    barcodes = [bk.copy_barcode for bk in bk_copies]
+
+    payload = {
+        "book_copies": [{"copy_barcode": bc, "status": "AVAILABLE"} for bc in barcodes]
+    }
+
+    response = await admin_auth_client.patch(
+        f"{admin_auth_client.base_url}/books/update-bk-copies-status", json=payload
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert "message" in data
+    assert data["num_not_found"] == 0
