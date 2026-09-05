@@ -1,0 +1,36 @@
+type: http_request
+model: http_request
+id: rq_nXqpoWxi5P
+createdAt: 2026-09-05T01:08:59.429331228
+updatedAt: 2026-09-05T01:09:52.854847316
+workspaceId: wk_J9eGDytoNN
+folderId: null
+authentication: {}
+authenticationType: null
+body: {}
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: root page
+sortPriority: -1788570539427.0
+url: http://127.0.0.1:8000/
+urlParameters: []
+settingSendCookies:
+  enabled: false
+  value: true
+settingStoreCookies:
+  enabled: false
+  value: true
+settingValidateCertificates:
+  enabled: false
+  value: true
+settingFollowRedirects:
+  enabled: false
+  value: true
+settingRequestTimeout:
+  enabled: false
+  value: 0
+settingHttpVersion:
+  enabled: false
+  value: auto

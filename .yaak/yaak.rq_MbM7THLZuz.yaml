@@ -1,0 +1,53 @@
+type: http_request
+model: http_request
+id: rq_MbM7THLZuz
+createdAt: 2026-09-05T01:10:01.968150301
+updatedAt: 2026-09-05T01:11:31.742476994
+workspaceId: wk_J9eGDytoNN
+folderId: null
+authentication: {}
+authenticationType: null
+body:
+  form:
+  - enabled: true
+    name: email
+    value: test@gmail.com
+  - enabled: true
+    name: full_name
+    value: Makima Simp
+  - enabled: true
+    name: password
+    value: IDontGiveAfUck344
+  - enabled: true
+    name: ''
+    value: ''
+bodyType: application/x-www-form-urlencoded
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/x-www-form-urlencoded
+  id: 0KRu8Rar0a
+method: POST
+name: ''
+sortPriority: -1788570539427.0
+url: http://127.0.0.1:8000/users/sign-up
+urlParameters: []
+settingSendCookies:
+  enabled: false
+  value: true
+settingStoreCookies:
+  enabled: false
+  value: true
+settingValidateCertificates:
+  enabled: false
+  value: true
+settingFollowRedirects:
+  enabled: false
+  value: true
+settingRequestTimeout:
+  enabled: false
+  value: 0
+settingHttpVersion:
+  enabled: false
+  value: auto
