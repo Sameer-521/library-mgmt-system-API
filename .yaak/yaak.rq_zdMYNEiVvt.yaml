@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_zdMYNEiVvt
 createdAt: 2026-09-15T20:41:01.385249592
-updatedAt: 2026-09-15T21:03:22.839070450
+updatedAt: 2026-09-15T23:55:23.837719064
 workspaceId: wk_J9eGDytoNN
 folderId: null
 authentication: {}
@@ -13,12 +13,12 @@ description: ''
 headers:
 - enabled: true
   name: Authorization
-  value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QGdtYWlsLmNvbSIsImV4cCI6MTc4OTUwNjcwOSwicm9sZSI6InVzZXIiLCJ1c2VyX3VpZCI6IlVTRVItWFYtMTE5NjQ4NTUiLCJpc19zdGFmZiI6ZmFsc2V9.RuXVZfwUBGMwHl-cvsou4mzqiBrG9H62rf16ecWX-N4
+  value: ${[ B ]} ${[ USER_TOKEN ]}
   id: PtrhV5hVxh
 - enabled: true
   name: ''
   value: ''
-  id: jmrhrsR8h6
+  id: cFw68iEZkN
 method: GET
 name: Get Book by ISBN
 sortPriority: 5000.0

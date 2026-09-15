@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_woLiagkaRE
 createdAt: 2026-09-15T21:05:20.146166472
-updatedAt: 2026-09-15T21:08:16.962487947
+updatedAt: 2026-09-15T23:55:00.132250631
 workspaceId: wk_J9eGDytoNN
 folderId: null
 authentication: {}
@@ -27,12 +27,12 @@ headers:
   id: iasDiWWKu2
 - enabled: true
   name: Authorization
-  value: Bearer ${[ TOKEN ]}
+  value: ${[ B ]} ${[ ADMIN_TOKEN ]}
   id: GbI5jPxQR9
 - enabled: true
   name: ''
   value: ''
-  id: jSdqnWBh8a
+  id: mQ0uRadhBc
 method: POST
 name: Loan Return
 sortPriority: 7000.0

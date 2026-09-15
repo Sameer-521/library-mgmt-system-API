@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_VmJ5PSDp6j
 createdAt: 2026-09-15T12:29:34.712319951
-updatedAt: 2026-09-15T21:03:22.832411506
+updatedAt: 2026-09-15T23:53:43.871183764
 workspaceId: wk_J9eGDytoNN
 folderId: null
 authentication: {}
@@ -24,12 +24,12 @@ headers:
   id: t2gfB0yIkM
 - enabled: true
   name: Authorization
-  value: Bearer ${[ TOKEN ]}
+  value: ${[ B ]} ${[ ADMIN_TOKEN ]}
   id: 7Ir2hUhNj4
 - enabled: true
   name: ''
   value: ''
-  id: PfJajV0mqf
+  id: vyikIgtsqx
 method: GET
 name: Get All Users(non-staff)
 sortPriority: 0.0

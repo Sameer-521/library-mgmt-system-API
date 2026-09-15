@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_MbM7THLZuz
 createdAt: 2026-09-05T01:10:01.968150301
-updatedAt: 2026-09-15T21:03:22.834083806
+updatedAt: 2026-09-15T23:52:39.192087401
 workspaceId: wk_J9eGDytoNN
 folderId: null
 authentication: {}
@@ -11,13 +11,13 @@ body:
   form:
   - enabled: true
     name: email
-    value: test@gmail.com
+    value: ${[ USER_EMAIL ]}
   - enabled: true
     name: full_name
     value: Makima Simp
   - enabled: true
     name: password
-    value: IDontGiveAfUck344
+    value: ${[ USER_PASS ]}
   - enabled: true
     name: ''
     value: ''

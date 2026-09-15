@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_5Pw5zpFtPG
 createdAt: 2026-09-15T21:00:06.456962367
-updatedAt: 2026-09-15T21:04:14.805744336
+updatedAt: 2026-09-15T23:54:06.595526288
 workspaceId: wk_J9eGDytoNN
 folderId: null
 authentication: {}
@@ -27,12 +27,12 @@ headers:
   id: vDr40w4Scj
 - enabled: true
   name: Authorization
-  value: Bearer ${[ TOKEN ]}
+  value: ${[ B ]} ${[ ADMIN_TOKEN ]}
   id: NvIzf7tshs
 - enabled: true
   name: ''
   value: ''
-  id: agVwInaSi2
+  id: 50BV4fzxRR
 method: POST
 name: Generate Copies
 sortPriority: 6000.0

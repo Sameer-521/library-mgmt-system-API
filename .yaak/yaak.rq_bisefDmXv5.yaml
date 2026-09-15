@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_bisefDmXv5
 createdAt: 2026-09-15T20:26:00.569529422
-updatedAt: 2026-09-15T21:03:22.836692932
+updatedAt: 2026-09-15T23:52:52.141871832
 workspaceId: wk_J9eGDytoNN
 folderId: null
 authentication: {}
@@ -11,10 +11,10 @@ body:
   form:
   - enabled: true
     name: email
-    value: test@gmail.com
+    value: ${[ USER_EMAIL ]}
   - enabled: true
     name: password
-    value: IDontGiveAfUck344
+    value: ${[ USER_PASS ]}
   - enabled: true
     name: ''
     value: ''
