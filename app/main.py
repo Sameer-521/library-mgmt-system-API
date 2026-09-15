@@ -1,12 +1,15 @@
-from fastapi import FastAPI
-from app.core.config import Settings
 from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+
+from app.core.auth import create_superuser
+from app.core.config import Settings
+from app.core.database import AsyncSessionLocal, Base, engine
 from app.core.middleware import AuditMiddleware
 from app.routers import books, users
-from app.core.database import engine, Base, AsyncSessionLocal
-from app.core.auth import create_superuser
 
 settings = Settings()
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -14,10 +17,11 @@ async def lifespan(app: FastAPI):
         await conn.run_sync(Base.metadata.create_all)
     async with AsyncSessionLocal() as session:
         if not settings.test_mode:
-            await create_superuser(session)         
+            await create_superuser(session)
     yield
     await engine.dispose()
-    
+
+
 app = FastAPI(lifespan=lifespan)
 
 if not settings.test_mode:
@@ -26,9 +30,11 @@ if not settings.test_mode:
 app.include_router(books.books_router)
 app.include_router(users.users_router)
 
-@app.get('/')
+
+@app.get("/")
 async def root():
-    return {'message': 'This is the root page'}
+    return {"message": "This is the root page"}
+
 
 # TODO:
 

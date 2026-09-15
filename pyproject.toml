@@ -21,3 +21,22 @@ dependencies = [
     "ruff>=0.14.10",
     "sqlalchemy>=2.0.44",
 ]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+indent-width = 4
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+skip-magic-trailing-comma = false
+docstring-code-format = false
+
+[tool.ruff.lint]
+extend-select = ["I"]
+
+[tool.ruff.lint.per-file-ignores]
+# conftest calls load_dotenv() before app/module imports; import sorting must not reorder it
+"app/tests/conftest.py" = ["I001"]

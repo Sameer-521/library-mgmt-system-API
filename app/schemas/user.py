@@ -1,20 +1,21 @@
-from pydantic import BaseModel, PositiveInt, ConfigDict, EmailStr, Field
 from datetime import datetime
-from typing import Optional, List
+from typing import List, Optional
+
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, PositiveInt
+
 
 class UserBase(BaseModel):
     email: EmailStr
-    
+
+
 class UserCreate(UserBase):
     full_name: str = Field(min_length=3, max_length=30)
-    password: str = Field(
-        min_length=8, 
-        max_length=30, 
-        pattern=r'^[a-zA-Z0-9_@!]+$'
-        )
-    
+    password: str = Field(min_length=8, max_length=30, pattern=r"^[a-zA-Z0-9_@!]+$")
+
+
 class UserLogin(UserBase):
-    password: str #= Field(pattern=r'^[a-zA-Z0-9_@!]*$')
+    password: str  # = Field(pattern=r'^[a-zA-Z0-9_@!]*$')
+
 
 class UserResponse(UserBase):
     id: PositiveInt
@@ -26,6 +27,7 @@ class UserResponse(UserBase):
     updated_at: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True)
+
 
 class UserListResponse(UserBase):
     users: List[UserResponse]
