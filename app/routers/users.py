@@ -17,7 +17,7 @@ async def get_all_non_staff_users(
     staff_user_exc: tuple = Depends(get_current_staff_user),
     db: AsyncSession = Depends(get_session),
 ):
-    staff_user, exc = staff_user_exc
+    staff_user, role, exc = staff_user_exc
     request.state.exceptions = exc
     users = await services.get_all_non_staff_users_service(request, db)
     return users

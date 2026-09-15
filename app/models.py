@@ -26,7 +26,7 @@ class Event(enum.Enum):
     CREATE_BOOK = "create_book"
     CREATE_BK_COPIES = "create_bk_copies"
     CREATE_USER = "create_user"
-    FETCH_BOOK = "fecth_book"
+    FETCH_BOOK = "fetch_book"
     FETCH_USER = "fetch_user"
     LOGIN_ADMIN_USER = "login_admin_user"
     LOGIN_USER = "login_user"

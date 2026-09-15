@@ -1,14 +1,19 @@
 # ruff: noqa: E402
 
+import os
+
 import pytest
 from dotenv import load_dotenv
 from httpx import ASGITransport, AsyncClient
 from typing import List
 
+os.environ.setdefault("AUDIT_ENABLED", "true")
+
 load_dotenv()
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+from app.core import middleware
 from app.core.auth import hash_password
 from app.core.config import Settings
 from app.core.database import Base, get_session
@@ -33,6 +38,8 @@ TestAsyncSessionLocal = async_sessionmaker(
     autoflush=False,
     expire_on_commit=False,
 )
+
+middleware.audit_session_factory = TestAsyncSessionLocal
 
 user_data = {
     "full_name": "Mock User2",

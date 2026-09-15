@@ -59,7 +59,14 @@ def create_access_token(
         role = "staff"
     else:
         role = "user"
-    to_encode.update({"exp": expire, "role": role})
+    to_encode.update(
+        {
+            "exp": expire,
+            "role": role,
+            "user_uid": user.user_uid,
+            "is_staff": user.is_staff,
+        }
+    )
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, JWT_ALGORITHM)
     return encoded_jwt
 
@@ -87,8 +94,8 @@ async def authenticate_user(credentials: dict, db: AsyncSession = Depends(get_se
             exceptions.append(credentials_exception)
     except Exception as e:
         print(f"Error: {e}")
-    finally:
-        return user, exceptions
+
+    return user, exceptions
 
 
 async def get_current_user(
@@ -113,8 +120,8 @@ async def get_current_user(
     except JWTError as e:
         print(f"JWTError: {e}")
         exceptions.append(credentials_exception)
-    finally:
-        return user, role, exceptions
+
+    return user, role, exceptions
 
 
 async def get_current_active_user(user_role_exc: tuple = Depends(get_current_user)):

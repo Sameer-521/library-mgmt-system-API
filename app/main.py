@@ -24,7 +24,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-if not settings.test_mode:
+audit_enabled = settings.audit_enabled
+if audit_enabled is None:
+    audit_enabled = not settings.test_mode
+if audit_enabled:
     app.add_middleware(AuditMiddleware)
 
 app.include_router(books.books_router)

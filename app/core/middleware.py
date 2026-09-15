@@ -1,4 +1,3 @@
-import json
 import time
 from datetime import datetime
 from logging import getLogger
@@ -6,8 +5,7 @@ from typing import Any, Awaitable, Callable, Dict
 from urllib.parse import parse_qs
 
 from fastapi import BackgroundTasks, Request
-from jose.exceptions import JWTError
-from jwt.exceptions import InvalidSignatureError
+from jose.exceptions import ExpiredSignatureError, JWTError
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request as StarletteRequest
 from starlette.responses import Response
@@ -20,8 +18,11 @@ from app.services import create_audit_service
 logger = getLogger(__name__)
 
 
+audit_session_factory = AsyncSessionLocal
+
+
 async def _bg_audit(entry: dict):
-    async with AsyncSessionLocal() as session:
+    async with audit_session_factory() as session:
         await create_audit_service(session, entry)
 
 
@@ -54,14 +55,14 @@ def actor_is_staff(actor, claims):
 def actor_id(actor, claims):
     try:
         if isinstance(actor, User):
-            return getattr(actor, "user_uid", -401)
-        if isinstance(claims, dict):
-            return claims.get("user_uid", -1)
-        if isinstance(actor, dict):
-            return actor.get("user_uid", -401)
+            return str(getattr(actor, "user_uid", "unknown"))
+        if isinstance(claims, dict) and claims.get("user_uid"):
+            return str(claims["user_uid"])
+        if isinstance(actor, dict) and actor.get("user_uid"):
+            return str(actor["user_uid"])
     except Exception as e:
-        logger.error(f"Error getting actor is_staff: {e}")
-    return -1
+        logger.error(f"Error getting actor id: {e}")
+    return "unauthenticated"
 
 
 def get_actor_claims(token: str):
@@ -75,7 +76,7 @@ def get_actor_claims(token: str):
             "user_uid": user_uid,
             "is_staff": is_staff,
         }
-    except (InvalidSignatureError, JWTError) as e:
+    except (ExpiredSignatureError, JWTError) as e:
         logger.error(f"Token decode error: {e}")
         return None
     except Exception as e:
@@ -166,13 +167,45 @@ def detect_event_from_request(request: Request) -> Event:
     return Event.UNIDENTIFIED_EVENT
 
 
+def _build_audit_entry(
+    request: Request,
+    start_time: float,
+    status_code: int,
+    form_data: Dict[str, Any],
+    event_type: Event,
+    actor: Any,
+    claims: Any,
+) -> dict:
+    extra_details = {
+        "timestamp": datetime.now().isoformat(),
+        "request_url": f"{request.url}",
+        "actor_email": actor_email(actor, claims),
+        "is_staff": actor_is_staff(actor, claims),
+        "latency": f"{round((time.time() - start_time) * 1000, 2)} ms",
+        "status_code": status_code,
+    }
+
+    if hasattr(request.state, "msg"):
+        msg: dict = getattr(request.state, "msg", {})
+        extra_details.update({"msg": msg.get("message", None)})
+
+    if form_data:
+        extra_details.update({"form": form_data})
+
+    return {
+        "actor_id": actor_id(actor, claims),
+        "success": status_code < 400,
+        "event": event_type,
+        "details": extra_details,
+    }
+
+
 class AuditMiddleware(BaseHTTPMiddleware):
     async def dispatch(
         self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
     ) -> Response:
         start_time = time.time()
         token = None
-        actor = None
         claims = None
         event_type = detect_event_from_request(request)
 
@@ -187,47 +220,35 @@ class AuditMiddleware(BaseHTTPMiddleware):
         if token:
             claims = get_actor_claims(token)
 
-        response = await call_next(request)
-
-        if hasattr(request.state, "actor"):
+        try:
+            response = await call_next(request)
+        except Exception:
             actor = getattr(request.state, "actor", None)
-
-        response.background = BackgroundTasks()
+            audit_entry = _build_audit_entry(
+                request, start_time, 500, form_data, event_type, actor, claims
+            )
+            await _bg_audit(audit_entry)
+            raise
 
         if event_type == Event.UNIDENTIFIED_EVENT:
             logger.warning("Unidentified event detected")
 
-        success = response.status_code < 400
+        actor = getattr(request.state, "actor", None)
+        audit_entry = _build_audit_entry(
+            request,
+            start_time,
+            response.status_code,
+            form_data,
+            event_type,
+            actor,
+            claims,
+        )
 
-        extra_details = {
-            "timestamp": datetime.now().isoformat(),
-            "request_url": f"{request.url}",
-            "actor_email": actor_email(actor, claims),
-            "is_staff": actor_is_staff(actor, claims),
-            "latency": f"{round((time.time() - start_time) * 1000, 2)} ms",
-            "status_code": response.status_code,
-        }
-
-        if hasattr(request.state, "msg"):
-            msg: dict = getattr(request.state, "msg", {})
-            extra_details.update({"msg": msg.get("message", None)})
-
-        if form_data:
-            extra_details.update({"form": form_data})
-
-        audit_entry = {
-            "actor_id": actor_id(actor, claims),
-            "success": success,
-            "event": event_type,
-            "details": json.dumps(extra_details),
-        }
-
-        if response.background is None:
+        tasks = response.background
+        if not isinstance(tasks, BackgroundTasks):
             tasks = BackgroundTasks()
-            tasks.add_task(_bg_audit, audit_entry)
             response.background = tasks
-        else:
-            response.background.add_task(_bg_audit, audit_entry)
+        tasks.add_task(_bg_audit, audit_entry)
         return response
 
     # avoid calling get_session() in middleware
