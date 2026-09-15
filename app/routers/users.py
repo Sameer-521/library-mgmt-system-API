@@ -7,11 +7,13 @@ from app.core.auth import get_current_admin_user, get_current_staff_user
 from app.core.database import AsyncSession, get_session
 from app.models import User
 from app.schemas.token import TokenResponse
-from app.schemas.user import UserCreate, UserListResponse, UserLogin
+from app.schemas.user import UserCreate, UserListResponse, UserLogin, UserResponse
 
 users_router = APIRouter(prefix="/users")
 
 
+#
+# decide to keep it or not later
 @users_router.get("", response_model=UserListResponse)
 async def get_all_non_staff_users(
     request: Request,
@@ -19,7 +21,7 @@ async def get_all_non_staff_users(
     db: AsyncSession = Depends(get_session),
 ):
     users = await services.get_all_non_staff_users_service(request, db)
-    return users
+    return UserListResponse(users=[UserResponse.model_validate(u) for u in users])
 
 
 @users_router.post("/create-staff-user")

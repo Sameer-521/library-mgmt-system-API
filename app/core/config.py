@@ -28,5 +28,7 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
+    seed_books: bool = False
+
 
 settings = Settings()

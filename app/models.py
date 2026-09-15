@@ -148,8 +148,8 @@ class BkCopySchedule(Base):
     __tablename__ = "bk_copy_schedules"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_uid: Mapped[int] = mapped_column(
-        Integer, ForeignKey("users.user_uid"), nullable=False
+    user_uid: Mapped[str] = mapped_column(
+        String(50), ForeignKey("users.user_uid"), nullable=False
     )
     bk_copy_barcode: Mapped[str] = mapped_column(
         String(50), ForeignKey("book_copies.copy_barcode"), nullable=False

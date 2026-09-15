@@ -1,6 +1,7 @@
 # ruff: noqa: E402
 
 import os
+from datetime import datetime, timedelta, timezone
 
 import pytest
 from dotenv import load_dotenv
@@ -114,7 +115,7 @@ async def mock_book(test_session, book_creation_data):
 
 
 @pytest.fixture(scope="function")
-async def mock_book_copies(test_session, mock_book) -> (str, List[BookCopy]):
+async def mock_book_copies(test_session, mock_book) -> tuple[str, List[BookCopy]]:
     """
     Adds `number_of_bk_copies`of mock book_copies and returns the original isbn used and a list of book copy instances
     """
@@ -141,7 +142,7 @@ async def mock_book_copies(test_session, mock_book) -> (str, List[BookCopy]):
 
 
 @pytest.fixture(scope="function")
-async def mock_loan(test_session, mock_user, mock_book_copies) -> (str, str):
+async def mock_loan(test_session, mock_user, mock_book_copies) -> tuple[str, str]:
     isbn, mock_bks = mock_book_copies
     first_bk: BookCopy = mock_bks[0]
     update_bk_data = {"status": BkCopyStatus.BORROWED}
@@ -156,6 +157,26 @@ async def mock_loan(test_session, mock_user, mock_book_copies) -> (str, str):
         "bk_copy_barcode": first_bk.copy_barcode,
     }
     loan = Loan(**loan_data)
+    test_session.add(loan)
+    await test_session.flush()
+    await test_session.refresh(loan)
+    return loan.loan_id, loan.bk_copy_barcode
+
+
+@pytest.fixture(scope="function")
+async def overdue_loan(test_session, mock_user, mock_book_copies) -> tuple[str, str]:
+    _, mock_bks = mock_book_copies
+    first_bk: BookCopy = mock_bks[0]
+    first_bk.status = BkCopyStatus.BORROWED
+
+    await test_session.flush()
+    await test_session.refresh(first_bk)
+
+    loan = Loan(
+        user_uid=mock_user.user_uid,
+        bk_copy_barcode=first_bk.copy_barcode,
+        due_at=datetime.now(timezone.utc) - timedelta(days=3),
+    )
     test_session.add(loan)
     await test_session.flush()
     await test_session.refresh(loan)

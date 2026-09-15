@@ -17,7 +17,7 @@ async def get_book_by_barcode(db: AsyncSession, barcode: str):
     return result.scalar_one_or_none()
 
 
-async def get_book_by_isbn(db: AsyncSession, bk_isbn: int):
+async def get_book_by_isbn(db: AsyncSession, bk_isbn: str):
     stmt = select(Book).where(Book.isbn == bk_isbn)
     result = await db.execute(stmt)
     return result.scalar_one_or_none()

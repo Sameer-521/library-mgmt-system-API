@@ -21,15 +21,15 @@ class UserResponse(UserBase):
     id: PositiveInt
     card_number: str
     is_active: bool
-    is_staff: bool
-    is_superuser: bool
+    # is_staff: bool
+    # is_superuser: bool
     created_at: datetime
     updated_at: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True)
 
 
-class UserListResponse(UserBase):
+class UserListResponse(BaseModel):
     users: List[UserResponse]
 
     model_config = ConfigDict(from_attributes=True)

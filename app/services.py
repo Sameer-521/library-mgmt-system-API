@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timedelta, timezone
-from typing import List
+from typing import List, Sequence
 
 from fastapi import HTTPException, Request, status
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -85,7 +85,7 @@ async def create_new_book_service(
 
 
 # tested
-async def get_book_by_isbn_service(request: Request, db: AsyncSession, isbn: int):
+async def get_book_by_isbn_service(request: Request, db: AsyncSession, isbn: str):
     try:
         book = await crud.get_book_by_isbn(db, isbn)
         if not book:
@@ -104,7 +104,7 @@ async def get_book_by_isbn_service(request: Request, db: AsyncSession, isbn: int
 
 # tested
 async def update_book_service(
-    request: Request, db: AsyncSession, update_data: dict, isbn: int, current_user: User
+    request: Request, db: AsyncSession, update_data: dict, isbn: str, current_user: User
 ):
     try:
         book = await crud.get_book_by_isbn(db, isbn)
@@ -135,7 +135,7 @@ async def add_book_copies_service(
     request: Request,
     db: AsyncSession,
     quantity: int,
-    isbn: int,
+    isbn: str,
 ):
     try:
         book_copies = []
@@ -323,7 +323,7 @@ async def login_user_service(
 async def get_all_non_staff_users_service(
     request: Request,
     db: AsyncSession,
-):
+) -> Sequence[User]:
     try:
         users = await crud.get_all_non_staff_users(db)
         return users
@@ -367,9 +367,7 @@ async def return_book_loan_service(
             )
         await crud.update_bk_copy(db, book_returned, {"status": BkCopyStatus.IN_CHECK})
 
-        returned_at = datetime.now(timezone.utc).replace(
-            minute=0, second=0, microsecond=0
-        )  # + timedelta(days=14)
+        returned_at = datetime.now(timezone.utc)
         loan_status = LoanStatus.RETURNED
         if safe_datetime_compare(returned_at, loan.due_at):  # overdue
             loan_status = LoanStatus.RETURNED_LATE
@@ -377,7 +375,7 @@ async def return_book_loan_service(
             fine = 100 * days_deltas
             fine_fee = fine
             fined = True
-            user = await crud.get_user_by_id(db, loan.user_id)
+            user = await crud.get_user_by_uid(db, loan.user_uid)
             if not user:
                 raise user_not_found_exception
             updated_fine = fine + user.fine_balance

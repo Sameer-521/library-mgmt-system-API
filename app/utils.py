@@ -77,9 +77,7 @@ def generate_schedule_id():
 
 
 def default_loan_due_date():
-    return datetime.now(timezone.utc).replace(
-        minute=0, second=0, microsecond=0
-    ) + timedelta(days=7)
+    return datetime.now(timezone.utc) + timedelta(days=7)
 
 
 def map_bk_copy_status(value: str):

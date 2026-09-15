@@ -31,7 +31,7 @@ async def get_all_books(request: Request):
 @books_router.get("/fetch", response_model=BookResponse)
 async def get_book_by_ISBN(
     request: Request,
-    isbn: Annotated[int, Query()],
+    isbn: Annotated[str, Query()],
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_session),
 ):
@@ -56,7 +56,7 @@ async def create_book(
 @books_router.put("/{isbn}", status_code=status.HTTP_204_NO_CONTENT)
 async def update_book(
     request: Request,
-    isbn: int,
+    isbn: str,
     update_data: Annotated[BookUpdate, Form()],
     staff_user: User = Depends(get_current_staff_user),
     db: AsyncSession = Depends(get_session),

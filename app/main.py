@@ -7,6 +7,7 @@ from app.core.config import settings
 from app.core.database import AsyncSessionLocal, Base, engine
 from app.core.middleware import AuditMiddleware
 from app.routers import books, users
+from app.seed import seed_books
 
 
 @asynccontextmanager
@@ -16,6 +17,8 @@ async def lifespan(app: FastAPI):
     async with AsyncSessionLocal() as session:
         if not settings.test_mode:
             await create_superuser(session)
+        if settings.seed_books:
+            await seed_books(session)
     yield
     await engine.dispose()
 

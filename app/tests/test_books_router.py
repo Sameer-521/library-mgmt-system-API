@@ -114,3 +114,16 @@ async def test_return_book(admin_auth_client, mock_loan):
         f"{admin_auth_client.base_url}/books/loan-return", data=form_data
     )
     assert response.status_code == 409
+
+
+@pytest.mark.anyio
+async def test_return_overdue_book(admin_auth_client, overdue_loan):
+    loan_id, barcode = overdue_loan
+    form_data = {"bk_copy_barcode": barcode, "loan_id": loan_id}
+    response = await admin_auth_client.post(
+        f"{admin_auth_client.base_url}/books/loan-return", data=form_data
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["message"] == "User loan cleared, you have also been fined for delay"
+    assert data["fine"] == "300"
