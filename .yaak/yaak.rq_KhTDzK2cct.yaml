@@ -1,8 +1,8 @@
 type: http_request
 model: http_request
-id: rq_MbM7THLZuz
-createdAt: 2026-09-05T01:10:01.968150301
-updatedAt: 2026-09-15T21:03:22.834083806
+id: rq_KhTDzK2cct
+createdAt: 2026-09-15T20:44:39.919909469
+updatedAt: 2026-09-15T21:03:22.841660675
 workspaceId: wk_J9eGDytoNN
 folderId: null
 authentication: {}
@@ -10,14 +10,11 @@ authenticationType: null
 body:
   form:
   - enabled: true
-    name: email
-    value: test@gmail.com
+    name: user_uid
+    value: USER-XV-11964855
   - enabled: true
-    name: full_name
-    value: Makima Simp
-  - enabled: true
-    name: password
-    value: IDontGiveAfUck344
+    name: isbn
+    value: '9780135957059'
   - enabled: true
     name: ''
     value: ''
@@ -25,13 +22,25 @@ bodyType: application/x-www-form-urlencoded
 description: ''
 headers:
 - enabled: true
+  name: Authorization
+  value: Bearer ${[ TOKEN ]}
+  id: 7YHUNvIZu2
+- enabled: true
+  name: user_uid
+  value: USER-XV-11964855
+  id: rISKMvHDfq
+- enabled: true
+  name: ''
+  value: ''
+  id: YEmYnZUxFV
+- enabled: true
   name: Content-Type
   value: application/x-www-form-urlencoded
-  id: 0KRu8Rar0a
+  id: uqXmvYBUez
 method: POST
-name: Sign-up
-sortPriority: 2000.0
-url: ${[ BASE_URL ]}/users/sign-up
+name: Loan Book
+sortPriority: 7000.0
+url: ${[ BASE_URL ]}/books/loan-book
 urlParameters: []
 settingSendCookies:
   enabled: false

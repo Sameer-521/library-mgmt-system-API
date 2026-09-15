@@ -1,8 +1,8 @@
 type: http_request
 model: http_request
-id: rq_MbM7THLZuz
-createdAt: 2026-09-05T01:10:01.968150301
-updatedAt: 2026-09-15T21:03:22.834083806
+id: rq_woLiagkaRE
+createdAt: 2026-09-15T21:05:20.146166472
+updatedAt: 2026-09-15T21:08:16.962487947
 workspaceId: wk_J9eGDytoNN
 folderId: null
 authentication: {}
@@ -10,14 +10,11 @@ authenticationType: null
 body:
   form:
   - enabled: true
-    name: email
-    value: test@gmail.com
+    name: bk_copy_barcode
+    value: COPY-BK-1528407-002
   - enabled: true
-    name: full_name
-    value: Makima Simp
-  - enabled: true
-    name: password
-    value: IDontGiveAfUck344
+    name: loan_id
+    value: LN-QS-49524188
   - enabled: true
     name: ''
     value: ''
@@ -27,11 +24,19 @@ headers:
 - enabled: true
   name: Content-Type
   value: application/x-www-form-urlencoded
-  id: 0KRu8Rar0a
+  id: iasDiWWKu2
+- enabled: true
+  name: Authorization
+  value: Bearer ${[ TOKEN ]}
+  id: GbI5jPxQR9
+- enabled: true
+  name: ''
+  value: ''
+  id: jSdqnWBh8a
 method: POST
-name: Sign-up
-sortPriority: 2000.0
-url: ${[ BASE_URL ]}/users/sign-up
+name: Loan Return
+sortPriority: 7000.0
+url: ${[ BASE_URL ]}/books/loan-return
 urlParameters: []
 settingSendCookies:
   enabled: false

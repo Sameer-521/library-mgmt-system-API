@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_nXqpoWxi5P
 createdAt: 2026-09-05T01:08:59.429331228
-updatedAt: 2026-09-05T01:09:52.854847316
+updatedAt: 2026-09-15T21:03:22.835509940
 workspaceId: wk_J9eGDytoNN
 folderId: null
 authentication: {}
@@ -12,8 +12,8 @@ bodyType: null
 description: ''
 headers: []
 method: GET
-name: root page
-sortPriority: -1788570539427.0
+name: Root Page
+sortPriority: 3000.0
 url: http://127.0.0.1:8000/
 urlParameters: []
 settingSendCookies:

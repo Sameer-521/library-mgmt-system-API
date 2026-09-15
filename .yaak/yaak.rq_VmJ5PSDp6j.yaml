@@ -1,23 +1,17 @@
 type: http_request
 model: http_request
-id: rq_MbM7THLZuz
-createdAt: 2026-09-05T01:10:01.968150301
-updatedAt: 2026-09-15T21:03:22.834083806
+id: rq_VmJ5PSDp6j
+createdAt: 2026-09-15T12:29:34.712319951
+updatedAt: 2026-09-15T21:03:22.832411506
 workspaceId: wk_J9eGDytoNN
 folderId: null
 authentication: {}
 authenticationType: null
 body:
   form:
-  - enabled: true
+  - enabled: false
     name: email
-    value: test@gmail.com
-  - enabled: true
-    name: full_name
-    value: Makima Simp
-  - enabled: true
-    name: password
-    value: IDontGiveAfUck344
+    value: admin@library.com
   - enabled: true
     name: ''
     value: ''
@@ -27,11 +21,19 @@ headers:
 - enabled: true
   name: Content-Type
   value: application/x-www-form-urlencoded
-  id: 0KRu8Rar0a
-method: POST
-name: Sign-up
-sortPriority: 2000.0
-url: ${[ BASE_URL ]}/users/sign-up
+  id: t2gfB0yIkM
+- enabled: true
+  name: Authorization
+  value: Bearer ${[ TOKEN ]}
+  id: 7Ir2hUhNj4
+- enabled: true
+  name: ''
+  value: ''
+  id: PfJajV0mqf
+method: GET
+name: Get All Users(non-staff)
+sortPriority: 0.0
+url: ${[ BASE_URL ]}/users
 urlParameters: []
 settingSendCookies:
   enabled: false

@@ -1,8 +1,8 @@
 type: http_request
 model: http_request
-id: rq_MbM7THLZuz
-createdAt: 2026-09-05T01:10:01.968150301
-updatedAt: 2026-09-15T21:03:22.834083806
+id: rq_5Pw5zpFtPG
+createdAt: 2026-09-15T21:00:06.456962367
+updatedAt: 2026-09-15T21:04:14.805744336
 workspaceId: wk_J9eGDytoNN
 folderId: null
 authentication: {}
@@ -10,14 +10,11 @@ authenticationType: null
 body:
   form:
   - enabled: true
-    name: email
-    value: test@gmail.com
+    name: isbn
+    value: '9780135957059'
   - enabled: true
-    name: full_name
-    value: Makima Simp
-  - enabled: true
-    name: password
-    value: IDontGiveAfUck344
+    name: quantity
+    value: '5'
   - enabled: true
     name: ''
     value: ''
@@ -27,11 +24,19 @@ headers:
 - enabled: true
   name: Content-Type
   value: application/x-www-form-urlencoded
-  id: 0KRu8Rar0a
+  id: vDr40w4Scj
+- enabled: true
+  name: Authorization
+  value: Bearer ${[ TOKEN ]}
+  id: NvIzf7tshs
+- enabled: true
+  name: ''
+  value: ''
+  id: agVwInaSi2
 method: POST
-name: Sign-up
-sortPriority: 2000.0
-url: ${[ BASE_URL ]}/users/sign-up
+name: Generate Copies
+sortPriority: 6000.0
+url: ${[ BASE_URL ]}/books/generate-copies
 urlParameters: []
 settingSendCookies:
   enabled: false

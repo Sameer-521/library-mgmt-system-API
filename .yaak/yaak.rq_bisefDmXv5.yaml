@@ -1,8 +1,8 @@
 type: http_request
 model: http_request
-id: rq_MbM7THLZuz
-createdAt: 2026-09-05T01:10:01.968150301
-updatedAt: 2026-09-15T21:03:22.834083806
+id: rq_bisefDmXv5
+createdAt: 2026-09-15T20:26:00.569529422
+updatedAt: 2026-09-15T21:03:22.836692932
 workspaceId: wk_J9eGDytoNN
 folderId: null
 authentication: {}
@@ -12,9 +12,6 @@ body:
   - enabled: true
     name: email
     value: test@gmail.com
-  - enabled: true
-    name: full_name
-    value: Makima Simp
   - enabled: true
     name: password
     value: IDontGiveAfUck344
@@ -27,11 +24,15 @@ headers:
 - enabled: true
   name: Content-Type
   value: application/x-www-form-urlencoded
-  id: 0KRu8Rar0a
+  id: RvRazdc5aF
+- enabled: true
+  name: ''
+  value: ''
+  id: bkh2NrwVBn
 method: POST
-name: Sign-up
-sortPriority: 2000.0
-url: ${[ BASE_URL ]}/users/sign-up
+name: User Login
+sortPriority: 4000.0
+url: ${[ BASE_URL ]}/users/login
 urlParameters: []
 settingSendCookies:
   enabled: false
