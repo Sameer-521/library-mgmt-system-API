@@ -1,10 +1,6 @@
-#!/usr/bin/env python3
-
 import uvicorn
 
-from app.core.config import Settings
-
-settings = Settings()
+from app.core.config import settings
 
 if __name__ == "__main__":
     if settings.test_mode:

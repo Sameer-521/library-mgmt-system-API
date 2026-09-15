@@ -15,13 +15,10 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from app.core import middleware
 from app.core.auth import hash_password
-from app.core.config import Settings
 from app.core.database import Base, get_session
 from app.main import app
 from app.models import Book, User, BookCopy, Loan, BkCopyStatus
 from app.utils import generate_book_copy_barcode
-
-settings = Settings()
 
 mock_admin_email = "mockadmin@example.com"
 mock_admin_password = "imjustfortesting"
@@ -99,7 +96,8 @@ async def mock_admin(test_session):
 
 @pytest.fixture(scope="function")
 async def mock_user(test_session):
-    user = User(**user_data)
+    data = {**user_data, "password": hash_password(user_data["password"])}
+    user = User(**data)
     test_session.add(user)
     await test_session.flush()
     await test_session.refresh(user)

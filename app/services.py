@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import crud
 from app.core.auth import authenticate_user, create_access_token, hash_password
-from app.core.config import Settings
+from app.core.config import settings
 from app.models import (
     Audit,
     BkCopySchedule,
@@ -23,13 +23,10 @@ from app.models import (
 from app.utils import (
     generate_book_copy_barcode,
     generate_staff_id,
-    reraise_exceptions,
     safe_datetime_compare,
 )
 
 logger = logging.getLogger(__name__)
-
-settings = Settings()
 
 loan_eligibility_exception = HTTPException(
     status.HTTP_403_FORBIDDEN, detail="User is not eligble for anymore loans"
@@ -71,7 +68,6 @@ async def create_new_book_service(
     book_data: dict,
 ):
     try:
-        reraise_exceptions(request)
         book = Book(**book_data)
         await crud.create_new_book(db, book)
         logger.info(f"New book created: {book_data['title']}")
@@ -91,7 +87,6 @@ async def create_new_book_service(
 # tested
 async def get_book_by_isbn_service(request: Request, db: AsyncSession, isbn: int):
     try:
-        reraise_exceptions(request)
         book = await crud.get_book_by_isbn(db, isbn)
         if not book:
             raise book_not_found_exception
@@ -112,7 +107,6 @@ async def update_book_service(
     request: Request, db: AsyncSession, update_data: dict, isbn: int, current_user: User
 ):
     try:
-        reraise_exceptions(request)
         book = await crud.get_book_by_isbn(db, isbn)
         if not book:
             raise book_not_found_exception
@@ -144,7 +138,6 @@ async def add_book_copies_service(
     isbn: int,
 ):
     try:
-        reraise_exceptions(request)
         book_copies = []
         last_serial = 0
         book = await crud.get_book_by_isbn(db, isbn)
@@ -283,7 +276,6 @@ async def create_user_service(
     user_data: dict,
 ):
     try:
-        # reraise_exceptions(request)
         data = user_data.copy()
         data["password"] = hash_password(data["password"])
         user = await crud.create_new_user(db, User(**data))
@@ -311,22 +303,11 @@ async def login_user_service(
     user_data: dict,
 ):
     try:
-        token = None
         ACCESS_TOKEN_EXPIRE_MINUTES = timedelta(
             minutes=settings.access_token_expire_minutes
         )
-        user, exc = await authenticate_user(user_data, db)
-        request.state.actor = user
-        if exc:
-            for exception in exc:
-                raise exception
-        if user:
-            data = {
-                "sub": user.email,
-                "user_uid": user.user_uid,
-                "is_staff": user.is_staff,
-            }
-            token = create_access_token(data, user, ACCESS_TOKEN_EXPIRE_MINUTES)
+        user = await authenticate_user(request, user_data, db)
+        token = create_access_token(user, ACCESS_TOKEN_EXPIRE_MINUTES)
     except HTTPException:
         await db.rollback()
         raise
@@ -344,7 +325,6 @@ async def get_all_non_staff_users_service(
     db: AsyncSession,
 ):
     try:
-        reraise_exceptions(request)
         users = await crud.get_all_non_staff_users(db)
         return users
     except HTTPException:
@@ -363,7 +343,6 @@ async def return_book_loan_service(
     loan_id: str,
 ):
     try:
-        reraise_exceptions(request)
         fined: bool = False
         fine_fee: int = 0
         days_deltas: int = 0
@@ -431,7 +410,6 @@ async def schedule_book_copy_service(
     request: Request, db: AsyncSession, isbn: int, current_user: User
 ):
     try:
-        reraise_exceptions(request)
         user_loans = await crud.get_user_active_loans(db, current_user.user_uid)
         if (len(user_loans) >= 3) or (current_user.fine_balance >= 10):
             raise schd_eligibility_exception
@@ -491,7 +469,6 @@ async def create_staff_user_service(
     user_data: dict,
 ):
     try:
-        reraise_exceptions(request)
         data = user_data.copy()
         data["password"] = hash_password(data["password"])
         data["user_uid"] = generate_staff_id()
@@ -516,7 +493,6 @@ async def create_staff_user_service(
 
 async def update_bk_copies_status(request: Request, db: AsyncSession, data: List[dict]):
     try:
-        reraise_exceptions(request)
         barcodes = {item["copy_barcode"] for item in data}  # remove duplicates
         book_copies = await crud.get_bk_copies_by_barcode(db, barcodes)
         if not book_copies:

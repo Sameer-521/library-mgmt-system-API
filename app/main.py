@@ -3,12 +3,10 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from app.core.auth import create_superuser
-from app.core.config import Settings
+from app.core.config import settings
 from app.core.database import AsyncSessionLocal, Base, engine
 from app.core.middleware import AuditMiddleware
 from app.routers import books, users
-
-settings = Settings()
 
 
 @asynccontextmanager

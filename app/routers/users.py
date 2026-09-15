@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Form, Request, status
 from app import services
 from app.core.auth import get_current_admin_user, get_current_staff_user
 from app.core.database import AsyncSession, get_session
+from app.models import User
 from app.schemas.token import TokenResponse
 from app.schemas.user import UserCreate, UserListResponse, UserLogin
 
@@ -14,11 +15,9 @@ users_router = APIRouter(prefix="/users")
 @users_router.get("", response_model=UserListResponse)
 async def get_all_non_staff_users(
     request: Request,
-    staff_user_exc: tuple = Depends(get_current_staff_user),
+    staff_user: User = Depends(get_current_staff_user),
     db: AsyncSession = Depends(get_session),
 ):
-    staff_user, role, exc = staff_user_exc
-    request.state.exceptions = exc
     users = await services.get_all_non_staff_users_service(request, db)
     return users
 
@@ -27,12 +26,9 @@ async def get_all_non_staff_users(
 async def create_new_staff_user(
     request: Request,
     form_data: Annotated[UserCreate, Form()],
-    admin_user_exc: tuple = Depends(get_current_admin_user),
+    admin_user: User = Depends(get_current_admin_user),
     db: AsyncSession = Depends(get_session),
 ):
-    admin_user, role, exc = admin_user_exc
-    request.state.exceptions = exc
-
     data = form_data.model_dump()
     msg = await services.create_staff_user_service(request, db, data)
     return msg

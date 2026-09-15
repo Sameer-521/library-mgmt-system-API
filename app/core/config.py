@@ -27,3 +27,6 @@ class Settings(BaseSettings):
     mock_user_name: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+
+settings = Settings()

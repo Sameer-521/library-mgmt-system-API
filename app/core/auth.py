@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from jose.exceptions import ExpiredSignatureError, JWTError
@@ -10,12 +10,10 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import crud
-from app.core.config import Settings
+from app.core.config import settings
 from app.core.database import get_session
 from app.models import User
 from app.utils import generate_admin_id
-
-settings = Settings()
 
 HASH_ALGORITHM = settings.hash_algorithm
 JWT_ALGORITHM = settings.jwt_algorithm
@@ -44,11 +42,7 @@ def verify_password(plain_password: str, hashed_password: str):
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def create_access_token(
-    data: dict, user: User, expires_delta: Optional[timedelta] = None
-):
-    role = None
-    to_encode = data.copy()
+def create_access_token(user: User, expires_delta: Optional[timedelta] = None):
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
@@ -59,14 +53,13 @@ def create_access_token(
         role = "staff"
     else:
         role = "user"
-    to_encode.update(
-        {
-            "exp": expire,
-            "role": role,
-            "user_uid": user.user_uid,
-            "is_staff": user.is_staff,
-        }
-    )
+    to_encode = {
+        "sub": user.email,
+        "exp": expire,
+        "role": role,
+        "user_uid": user.user_uid,
+        "is_staff": user.is_staff,
+    }
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, JWT_ALGORITHM)
     return encoded_jwt
 
@@ -81,85 +74,59 @@ def decode_token(token: str, verify_exp: bool = True):
     return payload
 
 
-async def authenticate_user(credentials: dict, db: AsyncSession = Depends(get_session)):
-    exceptions = []
-    user = None
-    try:
-        user_password = credentials["password"]
-        user_email = credentials["email"]
-
-        user = await crud.get_user_by_email(db, user_email)
-        print(user)
-        if not user or not verify_password(user_password, user.password):
-            exceptions.append(credentials_exception)
-    except Exception as e:
-        print(f"Error: {e}")
-
-    return user, exceptions
+async def authenticate_user(
+    request: Request,
+    credentials: dict,
+    db: AsyncSession = Depends(get_session),
+):
+    user = await crud.get_user_by_email(db, credentials["email"])
+    request.state.actor = user
+    if not user or not verify_password(credentials["password"], user.password):
+        raise credentials_exception
+    return user
 
 
 async def get_current_user(
     token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_session)
-):
-    exceptions = []
-    user = None
-    role = ""
+) -> User:
     try:
         payload = decode_token(token)
-        email = payload.get("sub")
-        # user_uid = payload.get('user_uid')
-        role = payload.get("role")
-        if not email:
-            exceptions.append(token_expire_exception)
-        else:
-            user = await crud.get_user_by_email(db, email)
-        if not user:
-            exceptions.append(credentials_exception)
     except ExpiredSignatureError:
-        exceptions.append(token_expire_exception)
-    except JWTError as e:
-        print(f"JWTError: {e}")
-        exceptions.append(credentials_exception)
+        raise token_expire_exception
+    except JWTError:
+        raise credentials_exception
 
-    return user, role, exceptions
+    email = payload.get("sub")
+    if not email:
+        raise credentials_exception
+    user = await crud.get_user_by_email(db, email)
+    if not user:
+        raise credentials_exception
+    return user
 
 
-async def get_current_active_user(user_role_exc: tuple = Depends(get_current_user)):
-    current_user, role, exc = user_role_exc
-    if not current_user:
-        exc.append(credentials_exception)
-        return current_user, role, exc
+async def get_current_active_user(
+    current_user: User = Depends(get_current_user),
+) -> User:
     if not current_user.is_active:
-        exc.append(HTTPException(status.HTTP_400_BAD_REQUEST, detail="Inactive user"))
-    return current_user, role, exc
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Inactive user")
+    return current_user
 
 
 async def get_current_staff_user(
-    user_role_exc: tuple = Depends(get_current_active_user),
-):
-    current_user, role, exc = user_role_exc
-    if not current_user:
-        exc.append(credentials_exception)
-        return current_user, role, exc
-    if role not in ["staff", "admin"]:
-        exc.append(
-            HTTPException(status.HTTP_403_FORBIDDEN, detail="Not enough previliges")
-        )
-    return current_user, role, exc
+    current_user: User = Depends(get_current_active_user),
+) -> User:
+    if not current_user.is_staff:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Not enough privileges")
+    return current_user
 
 
 async def get_current_admin_user(
-    user_role_exc: tuple = Depends(get_current_active_user),
-):
-    current_user, role, exc = user_role_exc
-    if not current_user:
-        exc.append(credentials_exception)
-        return current_user, role, exc
-    if role != "admin":
-        exc.append(
-            HTTPException(status.HTTP_403_FORBIDDEN, detail="Not enough previliges")
-        )
-    return current_user, role, exc
+    current_user: User = Depends(get_current_active_user),
+) -> User:
+    if not (current_user.is_staff and current_user.is_superuser):
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Not enough privileges")
+    return current_user
 
 
 async def create_superuser(

@@ -4,8 +4,6 @@ import string
 from datetime import datetime, timedelta, timezone
 from logging import Logger
 
-from fastapi import Request
-
 logger = Logger(__name__)
 
 
@@ -82,14 +80,6 @@ def default_loan_due_date():
     return datetime.now(timezone.utc).replace(
         minute=0, second=0, microsecond=0
     ) + timedelta(days=7)
-
-
-def reraise_exceptions(request: Request):
-    if hasattr(request.state, "exceptions"):
-        exc: list | None = getattr(request.state, "exceptions")
-        if exc:
-            for exception in exc:
-                raise exception
 
 
 def map_bk_copy_status(value: str):
