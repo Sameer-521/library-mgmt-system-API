@@ -1,4 +1,7 @@
+#!/usr/bin/env python3
+
 import uvicorn
+
 from app.core.config import Settings
 
 settings = Settings()

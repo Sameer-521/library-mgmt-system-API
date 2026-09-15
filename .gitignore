@@ -5,13 +5,24 @@ build/
 dist/
 wheels/
 *.egg-info
+.pytest_cache/
 
 # Virtual environments
 .venv
 
 .env
+TODO.md
 .vscode/
 guide/
 *.db
 *.txt
 tags
+
+# Yaak
+# Track your API collections in Git
+!.yaak/
+!yaak.*.yaml
+
+# Ignore local cookies, responses, and temporary history
+.yaak/history/
+.yaak/cookies/
