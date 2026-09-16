@@ -60,6 +60,7 @@ class Book(Base):
     title: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     author: Mapped[str] = mapped_column(String(100), nullable=False)
     isbn: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     library_barcode: Mapped[str] = mapped_column(
         String(50), unique=True, nullable=False, default=generate_barcode
     )

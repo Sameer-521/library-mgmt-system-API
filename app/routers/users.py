@@ -9,12 +9,12 @@ from app.core.database import AsyncSession, get_session
 from app.models import User
 from app.schemas.user import UserCreate, UserResponse
 
-users_router = APIRouter(prefix="/users")
+users_router = APIRouter(prefix="/users", tags=["users"])
 
 
 #
 # decide to keep it or not later
-@users_router.get("", response_model=LimitOffsetPage[UserResponse])
+@users_router.get("", response_model=LimitOffsetPage[UserResponse], tags=["staff"])
 async def get_all_non_staff_users(
     request: Request,
     staff_user: User = Depends(get_current_staff_user),
@@ -23,7 +23,7 @@ async def get_all_non_staff_users(
     return await services.get_all_non_staff_users_service(request, db)
 
 
-@users_router.post("/create-staff-user")
+@users_router.post("/create-staff-user", tags=["admin"])
 async def create_new_staff_user(
     request: Request,
     form_data: Annotated[UserCreate, Form()],
@@ -35,7 +35,7 @@ async def create_new_staff_user(
     return msg
 
 
-@users_router.post("/sign-up", status_code=status.HTTP_201_CREATED)
+@users_router.post("/sign-up", status_code=status.HTTP_201_CREATED, tags=["public"])
 async def create_new_user(
     request: Request,
     form_data: Annotated[UserCreate, Form()],

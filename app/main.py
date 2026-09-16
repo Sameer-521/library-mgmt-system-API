@@ -24,7 +24,18 @@ async def lifespan(app: FastAPI):
     await engine.dispose()
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    lifespan=lifespan,
+    openapi_tags=[
+        {"name": "auth", "description": "Token issuance / login"},
+        {"name": "books", "description": "Book, copy and loan operations"},
+        {"name": "users", "description": "User management"},
+        {"name": "public", "description": "No authentication required"},
+        {"name": "user", "description": "Requires an active user token"},
+        {"name": "staff", "description": "Requires a staff token"},
+        {"name": "admin", "description": "Requires an admin token"},
+    ],
+)
 
 audit_enabled = settings.audit_enabled
 if audit_enabled is None:

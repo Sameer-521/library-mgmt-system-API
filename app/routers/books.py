@@ -2,9 +2,14 @@ from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, Form, Query, Request, status
 from fastapi_pagination import LimitOffsetPage
+from starlette.status import HTTP_204_NO_CONTENT
 
 from app import services
-from app.core.auth import get_current_active_user, get_current_staff_user
+from app.core.auth import (
+    get_current_active_user,
+    get_current_admin_user,
+    get_current_staff_user,
+)
 from app.core.database import AsyncSession, get_session
 from app.models import User
 from app.schemas.book import (
@@ -20,10 +25,10 @@ from app.schemas.book import (
     LoanReturnForm,
 )
 
-books_router = APIRouter(prefix="/books")
+books_router = APIRouter(prefix="/books", tags=["books"])
 
 
-@books_router.get("", response_model=LimitOffsetPage[BookResponse])
+@books_router.get("", response_model=LimitOffsetPage[BookResponse], tags=["user"])
 async def get_all_books(
     request: Request,
     current_user: User = Depends(get_current_active_user),
@@ -33,7 +38,7 @@ async def get_all_books(
 
 
 # tested
-@books_router.get("/fetch", response_model=BookResponse)
+@books_router.get("/fetch", response_model=BookResponse, tags=["user"])
 async def get_book_by_ISBN(
     request: Request,
     isbn: Annotated[str, Query()],
@@ -45,7 +50,7 @@ async def get_book_by_ISBN(
 
 
 # tested
-@books_router.post("", status_code=status.HTTP_201_CREATED)
+@books_router.post("", status_code=status.HTTP_201_CREATED, tags=["staff"])
 async def create_book(
     request: Request,
     book_create: Annotated[BookCreate, Form()],
@@ -58,7 +63,7 @@ async def create_book(
 
 
 # tested
-@books_router.put("/{isbn}", status_code=status.HTTP_204_NO_CONTENT)
+@books_router.put("/{isbn}", status_code=status.HTTP_204_NO_CONTENT, tags=["staff"])
 async def update_book(
     request: Request,
     isbn: str,
@@ -71,7 +76,9 @@ async def update_book(
 
 
 # tested
-@books_router.post("/generate-copies", status_code=status.HTTP_201_CREATED)
+@books_router.post(
+    "/generate-copies", status_code=status.HTTP_201_CREATED, tags=["staff"]
+)
 async def add_book_copies(
     request: Request,
     add_copies_form: Annotated[BookCopyForm, Form()],
@@ -83,12 +90,17 @@ async def add_book_copies(
     return message
 
 
-@books_router.delete("/")
-async def delete_book(request: Request):
-    pass
+@books_router.delete("/{isbn}", status_code=HTTP_204_NO_CONTENT, tags=["admin"])
+async def delete_book(
+    request: Request,
+    isbn: str,
+    admin_user: User = Depends(get_current_admin_user),
+    db: AsyncSession = Depends(get_session),
+):
+    await services.soft_delete_book_by_isbn_service(request, db, isbn)
 
 
-@books_router.post("/loan-return")
+@books_router.post("/loan-return", tags=["staff"])
 async def return_book_loan(
     request: Request,
     return_loan_form: Annotated[LoanReturnForm, Form()],
@@ -104,7 +116,10 @@ async def return_book_loan(
 
 # tested
 @books_router.post(
-    "/loan-book", response_model=BkCopyLoanResponse, status_code=status.HTTP_201_CREATED
+    "/loan-book",
+    response_model=BkCopyLoanResponse,
+    status_code=status.HTTP_201_CREATED,
+    tags=["staff"],
 )
 async def loan_book(
     request: Request,
@@ -121,6 +136,7 @@ async def loan_book(
     "/schedule-book",
     response_model=FullScheduleInfo,
     status_code=status.HTTP_201_CREATED,
+    tags=["user"],
 )
 async def schedule_book(
     request: Request,
@@ -135,7 +151,7 @@ async def schedule_book(
 
 
 @books_router.patch(
-    "/update-bk-copies-status", response_model=BkCopyUpdateResponse
+    "/update-bk-copies-status", response_model=BkCopyUpdateResponse, tags=["staff"]
 )  # change method later
 async def update_bk_copies(
     request: Request,

@@ -10,7 +10,7 @@ from app.schemas.user import UserLogin
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@auth_router.post("/login", response_model=TokenResponse)
+@auth_router.post("/login", response_model=TokenResponse, tags=["public"])
 async def login_for_access_token(
     request: Request,
     form_data: Annotated[UserLogin, Form()],

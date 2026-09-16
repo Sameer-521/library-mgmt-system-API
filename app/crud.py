@@ -98,6 +98,12 @@ async def update_book(
     await db.flush()
 
 
+async def get_bk_copies_by_isbn(db: AsyncSession, isbn: str):
+    stmt = select(BookCopy).where(BookCopy.book_isbn == isbn)
+    result = await db.execute(stmt)
+    return result.scalars().all()
+
+
 async def get_book_copy(db: AsyncSession, isbn: str):
     stmt = select(BookCopy).where(
         BookCopy.book_isbn == isbn, BookCopy.status == "AVAILABLE"

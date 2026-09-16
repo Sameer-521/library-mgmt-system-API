@@ -160,3 +160,34 @@ async def test_return_overdue_book(admin_auth_client, overdue_loan):
     data = response.json()
     assert data["message"] == "User loan cleared, you have also been fined for delay"
     assert data["fine"] == "300"
+
+
+@pytest.mark.anyio
+async def test_soft_delete_book(
+    admin_auth_client, mock_book, mock_book_copies, test_session
+):
+    isbn, _ = mock_book_copies
+    response = await admin_auth_client.delete(
+        f"{admin_auth_client.base_url}/books/{isbn}"
+    )
+    assert response.status_code == 204
+
+    await test_session.refresh(mock_book)
+    assert mock_book.is_active is False
+
+    # unknown book
+    response_2 = await admin_auth_client.delete(
+        f"{admin_auth_client.base_url}/books/99999999"
+    )
+    assert response_2.status_code == 404
+
+
+@pytest.mark.anyio
+async def test_soft_delete_book_with_active_copy(
+    admin_auth_client, mock_book, mock_loan
+):
+    isbn = mock_book.isbn
+    response = await admin_auth_client.delete(
+        f"{admin_auth_client.base_url}/books/{isbn}"
+    )
+    assert response.status_code == 409

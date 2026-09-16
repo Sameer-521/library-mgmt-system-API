@@ -101,6 +101,36 @@ async def get_book_by_isbn_service(request: Request, db: AsyncSession, isbn: str
         return book
 
 
+async def soft_delete_book_by_isbn_service(
+    request: Request, db: AsyncSession, isbn: str
+):
+    try:
+        book = await crud.get_book_by_isbn(db, isbn)
+        if not book:
+            raise book_not_found_exception
+        book_copies = await crud.get_bk_copies_by_isbn(db, isbn)
+        if any(
+            copy.status in (BkCopyStatus.BORROWED, BkCopyStatus.RESERVED)
+            for copy in book_copies
+        ):
+            raise HTTPException(
+                status.HTTP_409_CONFLICT,
+                detail="Book has copies that are currently borrowed or reserved",
+            )
+        await crud.update_book(db, book, {"is_active": False})
+        logger.info(f"Book-{book.library_barcode} status `deactivated`")
+    except HTTPException:
+        raise
+    except SQLAlchemyError as e:
+        logger.error(f"DataBase error deactivating book: {e}")
+        await db.rollback()
+        raise internal_error_exception
+    else:
+        await db.commit()
+        request.state.msg = {"message": f"Book-{book.library_barcode} deactivated"}
+        return book
+
+
 # tested
 async def update_book_service(
     request: Request, db: AsyncSession, update_data: dict, isbn: str, current_user: User
