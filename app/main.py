@@ -6,7 +6,7 @@ from app.core.auth import create_superuser
 from app.core.config import settings
 from app.core.database import AsyncSessionLocal, Base, engine
 from app.core.middleware import AuditMiddleware
-from app.routers import books, users
+from app.routers import auth, books, users
 from app.seed import seed_books
 
 
@@ -31,6 +31,7 @@ if audit_enabled is None:
 if audit_enabled:
     app.add_middleware(AuditMiddleware)
 
+app.include_router(auth.auth_router)
 app.include_router(books.books_router)
 app.include_router(users.users_router)
 

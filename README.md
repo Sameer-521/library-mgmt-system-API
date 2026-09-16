@@ -61,6 +61,6 @@ Tests run against an in-memory SQLite database; see `app/tests/conftest.py` for 
 ## Auth quickstart
 
 1. Sign up a regular user: `POST /users/sign-up` (form-encoded `full_name`, `email`, `password`).
-2. Log in: `POST /users/login` (form-encoded `email`, `password`) to get a bearer token.
-3. Send the token as `Authorization: Bearer <token>` on protected endpoints.
-4. A superuser (staff + admin) is created automatically from the `ADMIN_*` variables on first startup; log in at `POST /users/admin/login`.
+2. Log in: `POST /auth/login` (form-encoded `email`, `password`) to get a bearer token.
+3. Send the token as `Authorization: Bearer <token>` on protected endpoints. The token's `role` claim (`user`/`staff`/`admin`) tells the frontend what to show.
+4. A superuser (staff + admin) is created automatically from the `ADMIN_*` variables on first startup and logs in through the same `POST /auth/login`.

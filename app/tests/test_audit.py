@@ -16,7 +16,7 @@ async def _get_audits(test_session):
 @pytest.mark.anyio
 async def test_successful_login_audited(client, mock_user, test_session):
     form_data = {"email": mock_user.email, "password": "mockuser123"}
-    response = await client.post(f"{client.base_url}/users/login", data=form_data)
+    response = await client.post(f"{client.base_url}/auth/login", data=form_data)
     assert response.status_code == 200
 
     audits = await _get_audits(test_session)
@@ -33,7 +33,7 @@ async def test_successful_login_audited(client, mock_user, test_session):
 @pytest.mark.anyio
 async def test_failed_login_audited(client, mock_admin, test_session):
     form_data = {"email": mock_admin.email, "password": "wrongpassword"}
-    response = await client.post(f"{client.base_url}/users/login", data=form_data)
+    response = await client.post(f"{client.base_url}/auth/login", data=form_data)
     assert response.status_code == 401
 
     audits = await _get_audits(test_session)

@@ -13,16 +13,3 @@ async def test_signup(client):
     # confirm
     response = await client.post(f"{client.base_url}/users/sign-up", data=form_data)
     assert response.status_code == 409
-
-
-@pytest.mark.anyio
-async def test_login(client, mock_user):
-    form_data = {
-        "email": mock_user.email,
-        "password": "mockuser123",  # cant use password tied to db user, its hashed
-    }
-    response = await client.post(f"{client.base_url}/users/login", data=form_data)
-    assert response.status_code == 200
-    data = response.json()
-    token = data["access_token"]
-    assert isinstance(token, str)

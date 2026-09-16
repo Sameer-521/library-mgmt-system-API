@@ -157,10 +157,8 @@ def detect_event_from_request(request: Request) -> Event:
     # User-related
     if path.startswith("/users/sign-up") and method == "POST":
         return Event.CREATE_USER
-    if path.startswith("/users/login") and method == "POST":
+    if path.startswith("/auth/login") and method == "POST":
         return Event.LOGIN_USER
-    if path.startswith("/users/admin/login") and method == "POST":
-        return Event.LOGIN_ADMIN_USER
     if path == "/users" and method == "GET":
         return Event.FETCH_USER
 

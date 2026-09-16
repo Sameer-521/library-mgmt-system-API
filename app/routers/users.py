@@ -6,8 +6,7 @@ from app import services
 from app.core.auth import get_current_admin_user, get_current_staff_user
 from app.core.database import AsyncSession, get_session
 from app.models import User
-from app.schemas.token import TokenResponse
-from app.schemas.user import UserCreate, UserListResponse, UserLogin, UserResponse
+from app.schemas.user import UserCreate, UserListResponse, UserResponse
 
 users_router = APIRouter(prefix="/users")
 
@@ -47,32 +46,6 @@ async def create_new_user(
 
     msg = await services.create_user_service(request, db, form_data.model_dump())
     return msg
-
-
-@users_router.post("/login", response_model=TokenResponse)
-async def login_for_access_token(
-    request: Request,
-    form_data: Annotated[UserLogin, Form()],
-    db: AsyncSession = Depends(get_session),
-):
-    data = form_data.model_dump()
-    request.state.actor = {"email": data["email"]}  # safety net
-
-    token = await services.login_user_service(request, db, form_data.model_dump())
-    return token
-
-
-@users_router.post("/admin/login", response_model=TokenResponse)
-async def admin_login_for_access_token(
-    request: Request,
-    form_data: Annotated[UserLogin, Form()],
-    db: AsyncSession = Depends(get_session),
-):
-    data = form_data.model_dump()
-    request.state.actor = {"email": data["email"]}  # safety net
-
-    token = await services.login_user_service(request, db, form_data.model_dump())
-    return token
 
 
 # Note: You can inject request object in dependency signature

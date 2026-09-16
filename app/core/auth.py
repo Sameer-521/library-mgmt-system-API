@@ -21,7 +21,7 @@ SECRET_KEY = settings.secret_key
 
 pwd_context = CryptContext(schemes=[HASH_ALGORITHM], deprecated="auto")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 credentials_exception = HTTPException(
     status.HTTP_401_UNAUTHORIZED,

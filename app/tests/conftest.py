@@ -194,7 +194,7 @@ async def auth_client(client, mock_user) -> AsyncClient:
         "email": "mockuser2@gmail.com",
         "password": "mockuser123",
     }
-    response = await client.post(f"{BASE_URL}/users/login", data=form_data)
+    response = await client.post(f"{BASE_URL}/auth/login", data=form_data)
     data = response.json()
     token = data.get("access_token", None)
     client.headers.update({"Authorization": f"Bearer {token}"})
@@ -206,7 +206,7 @@ async def auth_client(client, mock_user) -> AsyncClient:
 )  # doesnt need to create another admin, a default mock admin is always created for test purposes
 async def admin_auth_client(client, mock_admin) -> AsyncClient:
     form_data = {"email": mock_admin_email, "password": mock_admin_password}
-    response = await client.post(f"{BASE_URL}/users/login", data=form_data)
+    response = await client.post(f"{BASE_URL}/auth/login", data=form_data)
     data = response.json()
     token = data.get("access_token", None)
     client.headers.update({"Authorization": f"Bearer {token}"})
