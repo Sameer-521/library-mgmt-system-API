@@ -1,26 +1,26 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Form, Request, status
+from fastapi_pagination import LimitOffsetPage
 
 from app import services
 from app.core.auth import get_current_admin_user, get_current_staff_user
 from app.core.database import AsyncSession, get_session
 from app.models import User
-from app.schemas.user import UserCreate, UserListResponse, UserResponse
+from app.schemas.user import UserCreate, UserResponse
 
 users_router = APIRouter(prefix="/users")
 
 
 #
 # decide to keep it or not later
-@users_router.get("", response_model=UserListResponse)
+@users_router.get("", response_model=LimitOffsetPage[UserResponse])
 async def get_all_non_staff_users(
     request: Request,
     staff_user: User = Depends(get_current_staff_user),
     db: AsyncSession = Depends(get_session),
 ):
-    users = await services.get_all_non_staff_users_service(request, db)
-    return UserListResponse(users=[UserResponse.model_validate(u) for u in users])
+    return await services.get_all_non_staff_users_service(request, db)
 
 
 @users_router.post("/create-staff-user")

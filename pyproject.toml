@@ -8,6 +8,7 @@ dependencies = [
     "aiosqlite>=0.21.0",
     "argon2-cffi>=25.1.0",
     "asyncpg>=0.31.0",
+    "fastapi-pagination>=0.15.16",
     "fastapi-standalone-docs>=0.2.0",
     "fastapi[all,standard]>=0.124.0",
     "passlib[bcrypt]>=1.7.4",

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, PositiveInt
 
@@ -25,11 +25,5 @@ class UserResponse(UserBase):
     # is_superuser: bool
     created_at: datetime
     updated_at: Optional[datetime] = None
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-class UserListResponse(BaseModel):
-    users: List[UserResponse]
 
     model_config = ConfigDict(from_attributes=True)

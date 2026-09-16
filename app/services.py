@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime, timedelta, timezone
-from typing import List, Sequence
 
 from fastapi import HTTPException, Request, status
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -177,7 +176,7 @@ async def add_book_copies_service(
 
 # tested
 async def loan_book_service(
-    request: Request, db: AsyncSession, isbn: int, user_uid: str
+    request: Request, db: AsyncSession, isbn: str, user_uid: str
 ):
     created_loan = None
     updated_bk_copy = None
@@ -323,7 +322,7 @@ async def login_user_service(
 async def get_all_non_staff_users_service(
     request: Request,
     db: AsyncSession,
-) -> Sequence[User]:
+):
     try:
         users = await crud.get_all_non_staff_users(db)
         return users
@@ -333,6 +332,22 @@ async def get_all_non_staff_users_service(
     except SQLAlchemyError as e:
         await db.rollback()  # is rollback even necessary here?
         logger.error(f"DataBase error fetching users: {e}")
+        raise internal_error_exception
+
+
+async def get_all_books_service(
+    request: Request,
+    db: AsyncSession,
+):
+    try:
+        books = await crud.get_all_books(db)
+        return books
+    except HTTPException:
+        await db.rollback()
+        raise
+    except SQLAlchemyError as e:
+        await db.rollback()
+        logger.error(f"DataBase error fetching books: {e}")
         raise internal_error_exception
 
 
@@ -405,7 +420,7 @@ async def return_book_loan_service(
 
 # tested
 async def schedule_book_copy_service(
-    request: Request, db: AsyncSession, isbn: int, current_user: User
+    request: Request, db: AsyncSession, isbn: str, current_user: User
 ):
     try:
         user_loans = await crud.get_user_active_loans(db, current_user.user_uid)
@@ -489,7 +504,7 @@ async def create_staff_user_service(
         return msg
 
 
-async def update_bk_copies_status(request: Request, db: AsyncSession, data: List[dict]):
+async def update_bk_copies_status(request: Request, db: AsyncSession, data: list[dict]):
     try:
         barcodes = {item["copy_barcode"] for item in data}  # remove duplicates
         book_copies = await crud.get_bk_copies_by_barcode(db, barcodes)

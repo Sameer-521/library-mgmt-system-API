@@ -1,5 +1,4 @@
-from typing import List, Set
-
+from fastapi_pagination.ext.sqlalchemy import apaginate
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -47,7 +46,7 @@ async def get_reserved_bk_copy_by_barcode(db: AsyncSession, barcode: str):
     return result.scalar_one_or_none()
 
 
-async def get_active_schedule(db: AsyncSession, isbn: int, user_uid: str):
+async def get_active_schedule(db: AsyncSession, isbn: str, user_uid: str):
     stmt = (
         select(BkCopySchedule)
         .join(BookCopy, BkCopySchedule.bk_copy_barcode == BookCopy.copy_barcode)
@@ -84,7 +83,7 @@ async def create_new_book(db: AsyncSession, book: Book):
     await db.flush()
 
 
-async def add_book_copies(db: AsyncSession, copies: List[BookCopy]):
+async def add_book_copies(db: AsyncSession, copies: list[BookCopy]):
     db.add_all(copies)
     await db.flush()
 
@@ -99,7 +98,7 @@ async def update_book(
     await db.flush()
 
 
-async def get_book_copy(db: AsyncSession, isbn: int):
+async def get_book_copy(db: AsyncSession, isbn: str):
     stmt = select(BookCopy).where(
         BookCopy.book_isbn == isbn, BookCopy.status == "AVAILABLE"
     )
@@ -150,9 +149,13 @@ async def create_loan(db: AsyncSession, loan: Loan):
 
 
 async def get_all_non_staff_users(db: AsyncSession):
-    stmt = select(User).where(~User.is_staff, ~User.is_superuser)
-    result = await db.execute(stmt)
-    return result.scalars().all()
+    stmt = select(User).where(~User.is_staff, ~User.is_superuser).order_by(User.id)
+    return await apaginate(db, stmt)
+
+
+async def get_all_books(db: AsyncSession):
+    stmt = select(Book).order_by(Book.id)
+    return await apaginate(db, stmt)
 
 
 async def get_loan_by_loan_id(db: AsyncSession, _loan_id: str):
@@ -222,14 +225,14 @@ async def add_audit(db: AsyncSession, audit: Audit):
     await db.flush()
 
 
-async def get_bk_copies_by_barcode(db: AsyncSession, barcodes: Set[str]):
+async def get_bk_copies_by_barcode(db: AsyncSession, barcodes: set[str]):
     stmt = select(BookCopy).where(BookCopy.copy_barcode.in_(barcodes))
     result = await db.execute(stmt)
     return result.scalars().all()
 
 
 async def update_bk_copies_status(
-    db: AsyncSession, bk_copies: List[BookCopy], update_data: List[dict]
+    db: AsyncSession, bk_copies: list[BookCopy], update_data: list[dict]
 ):
     for i, data in enumerate(update_data):
         for key, value in data.items():

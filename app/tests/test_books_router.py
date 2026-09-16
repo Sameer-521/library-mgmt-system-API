@@ -1,5 +1,7 @@
 import pytest
 
+from app.models import Book
+
 
 @pytest.mark.anyio
 async def test_book_creation(admin_auth_client, book_creation_data):
@@ -13,6 +15,37 @@ async def test_book_creation(admin_auth_client, book_creation_data):
         f"{admin_auth_client.base_url}/books", data=form_data
     )
     assert response.status_code == 409
+
+
+@pytest.mark.anyio
+async def test_get_books_pagination(auth_client, test_session):
+    for i in range(3):
+        test_session.add(
+            Book(
+                title=f"Pagination Book {i}",
+                author="Pagination Author",
+                location="P1",
+                isbn=f"pagination-isbn-{i}",
+            )
+        )
+    await test_session.flush()
+
+    response = await auth_client.get(f"{auth_client.base_url}/books?limit=2&offset=0")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total"] == 3
+    assert data["limit"] == 2
+    assert data["offset"] == 0
+    assert len(data["items"]) == 2
+
+    response_2 = await auth_client.get(f"{auth_client.base_url}/books?limit=2&offset=2")
+    assert response_2.status_code == 200
+    data_2 = response_2.json()
+    assert data_2["offset"] == 2
+    assert len(data_2["items"]) == 1
+    first_page_ids = {b["id"] for b in data["items"]}
+    second_page_ids = {b["id"] for b in data_2["items"]}
+    assert first_page_ids.isdisjoint(second_page_ids)
 
 
 @pytest.mark.anyio
@@ -73,7 +106,7 @@ async def test_loan_book_no_schedule(admin_auth_client, mock_book_copies, mock_u
 async def test_schedule_bk_copy(auth_client, mock_book_copies):
     isbn, _ = mock_book_copies
     response = await auth_client.post(
-        f"{auth_client.base_url}/books/book-schedule/{isbn}"
+        f"{auth_client.base_url}/books/schedule-book?isbn={isbn}"
     )
     assert response.status_code == 201
     assert response.json()["message"] == "Schedule has been successfuly created"

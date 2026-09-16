@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi_pagination import add_pagination
 
 from app.core.auth import create_superuser
 from app.core.config import settings
@@ -34,6 +35,27 @@ if audit_enabled:
 app.include_router(auth.auth_router)
 app.include_router(books.books_router)
 app.include_router(users.users_router)
+
+add_pagination(app)
+
+_original_openapi = app.openapi
+
+
+def custom_openapi():
+    # avoids regenerating/caching conflicts
+    if app.openapi_schema:
+        return app.openapi_schema
+    schema = _original_openapi()
+    schema["components"]["securitySchemes"]["OAuth2PasswordBearer"] = {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+    }
+    app.openapi_schema = schema
+    return schema
+
+
+app.openapi = custom_openapi
 
 
 @app.get("/")

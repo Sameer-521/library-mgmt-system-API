@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, Form, Query, Request, status
+from fastapi_pagination import LimitOffsetPage
 
 from app import services
 from app.core.auth import get_current_active_user, get_current_staff_user
@@ -22,9 +23,13 @@ from app.schemas.book import (
 books_router = APIRouter(prefix="/books")
 
 
-@books_router.get("")
-async def get_all_books(request: Request):
-    return {"books": []}
+@books_router.get("", response_model=LimitOffsetPage[BookResponse])
+async def get_all_books(
+    request: Request,
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_session),
+):
+    return await services.get_all_books_service(request, db)
 
 
 # tested
@@ -113,13 +118,13 @@ async def loan_book(
 
 
 @books_router.post(
-    "/book-schedule/{isbn}",
+    "/schedule-book",
     response_model=FullScheduleInfo,
     status_code=status.HTTP_201_CREATED,
 )
 async def schedule_book(
     request: Request,
-    isbn: int,
+    isbn: Annotated[str, Query()],
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_session),
 ):

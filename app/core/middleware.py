@@ -1,7 +1,7 @@
 import time
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Awaitable, Callable, Dict
+from typing import Any, Awaitable, Callable
 from urllib.parse import parse_qs
 
 from fastapi import BackgroundTasks, Request
@@ -84,7 +84,7 @@ def get_actor_claims(token: str):
         return None
 
 
-async def extract_form_data(request: Request) -> Dict[str, Any]:
+async def extract_form_data(request: Request) -> dict[str, Any]:
     """
     Safely extract form fields (urlencoded or multipart) from `request`
     without preventing downstream code (FastAPI/Dependencies) from reading
@@ -107,7 +107,7 @@ async def extract_form_data(request: Request) -> Dict[str, Any]:
         decoded = body.decode("utf-8") if body else ""
         parsed = parse_qs(decoded, keep_blank_values=True)
         # convert single-item lists to scalars
-        data: Dict[str, Any] = {
+        data: dict[str, Any] = {
             k: (v if len(v) > 1 else v[0]) for k, v in parsed.items()
         }
         return data
@@ -118,7 +118,7 @@ async def extract_form_data(request: Request) -> Dict[str, Any]:
         temp_scope = dict(request.scope)
         temp_req = StarletteRequest(temp_scope, _receive)
         form = await temp_req.form()
-        data: Dict[str, Any] = {}
+        data: dict[str, Any] = {}
         for key, val in form.multi_items():
             if key not in data:
                 data[key] = val
@@ -143,7 +143,7 @@ def detect_event_from_request(request: Request) -> Event:
         return Event.CHECKOUT
     if path.startswith("/books/generate-copies") and method == "POST":
         return Event.CREATE_BK_COPIES
-    if path.startswith("/books/book-schedule") and method == "POST":
+    if path.startswith("/books/schedule-book") and method == "POST":
         return Event.SCHEDULE_BOOK
     if path == "/books" and method == "POST":
         return Event.CREATE_BOOK
@@ -169,7 +169,7 @@ def _build_audit_entry(
     request: Request,
     start_time: float,
     status_code: int,
-    form_data: Dict[str, Any],
+    form_data: dict[str, Any],
     event_type: Event,
     actor: Any,
     claims: Any,
