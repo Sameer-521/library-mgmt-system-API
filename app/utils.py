@@ -78,18 +78,3 @@ def generate_schedule_id():
 
 def default_loan_due_date():
     return datetime.now(timezone.utc) + timedelta(days=7)
-
-
-def map_bk_copy_status(value: str):
-    if value == "available":
-        return BkCopyStatus.AVAILABLE
-    elif value == "in_check":
-        return BkCopyStatus.IN_CHECK
-    elif value == "reserved":
-        return BkCopyStatus.RESERVED
-    elif value == "lost":
-        return BkCopyStatus.LOST
-    elif value == "damaged":
-        return BkCopyStatus.DAMAGED
-    else:
-        return BkCopyStatus.BORROWED

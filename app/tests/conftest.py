@@ -175,7 +175,7 @@ async def overdue_loan(test_session, mock_user, mock_book_copies) -> tuple[str, 
     loan = Loan(
         user_uid=mock_user.user_uid,
         bk_copy_barcode=first_bk.copy_barcode,
-        due_at=datetime.now(timezone.utc) - timedelta(days=3),
+        due_at=datetime.now(timezone.utc) - timedelta(days=3),  # now - 3 days
     )
     test_session.add(loan)
     await test_session.flush()

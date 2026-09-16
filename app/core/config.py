@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     admin_name: str = ""
 
     database_url: str = ""
-    test_database_url: str = ""
+    db_echo: bool = True
 
     hash_algorithm: str = ""
     jwt_algorithm: str = ""

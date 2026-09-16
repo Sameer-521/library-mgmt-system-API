@@ -154,27 +154,3 @@ async def create_superuser(
         print(f"DataBase error initializing admin_user: {e}")
     else:
         await db.commit()
-
-
-async def create_mock_superuser(
-    db: AsyncSession,
-    email=settings.mock_admin_email,
-    password=settings.mock_admin_password,
-    full_name=settings.mock_admin_name,
-):
-    try:
-        data = {
-            "full_name": full_name,
-            "password": hash_password(password),
-            "email": email,
-            "is_staff": True,
-            "is_superuser": True,
-        }
-        mock_admin_user = User(**data)
-        await crud.create_default_superuser(db, mock_admin_user)
-        print("Mock Superuser initialized for testing")
-    except SQLAlchemyError as e:
-        await db.rollback()
-        print(f"DataBase error initializing mock_admin_user: {e}")
-    else:
-        await db.commit()
