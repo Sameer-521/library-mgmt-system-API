@@ -26,3 +26,5 @@ tags
 # Ignore local cookies, responses, and temporary history
 .yaak/history/
 .yaak/cookies/
+
+library.sqbpro

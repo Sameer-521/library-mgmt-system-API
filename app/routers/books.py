@@ -152,9 +152,7 @@ async def schedule_book(
     return schedule_info
 
 
-@books_router.patch(
-    "/update-bk-copies-status", response_model=BkCopyUpdateResponse, tags=["staff"]
-)  # change method later
+@books_router.patch("/bk-copies", response_model=BkCopyUpdateResponse, tags=["staff"])
 async def update_bk_copies(
     request: Request,
     data: ListBkUpdate = Body(),

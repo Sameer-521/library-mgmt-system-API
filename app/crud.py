@@ -164,6 +164,11 @@ async def get_all_books(db: AsyncSession):
     return await apaginate(db, stmt)
 
 
+async def get_all_active_books(db: AsyncSession):
+    stmt = select(Book).where(Book.is_active == True).order_by(Book.id)
+    return await apaginate(db, stmt)
+
+
 async def get_user_schedules(db: AsyncSession, user_uid: str):
     stmt = (
         select(BkCopySchedule)

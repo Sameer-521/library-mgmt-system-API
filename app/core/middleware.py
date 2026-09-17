@@ -132,35 +132,39 @@ async def extract_form_data(request: Request) -> dict[str, Any]:
     return {}
 
 
+_EVENT_RULES: tuple[tuple[str, str, bool, Event], ...] = (
+    # (method, path, is_prefix, event)
+    ("GET", "/", False, Event.ROOT),
+    ("POST", "/auth/login", False, Event.LOGIN_USER),
+    # books - static paths before dynamic/prefix rules
+    ("POST", "/books/loan-return", False, Event.RETURN_BOOK),
+    ("POST", "/books/loan-book", False, Event.CHECKOUT),
+    ("POST", "/books/generate-copies", False, Event.CREATE_BK_COPIES),
+    ("POST", "/books/schedule-book", False, Event.SCHEDULE_BOOK),
+    ("GET", "/books/fetch", False, Event.FETCH_BOOK),
+    ("GET", "/books/schedules/me", False, Event.FETCH_USER_SCHEDULES),
+    ("GET", "/books/loans/active", False, Event.FETCH_ACTIVE_LOANS),
+    ("PATCH", "/books/bk-copies", False, Event.UPDATE_BOOK_COPIES),
+    ("GET", "/books", False, Event.FETCH_BOOKS),
+    ("POST", "/books", False, Event.CREATE_BOOK),
+    ("PUT", "/books/", True, Event.UPDATE_BOOK),
+    ("DELETE", "/books/", True, Event.DELETE_BOOK),
+    # users
+    ("GET", "/users", False, Event.FETCH_USER),
+    ("POST", "/users/sign-up", False, Event.CREATE_USER),
+    ("POST", "/users/create-staff-user", False, Event.CREATE_STAFF_USER),
+)
+
+
 def detect_event_from_request(request: Request) -> Event:
-    path = request.url.path.lower()
+    path = request.url.path.lower().rstrip("/") or "/"
     method = request.method.upper()
 
-    # Book-related
-    if path.startswith("/books/loan-return") and method == "POST":
-        return Event.RETURN_BOOK
-    if path.startswith("/books/loan") and method == "POST":
-        return Event.CHECKOUT
-    if path.startswith("/books/generate-copies") and method == "POST":
-        return Event.CREATE_BK_COPIES
-    if path.startswith("/books/schedule-book") and method == "POST":
-        return Event.SCHEDULE_BOOK
-    if path == "/books" and method == "POST":
-        return Event.CREATE_BOOK
-    if path.startswith("/books/") and method == "PUT":
-        return Event.UPDATE_BOOK
-    if path.startswith("/books/update-bk-copies-status") and method == "PATCH":
-        return Event.UPDATE_BOOK_COPIES
-    if path.startswith("/books/fetch") and method == "GET":
-        return Event.FETCH_BOOK
-
-    # User-related
-    if path.startswith("/users/sign-up") and method == "POST":
-        return Event.CREATE_USER
-    if path.startswith("/auth/login") and method == "POST":
-        return Event.LOGIN_USER
-    if path == "/users" and method == "GET":
-        return Event.FETCH_USER
+    for rule_method, rule_path, is_prefix, event in _EVENT_RULES:
+        if method != rule_method:
+            continue
+        if path == rule_path or (is_prefix and path.startswith(rule_path)):
+            return event
 
     return Event.UNIDENTIFIED_EVENT
 

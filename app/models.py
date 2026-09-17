@@ -34,6 +34,12 @@ class Event(enum.Enum):
     SCHEDULE_BOOK = "schedule_book"
     UPDATE_BOOK = "update_book"
     UPDATE_BOOK_COPIES = "update_book_copies"
+    FETCH_BOOKS = "fetch_books"
+    DELETE_BOOK = "delete_book"
+    FETCH_USER_SCHEDULES = "fetch_user_schedules"
+    FETCH_ACTIVE_LOANS = "fetch_active_loans"
+    CREATE_STAFF_USER = "create_staff_user"
+    ROOT = "root"
     UNIDENTIFIED_EVENT = "unidentified_event"  # safety net
     REJECTED_EVENT = "rejected_event"
 

@@ -370,7 +370,7 @@ async def get_all_books_service(
     db: AsyncSession,
 ):
     try:
-        books = await crud.get_all_books(db)
+        books = await crud.get_all_active_books(db)
         return books
     except HTTPException:
         await db.rollback()
