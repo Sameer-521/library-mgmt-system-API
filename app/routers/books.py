@@ -14,6 +14,7 @@ from app.core.database import AsyncSession, get_session
 from app.models import User
 from app.schemas.book import (
     BkCopyLoanResponse,
+    BkCopyScheduleInfo,
     BkCopyUpdateResponse,
     BookCopyForm,
     BookCreate,
@@ -22,6 +23,7 @@ from app.schemas.book import (
     FullScheduleInfo,
     ListBkUpdate,
     LoanForm,
+    LoanResponse,
     LoanReturnForm,
 )
 
@@ -161,6 +163,28 @@ async def update_bk_copies(
 ):
     parsed = data.model_dump()
     return await services.update_bk_copies_status(request, db, parsed["book_copies"])
+
+
+@books_router.get(
+    "/schedules/me", response_model=list[BkCopyScheduleInfo], tags=["user"]
+)
+async def get_user_schedules(
+    request: Request,
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_session),
+):
+    return await services.get_user_schedules_service(request, db, current_user.user_uid)
+
+
+@books_router.get(
+    "/loans/active", response_model=LimitOffsetPage[LoanResponse], tags=["staff"]
+)
+async def get_active_loans(
+    request: Request,
+    staff_user: User = Depends(get_current_staff_user),
+    db: AsyncSession = Depends(get_session),
+):
+    return await services.get_all_active_loans_service(request, db)
 
 
 # fastapi depends should return a single value, you can unpack

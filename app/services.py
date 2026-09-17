@@ -87,7 +87,7 @@ async def create_new_book_service(
 async def get_book_by_isbn_service(request: Request, db: AsyncSession, isbn: str):
     try:
         book = await crud.get_book_by_isbn(db, isbn)
-        if not book:
+        if not book or not book.is_active:
             raise book_not_found_exception
 
         logger.info(f"Retrieved book: {book.library_barcode}")
@@ -381,6 +381,39 @@ async def get_all_books_service(
         raise internal_error_exception
 
 
+async def get_user_schedules_service(
+    request: Request,
+    db: AsyncSession,
+    user_uid: str,
+):
+    try:
+        schedules = await crud.get_user_schedules(db, user_uid)
+        return schedules
+    except HTTPException:
+        await db.rollback()
+        raise
+    except SQLAlchemyError as e:
+        await db.rollback()
+        logger.error(f"DataBase error fetching schedules: {e}")
+        raise internal_error_exception
+
+
+async def get_all_active_loans_service(
+    request: Request,
+    db: AsyncSession,
+):
+    try:
+        loans = await crud.get_all_active_loans(db)
+        return loans
+    except HTTPException:
+        await db.rollback()
+        raise
+    except SQLAlchemyError as e:
+        await db.rollback()
+        logger.error(f"DataBase error fetching active loans: {e}")
+        raise internal_error_exception
+
+
 async def return_book_loan_service(
     request: Request,
     db: AsyncSession,
@@ -515,6 +548,7 @@ async def create_staff_user_service(
         data = user_data.copy()
         data["password"] = hash_password(data["password"])
         data["user_uid"] = generate_staff_id()
+        data["is_staff"] = True
         user = await crud.create_new_user(db, User(**data))
         logger.info("Created new staff user successfully")
 

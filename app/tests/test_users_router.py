@@ -47,6 +47,6 @@ async def test_get_users_pagination(admin_auth_client, test_session):
     data_2 = response_2.json()
     assert data_2["offset"] == 2
     assert len(data_2["items"]) == 1
-    first_page_ids = {u["id"] for u in data["items"]}
-    second_page_ids = {u["id"] for u in data_2["items"]}
+    first_page_ids = {u["user_uid"] for u in data["items"]}
+    second_page_ids = {u["user_uid"] for u in data_2["items"]}
     assert first_page_ids.isdisjoint(second_page_ids)

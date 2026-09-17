@@ -1,6 +1,6 @@
 import pytest
 
-from app.models import Book
+from app.models import BkCopyStatus, Book, Loan, LoanStatus
 
 
 @pytest.mark.anyio
@@ -191,3 +191,52 @@ async def test_soft_delete_book_with_active_copy(
         f"{admin_auth_client.base_url}/books/{isbn}"
     )
     assert response.status_code == 409
+
+
+@pytest.mark.anyio
+async def test_get_my_schedules(auth_client, mock_user, mock_book_copies):
+    isbn, bk_copies = mock_book_copies
+    schedule_response = await auth_client.post(
+        f"{auth_client.base_url}/books/schedule-book?isbn={isbn}"
+    )
+    assert schedule_response.status_code == 201
+    schedule_id = schedule_response.json()["schedule_info"]["schedule_id"]
+
+    response = await auth_client.get(f"{auth_client.base_url}/books/schedules/me")
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) == 1
+    assert data[0]["schedule_id"] == schedule_id
+    assert data[0]["user_uid"] == mock_user.user_uid
+    assert data[0]["bk_copy_barcode"] == bk_copies[0].copy_barcode
+    assert data[0]["status"] == "active"
+
+
+@pytest.mark.anyio
+async def test_get_active_loans(
+    admin_auth_client, mock_user, mock_loan, mock_book_copies, test_session
+):
+    loan_id, _ = mock_loan
+    _, bk_copies = mock_book_copies
+    returned_copy = bk_copies[1]
+    returned_copy.status = BkCopyStatus.BORROWED
+    test_session.add(
+        Loan(
+            user_uid=mock_user.user_uid,
+            bk_copy_barcode=returned_copy.copy_barcode,
+            status=LoanStatus.RETURNED,
+        )
+    )
+    await test_session.flush()
+
+    response = await admin_auth_client.get(
+        f"{admin_auth_client.base_url}/books/loans/active?limit=10&offset=0"
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total"] == 1
+    assert len(data["items"]) == 1
+    assert data["items"][0]["loan_id"] == loan_id
+    assert data["limit"] == 10
+    assert data["offset"] == 0

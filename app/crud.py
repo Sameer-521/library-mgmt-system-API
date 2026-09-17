@@ -164,6 +164,21 @@ async def get_all_books(db: AsyncSession):
     return await apaginate(db, stmt)
 
 
+async def get_user_schedules(db: AsyncSession, user_uid: str):
+    stmt = (
+        select(BkCopySchedule)
+        .where(BkCopySchedule.user_uid == user_uid)
+        .order_by(desc(BkCopySchedule.created_at))
+    )
+    result = await db.execute(stmt)
+    return result.scalars().all()
+
+
+async def get_all_active_loans(db: AsyncSession):
+    stmt = select(Loan).where(Loan.status == LoanStatus.ACTIVE).order_by(Loan.id)
+    return await apaginate(db, stmt)
+
+
 async def get_loan_by_loan_id(db: AsyncSession, _loan_id: str):
     stmt = select(Loan).where(Loan.loan_id == _loan_id)
     result = await db.execute(stmt)

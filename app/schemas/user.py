@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, PositiveInt
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class UserBase(BaseModel):
@@ -18,7 +18,7 @@ class UserLogin(UserBase):
 
 
 class UserResponse(UserBase):
-    id: PositiveInt
+    user_uid: str
     card_number: str
     is_active: bool
     # is_staff: bool

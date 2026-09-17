@@ -31,8 +31,7 @@ async def create_new_staff_user(
     db: AsyncSession = Depends(get_session),
 ):
     data = form_data.model_dump()
-    msg = await services.create_staff_user_service(request, db, data)
-    return msg
+    return await services.create_staff_user_service(request, db, data)
 
 
 @users_router.post("/sign-up", status_code=status.HTTP_201_CREATED, tags=["public"])
@@ -44,8 +43,7 @@ async def create_new_user(
     data = form_data.model_dump()
     request.state.actor = {"email": data["email"]}  # safety net
 
-    msg = await services.create_user_service(request, db, form_data.model_dump())
-    return msg
+    return await services.create_user_service(request, db, form_data.model_dump())
 
 
 # Note: You can inject request object in dependency signature

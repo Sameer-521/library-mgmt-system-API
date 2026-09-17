@@ -72,11 +72,3 @@ app.openapi = custom_openapi
 @app.get("/")
 async def root():
     return {"message": "This is the root page"}
-
-
-# TODO:
-
-# Write tests: ongoing
-# add view schedules and active loans endpoint
-# Add maintenance utilities
-# Implement soft delete functionality or just a seperate endpoint for it
