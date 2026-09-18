@@ -33,10 +33,13 @@ books_router = APIRouter(prefix="/books", tags=["books"])
 @books_router.get("", response_model=LimitOffsetPage[BookResponse], tags=["user"])
 async def get_all_books(
     request: Request,
+    title: Annotated[str | None, Query()] = None,
+    author: Annotated[str | None, Query()] = None,
+    isbn: Annotated[str | None, Query()] = None,
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_session),
 ):
-    return await services.get_all_books_service(request, db)
+    return await services.get_all_books_service(request, db, title, author, isbn)
 
 
 # tested

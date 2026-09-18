@@ -368,9 +368,12 @@ async def get_all_non_staff_users_service(
 async def get_all_books_service(
     request: Request,
     db: AsyncSession,
+    title: str | None = None,
+    author: str | None = None,
+    isbn: str | None = None,
 ):
     try:
-        books = await crud.get_all_active_books(db)
+        books = await crud.get_all_active_books(db, title, author, isbn)
         return books
     except HTTPException:
         await db.rollback()

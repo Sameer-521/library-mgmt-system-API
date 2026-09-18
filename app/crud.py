@@ -164,8 +164,20 @@ async def get_all_books(db: AsyncSession):
     return await apaginate(db, stmt)
 
 
-async def get_all_active_books(db: AsyncSession):
-    stmt = select(Book).where(Book.is_active == True).order_by(Book.id)
+async def get_all_active_books(
+    db: AsyncSession,
+    title: str | None = None,
+    author: str | None = None,
+    isbn: str | None = None,
+):
+    stmt = select(Book).where(Book.is_active == True)
+    if title:
+        stmt = stmt.where(Book.title.ilike(f"%{title}%"))
+    if author:
+        stmt = stmt.where(Book.author.ilike(f"%{author}%"))
+    if isbn:
+        stmt = stmt.where(Book.isbn == isbn)
+    stmt = stmt.order_by(Book.id)
     return await apaginate(db, stmt)
 
 
