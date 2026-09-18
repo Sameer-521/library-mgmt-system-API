@@ -183,12 +183,14 @@ async def get_all_active_books(
 
 async def get_user_schedules(db: AsyncSession, user_uid: str):
     stmt = (
-        select(BkCopySchedule)
+        select(BkCopySchedule, Book)
+        .join(BookCopy, BkCopySchedule.bk_copy_barcode == BookCopy.copy_barcode)
+        .join(Book, BookCopy.book_isbn == Book.isbn)
         .where(BkCopySchedule.user_uid == user_uid)
         .order_by(desc(BkCopySchedule.created_at))
     )
     result = await db.execute(stmt)
-    return result.scalars().all()
+    return result.all()
 
 
 async def get_all_active_loans(db: AsyncSession):

@@ -89,6 +89,9 @@ class BkCopyScheduleInfo(BaseModel):
     schedule_id: str
     status: str
     created_at: datetime
+    book_isbn: str
+    book_title: str
+    book_author: str
     model_config = ConfigDict(from_attributes=True)
 
 

@@ -390,8 +390,22 @@ async def get_user_schedules_service(
     user_uid: str,
 ):
     try:
-        schedules = await crud.get_user_schedules(db, user_uid)
-        return schedules
+        rows = await crud.get_user_schedules(db, user_uid)
+        return [
+            {
+                **{
+                    "user_uid": schedule.user_uid,
+                    "bk_copy_barcode": schedule.bk_copy_barcode,
+                    "schedule_id": schedule.schedule_id,
+                    "status": schedule.status,
+                    "created_at": schedule.created_at,
+                },
+                "book_isbn": book.isbn,
+                "book_title": book.title,
+                "book_author": book.author,
+            }
+            for schedule, book in rows
+        ]
     except HTTPException:
         await db.rollback()
         raise
@@ -533,7 +547,16 @@ async def schedule_book_copy_service(
         return {
             "message": "Schedule has been successfuly created",
             "note": "All schedules that have'nt been consumed will be cleared by 6pm",
-            "schedule_info": schedule,
+            "schedule_info": {
+                "user_uid": schedule.user_uid,
+                "bk_copy_barcode": schedule.bk_copy_barcode,
+                "schedule_id": schedule.schedule_id,
+                "status": schedule.status,
+                "created_at": schedule.created_at,
+                "book_isbn": book.isbn,
+                "book_title": book.title,
+                "book_author": book.author,
+            },
         }
 
 

@@ -374,6 +374,9 @@ async def test_get_my_schedules(auth_client, mock_user, mock_book_copies):
     assert data[0]["user_uid"] == mock_user.user_uid
     assert data[0]["bk_copy_barcode"] == bk_copies[0].copy_barcode
     assert data[0]["status"] == "active"
+    assert data[0]["book_isbn"] == isbn
+    assert data[0]["book_title"] == "mock1"
+    assert data[0]["book_author"] == "hitler"
 
 
 @pytest.mark.anyio
