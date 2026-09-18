@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, Request, status
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -448,7 +448,7 @@ async def return_book_loan_service(
             )
         await crud.update_bk_copy(db, book_returned, {"status": BkCopyStatus.IN_CHECK})
 
-        returned_at = datetime.now(timezone.utc)
+        returned_at = datetime.now(UTC)
         loan_status = LoanStatus.RETURNED
         if safe_datetime_compare(returned_at, loan.due_at):  # overdue
             loan_status = LoanStatus.RETURNED_LATE

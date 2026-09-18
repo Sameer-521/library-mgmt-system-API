@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -339,7 +339,7 @@ async def test_get_my_schedules_newest_first(
     auth_client, mock_user, mock_book_copies, test_session
 ):
     _, bk_copies = mock_book_copies
-    base = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    base = datetime(2026, 1, 1, tzinfo=UTC)
     test_session.add_all(
         [
             BkCopySchedule(

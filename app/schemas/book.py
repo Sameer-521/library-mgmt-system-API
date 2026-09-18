@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, PositiveInt
 
@@ -16,10 +16,10 @@ class BookCreate(BookBase):
 
 
 class BookUpdate(BaseModel):
-    title: Optional[str] = None
-    author: Optional[str] = None
-    available: Optional[bool] = True
-    location: Optional[str] = None
+    title: str | None = None
+    author: str | None = None
+    available: bool | None = True
+    location: str | None = None
 
 
 class BookResponse(BookBase):
@@ -27,7 +27,7 @@ class BookResponse(BookBase):
     isbn: str
     library_barcode: str
     created_at: datetime
-    updated_at: Optional[datetime] = None
+    updated_at: datetime | None = None
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -78,7 +78,7 @@ class BkCopyResponse(BaseModel):
 class BkCopyLoanResponse(BaseModel):
     loan: LoanResponse
     book_copy: BkCopyResponse
-    was_scheduled: Optional[bool] = False
+    was_scheduled: bool | None = False
     model_config = ConfigDict(from_attributes=True)
 
 

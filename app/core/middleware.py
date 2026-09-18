@@ -1,7 +1,8 @@
 import time
+from collections.abc import Awaitable, Callable
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Awaitable, Callable
+from typing import Any
 from urllib.parse import parse_qs
 
 from fastapi import BackgroundTasks, Request

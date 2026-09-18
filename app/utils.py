@@ -1,7 +1,7 @@
 import enum
 import secrets
 import string
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from logging import Logger
 
 logger = Logger(__name__)
@@ -18,9 +18,9 @@ class BkCopyStatus(enum.Enum):
 
 def safe_datetime_compare(dt1: datetime, dt2: datetime) -> bool:
     if dt1.tzinfo is None and dt2.tzinfo is not None:
-        dt1 = dt1.replace(tzinfo=timezone.utc)
+        dt1 = dt1.replace(tzinfo=UTC)
     elif dt1.tzinfo is not None and dt2.tzinfo is None:
-        dt2 = dt2.replace(tzinfo=timezone.utc)
+        dt2 = dt2.replace(tzinfo=UTC)
     return dt1 > dt2
 
 
@@ -77,4 +77,4 @@ def generate_schedule_id():
 
 
 def default_loan_due_date():
-    return datetime.now(timezone.utc) + timedelta(days=7)
+    return datetime.now(UTC) + timedelta(days=7)

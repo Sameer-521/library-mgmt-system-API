@@ -1,12 +1,10 @@
-# ruff: noqa: E402
 
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, UTC
 
 import pytest
 from dotenv import load_dotenv
 from httpx import ASGITransport, AsyncClient
-from typing import List
 
 os.environ.setdefault("AUDIT_ENABLED", "true")
 
@@ -115,7 +113,7 @@ async def mock_book(test_session, book_creation_data):
 
 
 @pytest.fixture(scope="function")
-async def mock_book_copies(test_session, mock_book) -> tuple[str, List[BookCopy]]:
+async def mock_book_copies(test_session, mock_book) -> tuple[str, list[BookCopy]]:
     """
     Adds `number_of_bk_copies`of mock book_copies and returns the original isbn used and a list of book copy instances
     """
@@ -175,7 +173,7 @@ async def overdue_loan(test_session, mock_user, mock_book_copies) -> tuple[str, 
     loan = Loan(
         user_uid=mock_user.user_uid,
         bk_copy_barcode=first_bk.copy_barcode,
-        due_at=datetime.now(timezone.utc) - timedelta(days=3),  # now - 3 days
+        due_at=datetime.now(UTC) - timedelta(days=3),  # now - 3 days
     )
     test_session.add(loan)
     await test_session.flush()

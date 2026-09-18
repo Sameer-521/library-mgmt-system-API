@@ -1,4 +1,3 @@
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -13,9 +12,9 @@ class TokenResponse(Token):
 
 
 class TokenPayload(BaseModel):
-    sub: Optional[str] = None
-    exp: Optional[str] = None
+    sub: str | None = None
+    exp: str | None = None
 
 
 class TokenData(BaseModel):
-    email: Optional[str] = None
+    email: str | None = None
