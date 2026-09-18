@@ -77,7 +77,7 @@
     sidebar.appendChild(brand);
 
     const nav = el("nav", "sidebar__nav");
-    const current = window.location.pathname.split("/").pop();
+    const current = document.body.dataset.nav || window.location.pathname.split("/").pop();
     let activeSet = false;
     for (const section of navItems().sections) {
       nav.appendChild(el("div", "sidebar__section", section.label));

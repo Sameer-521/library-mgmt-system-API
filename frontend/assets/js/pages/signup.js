@@ -42,7 +42,7 @@ function showSuccess(userUid) {
   info.append("Your member ID: ");
   const code = document.createElement("span");
   code.className = "mono";
-  code.textContent = userUid || "—";
+  code.textContent = userUid || "-";
   info.appendChild(code);
   const link = document.createElement("a");
   link.className = "btn btn--primary btn--block";

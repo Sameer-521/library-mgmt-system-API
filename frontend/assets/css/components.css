@@ -237,6 +237,18 @@
   color: var(--warning);
 }
 
+.badge-available {
+  color: #166534;
+  background-color: #dcfce7;
+  border: 1px solid #86efac;
+}
+
+.badge-unavailable {
+  color: #991b1b;
+  background-color: #fee2e2;
+  border: 1px solid #fca5a5;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -314,4 +326,111 @@
 .auth-alt a {
   text-decoration: underline;
   font-weight: 600;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.toolbar .select {
+  width: auto;
+}
+
+.toolbar .input {
+  flex: 1;
+  min-width: 180px;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+}
+
+.pagination__info {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.pagination__controls {
+  display: flex;
+  gap: 8px;
+}
+
+.pagination__controls .btn[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination__controls .btn[aria-disabled="true"]:hover {
+  background: var(--surface);
+}
+
+.dl {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 10px 20px;
+}
+
+.dl dt {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.dl dd {
+  margin: 0;
+}
+
+.modal-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(15, 23, 42, 0.4);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.modal-scrim[hidden] {
+  display: none;
+}
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: min(400px, 90vw);
+}
+
+.modal__header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal__body {
+  padding: 16px 20px;
+}
+
+.modal__body p {
+  margin-bottom: 6px;
+}
+
+.modal__body p:last-child {
+  margin-bottom: 0;
+}
+
+.modal__actions {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }

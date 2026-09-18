@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book details - Library</title>
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/pages.css">
+  <link rel="icon" href="data:,">
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/core/session.js"></script>
+  <script src="assets/js/core/guard.js" data-auth="required"></script>
+  <script src="assets/js/layout.js" defer></script>
+</head>
+<body data-title="Book details" data-nav="catalog.html">
+  <p><a href="catalog.html" id="back-link">Back to catalog</a></p>
+  <div id="alert" class="alert" hidden></div>
+
+  <div id="loading-state" class="card"><div class="card__body muted">Loading...</div></div>
+
+  <div class="card" id="book-card" hidden>
+    <div class="card__header">
+      <h2 id="book-title"></h2>
+      <span id="book-badge"></span>
+    </div>
+    <div class="card__body">
+      <dl class="dl">
+        <dt>Author</dt>
+        <dd id="book-author"></dd>
+        <dt>ISBN</dt>
+        <dd class="mono" id="book-isbn"></dd>
+        <dt>Library barcode</dt>
+        <dd class="mono" id="book-barcode"></dd>
+        <dt>Location</dt>
+        <dd id="book-location"></dd>
+        <dt>Added</dt>
+        <dd id="book-added"></dd>
+        <dt>Updated</dt>
+        <dd id="book-updated"></dd>
+      </dl>
+    </div>
+    <div class="card__header" style="border-top: 1px solid var(--border)">
+      <button class="btn btn--primary" type="button" id="reserve-btn">Reserve</button>
+      <span class="muted" id="reserve-note" hidden></span>
+    </div>
+  </div>
+
+  <div class="card" id="reserve-result" hidden>
+    <div class="card__header"><h3>Reservation</h3></div>
+    <div class="card__body">
+      <div id="reserve-alert" class="alert alert--success"></div>
+      <dl class="dl" id="reserve-details"></dl>
+    </div>
+  </div>
+
+  <div class="modal-scrim" id="reserve-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="reserve-modal-title">
+      <div class="modal__header"><h3 id="reserve-modal-title">Reserve this book?</h3></div>
+      <div class="modal__body">
+        <p><strong id="modal-book-title"></strong></p>
+        <p class="muted" id="modal-book-meta"></p>
+        <p class="muted">The copy will be held for you until 6pm.</p>
+      </div>
+      <div class="modal__actions">
+        <button class="btn btn--secondary" id="modal-cancel" type="button">Cancel</button>
+        <button class="btn btn--primary" id="modal-confirm" type="button">Reserve</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="assets/js/pages/book.js"></script>
+</body>
+</html>

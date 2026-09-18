@@ -1,11 +1,12 @@
 const BASE_URL = window.CONFIG.API_BASE_URL;
 
 export class ApiError extends Error {
-  constructor(status, detail) {
+  constructor(status, detail, code = null) {
     super(detail);
     this.name = "ApiError";
     this.status = status;
     this.detail = detail;
+    this.code = code;
   }
 }
 
@@ -20,7 +21,17 @@ function extractDetail(data) {
       })
       .join("; ");
   }
+  if (typeof data.detail === "object" && data.detail !== null) {
+    return data.detail.message || data.detail.code || JSON.stringify(data.detail);
+  }
   return typeof data === "string" ? data : JSON.stringify(data);
+}
+
+function extractErrorCode(data) {
+  if (data && typeof data.detail === "object" && data.detail !== null) {
+    return data.detail.code || null;
+  }
+  return null;
 }
 
 async function parseBody(response) {
@@ -70,7 +81,7 @@ export async function request(method, path, { query, form, json } = {}) {
   const data = await parseBody(response);
 
   if (!response.ok) {
-    throw new ApiError(response.status, extractDetail(data));
+    throw new ApiError(response.status, extractDetail(data), extractErrorCode(data));
   }
 
   return data;
