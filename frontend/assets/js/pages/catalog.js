@@ -56,6 +56,7 @@ function renderRows(items) {
     const row = document.createElement("tr");
 
     const titleCell = document.createElement("td");
+    titleCell.className = "col-book";
     const link = document.createElement("a");
     link.href = `book.html?isbn=${encodeURIComponent(book.isbn)}`;
     link.textContent = book.title;

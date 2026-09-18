@@ -140,6 +140,25 @@
 
 .table-wrap {
   overflow-x: auto;
+  background-color: var(--surface);
+  background-image:
+    linear-gradient(to right, var(--surface), transparent),
+    linear-gradient(to left, var(--surface), transparent),
+    linear-gradient(to right, rgba(15, 23, 42, 0.1), rgba(15, 23, 42, 0)),
+    linear-gradient(to left, rgba(15, 23, 42, 0.1), rgba(15, 23, 42, 0));
+  background-position: 0 0, 100% 0, 0 0, 100% 0;
+  background-repeat: no-repeat;
+  background-size: 24px 100%, 24px 100%, 10px 100%, 10px 100%;
+  background-attachment: local, local, scroll, scroll;
+}
+
+.table-wrap::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-wrap::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
 }
 
 .no-scroll {

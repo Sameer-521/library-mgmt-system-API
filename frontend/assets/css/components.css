@@ -251,6 +251,7 @@
 
 .table {
   width: 100%;
+  min-width: 600px;
   border-collapse: collapse;
   font-size: 13.5px;
 }
@@ -271,6 +272,14 @@
   padding: 10px 12px;
   border-bottom: 1px solid var(--border);
   vertical-align: middle;
+  white-space: nowrap;
+}
+
+.table .col-book {
+  white-space: normal;
+  min-width: 160px;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 .table tbody tr:last-child td {
