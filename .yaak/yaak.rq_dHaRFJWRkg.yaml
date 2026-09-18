@@ -1,39 +1,37 @@
 type: http_request
 model: http_request
-id: rq_bisefDmXv5
-createdAt: 2026-09-15T20:26:00.569529422
-updatedAt: 2026-09-16T11:16:59.498015962
+id: rq_dHaRFJWRkg
+createdAt: 2026-09-16T11:09:36.918873543
+updatedAt: 2026-09-16T11:18:06.998112095
 workspaceId: wk_J9eGDytoNN
 folderId: null
 authentication: {}
 authenticationType: null
-body:
-  form:
-  - enabled: true
-    name: email
-    value: ${[ USER_EMAIL ]}
-  - enabled: true
-    name: password
-    value: ${[ USER_PASS ]}
-  - enabled: true
-    name: ''
-    value: ''
-bodyType: application/x-www-form-urlencoded
+body: {}
+bodyType: null
 description: ''
 headers:
 - enabled: true
-  name: Content-Type
-  value: application/x-www-form-urlencoded
-  id: RvRazdc5aF
+  name: Authorization
+  value: ${[ B ]} ${[ USER_TOKEN ]}
+  id: MkgfG5fs6h
 - enabled: true
   name: ''
   value: ''
-  id: bkh2NrwVBn
+  id: C97y7UPHhT
 method: POST
-name: User Login
+name: Schedule a book
 sortPriority: 4000.0
-url: ${[ BASE_URL ]}/auth/login
-urlParameters: []
+url: ${[ BASE_URL ]}/books/schedule-book
+urlParameters:
+- enabled: true
+  name: isbn
+  value: '9780135957059'
+  id: zxGtyZqvJg
+- enabled: true
+  name: ''
+  value: ''
+  id: bwiUtdTS9p
 settingSendCookies:
   enabled: false
   value: true

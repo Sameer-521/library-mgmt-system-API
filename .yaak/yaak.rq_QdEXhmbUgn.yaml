@@ -1,34 +1,28 @@
 type: http_request
 model: http_request
-id: rq_ZqimhpvuPv
-createdAt: 2026-09-15T12:33:39.139094543
-updatedAt: 2026-09-16T11:19:07.988118456
+id: rq_QdEXhmbUgn
+createdAt: 2026-09-18T15:36:17.440584321
+updatedAt: 2026-09-18T15:37:33.270790822
 workspaceId: wk_J9eGDytoNN
 folderId: null
 authentication: {}
 authenticationType: null
-body:
-  form:
-  - enabled: true
-    name: email
-    value: ${[ ADMIN_EMAIL ]}
-  - enabled: true
-    name: password
-    value: ${[ ADMIN_PASS ]}
-  - enabled: true
-    name: ''
-    value: ''
-bodyType: application/x-www-form-urlencoded
+body: {}
+bodyType: null
 description: ''
 headers:
 - enabled: true
-  name: Content-Type
-  value: application/x-www-form-urlencoded
-  id: Jt38x4JbVQ
-method: POST
-name: Admin Login
+  name: Authorization
+  value: ${[ B ]} ${[ USER_TOKEN ]}
+  id: 2IiU9XAMsB
+- enabled: true
+  name: ''
+  value: ''
+  id: DXyhKZHA7u
+method: GET
+name: Get All Books
 sortPriority: 1000.0
-url: ${[ BASE_URL ]}/auth/login
+url: ${[ BASE_URL ]}/books
 urlParameters: []
 settingSendCookies:
   enabled: false
