@@ -49,6 +49,59 @@ async def test_get_books_pagination(auth_client, test_session):
 
 
 @pytest.mark.anyio
+async def test_get_books_filtering(auth_client, test_session):
+    test_session.add_all(
+        [
+            Book(
+                title="Clean Code",
+                author="Robert Martin",
+                location="F1",
+                isbn="filter-clean",
+            ),
+            Book(
+                title="The Pragmatic Programmer",
+                author="Andrew Hunt",
+                location="F1",
+                isbn="filter-prag",
+            ),
+            Book(
+                title="Clean Architecture",
+                author="Robert Martin",
+                location="F1",
+                isbn="filter-arch",
+            ),
+        ]
+    )
+    await test_session.flush()
+
+    by_title = await auth_client.get(f"{auth_client.base_url}/books?title=Clean")
+    assert by_title.status_code == 200
+    data = by_title.json()
+    assert data["total"] == 2
+    assert {book["isbn"] for book in data["items"]} == {"filter-clean", "filter-arch"}
+
+    by_author = await auth_client.get(f"{auth_client.base_url}/books?author=Andrew")
+    assert by_author.status_code == 200
+    data = by_author.json()
+    assert data["total"] == 1
+    assert data["items"][0]["isbn"] == "filter-prag"
+
+    by_isbn = await auth_client.get(f"{auth_client.base_url}/books?isbn=filter-prag")
+    assert by_isbn.status_code == 200
+    data = by_isbn.json()
+    assert data["total"] == 1
+    assert data["items"][0]["title"] == "The Pragmatic Programmer"
+
+    combined = await auth_client.get(
+        f"{auth_client.base_url}/books?author=Robert&title=Architecture"
+    )
+    assert combined.status_code == 200
+    data = combined.json()
+    assert data["total"] == 1
+    assert data["items"][0]["isbn"] == "filter-arch"
+
+
+@pytest.mark.anyio
 async def test_get_created_book(auth_client, mock_book):
     isbn = mock_book.isbn
     response = await auth_client.get(f"{auth_client.base_url}/books/fetch?isbn={isbn}")
@@ -123,7 +176,7 @@ async def test_update_bk_copies(admin_auth_client, mock_book_copies):
     }
 
     response = await admin_auth_client.patch(
-        f"{admin_auth_client.base_url}/books/update-bk-copies-status", json=payload
+        f"{admin_auth_client.base_url}/books/bk-copies", json=payload
     )
 
     assert response.status_code == 200
@@ -191,6 +244,32 @@ async def test_soft_delete_book_with_active_copy(
         f"{admin_auth_client.base_url}/books/{isbn}"
     )
     assert response.status_code == 409
+
+
+@pytest.mark.anyio
+async def test_inactive_book_hidden_and_unfetchable(
+    auth_client, test_session, mock_book
+):
+    inactive_book = Book(
+        title="Inactive Book",
+        author="Inactive Author",
+        location="P2",
+        isbn="inactive-isbn-1",
+        is_active=False,
+    )
+    test_session.add(inactive_book)
+    await test_session.flush()
+
+    response = await auth_client.get(f"{auth_client.base_url}/books?limit=10&offset=0")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total"] == 1
+    assert {book["isbn"] for book in data["items"]} == {mock_book.isbn}
+
+    response_2 = await auth_client.get(
+        f"{auth_client.base_url}/books/fetch?isbn={inactive_book.isbn}"
+    )
+    assert response_2.status_code == 404
 
 
 @pytest.mark.anyio
