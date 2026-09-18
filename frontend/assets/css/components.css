@@ -2,7 +2,7 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-lg);
 }
 
 .card__body {
@@ -83,7 +83,7 @@
 
 .field__label {
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .field__hint {
@@ -139,7 +139,7 @@
 .textarea {
   width: 100%;
   padding: 8px 10px;
-  border: 1px solid var(--border-strong);
+  border: 1.5px solid var(--border-strong);
   border-radius: var(--radius);
   background: var(--surface);
   color: var(--text);
@@ -156,7 +156,7 @@
 .textarea:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 .alert {
@@ -309,4 +309,9 @@
   color: var(--text-muted);
   font-size: 13px;
   margin-top: 2px;
+}
+
+.auth-alt a {
+  text-decoration: underline;
+  font-weight: 600;
 }
