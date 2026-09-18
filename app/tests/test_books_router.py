@@ -1,6 +1,8 @@
+from datetime import datetime, timedelta, timezone
+
 import pytest
 
-from app.models import BkCopyStatus, Book, Loan, LoanStatus
+from app.models import BkCopySchedule, BkCopyStatus, Book, Loan, LoanStatus
 
 
 @pytest.mark.anyio
@@ -293,6 +295,50 @@ async def test_get_my_schedules(auth_client, mock_user, mock_book_copies):
 
 
 @pytest.mark.anyio
+async def test_get_my_schedules_requires_token(client):
+    response = await client.get(f"{client.base_url}/books/schedules/me")
+    assert response.status_code == 401
+
+
+@pytest.mark.anyio
+async def test_get_my_schedules_inactive_user(auth_client, mock_user, test_session):
+    mock_user.is_active = False
+    await test_session.flush()
+
+    response = await auth_client.get(f"{auth_client.base_url}/books/schedules/me")
+    assert response.status_code == 400
+
+
+@pytest.mark.anyio
+async def test_get_my_schedules_newest_first(
+    auth_client, mock_user, mock_book_copies, test_session
+):
+    _, bk_copies = mock_book_copies
+    base = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    test_session.add_all(
+        [
+            BkCopySchedule(
+                user_uid=mock_user.user_uid,
+                bk_copy_barcode=bk_copies[i].copy_barcode,
+                created_at=base + timedelta(minutes=i),
+            )
+            for i in range(3)
+        ]
+    )
+    await test_session.flush()
+
+    response = await auth_client.get(f"{auth_client.base_url}/books/schedules/me")
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 3
+    assert [schedule["bk_copy_barcode"] for schedule in data] == [
+        bk_copies[2].copy_barcode,
+        bk_copies[1].copy_barcode,
+        bk_copies[0].copy_barcode,
+    ]
+
+
+@pytest.mark.anyio
 async def test_get_active_loans(
     admin_auth_client, mock_user, mock_loan, mock_book_copies, test_session
 ):
@@ -319,3 +365,15 @@ async def test_get_active_loans(
     assert data["items"][0]["loan_id"] == loan_id
     assert data["limit"] == 10
     assert data["offset"] == 0
+
+
+@pytest.mark.anyio
+async def test_get_active_loans_requires_token(client):
+    response = await client.get(f"{client.base_url}/books/loans/active")
+    assert response.status_code == 401
+
+
+@pytest.mark.anyio
+async def test_get_active_loans_requires_staff(auth_client):
+    response = await auth_client.get(f"{auth_client.base_url}/books/loans/active")
+    assert response.status_code == 403
