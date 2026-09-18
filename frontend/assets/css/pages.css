@@ -1,0 +1,19 @@
+.stub-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.stub-tile {
+  padding: 18px;
+}
+
+.stub-tile__title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.stub-tile__text {
+  color: var(--text-muted);
+  font-size: 13px;
+}
