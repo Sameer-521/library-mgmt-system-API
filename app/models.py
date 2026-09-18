@@ -79,6 +79,12 @@ class Book(Base):
         DateTime(timezone=True), nullable=True, onupdate=func.now()
     )
 
+    copies = relationship("BookCopy", lazy="selectin")
+
+    @property
+    def available_copies(self) -> int:
+        return sum(1 for copy in self.copies if copy.status == BkCopyStatus.AVAILABLE)
+
 
 class User(Base):
     __tablename__ = "users"

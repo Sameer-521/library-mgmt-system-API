@@ -493,9 +493,19 @@ async def schedule_book_copy_service(
         if (len(user_loans) >= 3) or (current_user.fine_balance >= 10):
             raise schd_eligibility_exception
 
+        book = await crud.get_book_by_isbn(db, isbn)
+        if not book or not book.is_active:
+            raise book_not_found_exception
+
         book_copy = await crud.get_book_copy(db, isbn)
         if not book_copy:
-            raise book_not_found_exception
+            raise HTTPException(
+                status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "code": "NO_COPIES_AVAILABLE",
+                    "message": "No available copies",
+                },
+            )
 
         await crud.update_bk_copy(
             db, book_copy, update_data={"status": BkCopyStatus.RESERVED}

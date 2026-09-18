@@ -2,7 +2,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from app.models import BkCopySchedule, BkCopyStatus, Book, Loan, LoanStatus
+from app.models import BkCopySchedule, BkCopyStatus, Book, BookCopy, Loan, LoanStatus
 
 
 @pytest.mark.anyio
@@ -165,6 +165,63 @@ async def test_schedule_bk_copy(auth_client, mock_book_copies):
     )
     assert response.status_code == 201
     assert response.json()["message"] == "Schedule has been successfuly created"
+
+
+@pytest.mark.anyio
+async def test_schedule_bk_copy_unknown_isbn_404(auth_client):
+    response = await auth_client.post(
+        f"{auth_client.base_url}/books/schedule-book?isbn=0000000000"
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.anyio
+async def test_schedule_bk_copy_no_copies_400(auth_client, mock_book):
+    response = await auth_client.post(
+        f"{auth_client.base_url}/books/schedule-book?isbn={mock_book.isbn}"
+    )
+    assert response.status_code == 400
+    detail = response.json()["detail"]
+    assert detail["code"] == "NO_COPIES_AVAILABLE"
+    assert detail["message"] == "No available copies"
+
+
+@pytest.mark.anyio
+async def test_book_response_includes_available_copies(
+    auth_client, mock_book_copies, test_session
+):
+    isbn, bk_copies = mock_book_copies
+    bk_copies[0].status = BkCopyStatus.BORROWED
+    await test_session.flush()
+    test_session.expire_all()
+
+    response = await auth_client.get(f"{auth_client.base_url}/books/fetch?isbn={isbn}")
+    assert response.status_code == 200
+    assert response.json()["available_copies"] == 4
+
+    list_response = await auth_client.get(f"{auth_client.base_url}/books?isbn={isbn}")
+    assert list_response.status_code == 200
+    assert list_response.json()["items"][0]["available_copies"] == 4
+
+
+@pytest.mark.anyio
+async def test_copy_status_changes_reflect_in_count(
+    auth_client, mock_book_copies, test_session
+):
+    isbn, _ = mock_book_copies
+    damaged = BookCopy(
+        book_isbn=isbn,
+        serial=99,
+        copy_barcode="COPY-DAMAGED-99",
+        status=BkCopyStatus.DAMAGED,
+    )
+    test_session.add(damaged)
+    await test_session.flush()
+    test_session.expire_all()
+
+    response = await auth_client.get(f"{auth_client.base_url}/books/fetch?isbn={isbn}")
+    assert response.status_code == 200
+    assert response.json()["available_copies"] == 5
 
 
 @pytest.mark.anyio
