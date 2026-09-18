@@ -205,6 +205,31 @@ async def test_return_book(admin_auth_client, mock_loan):
 
 
 @pytest.mark.anyio
+async def test_inspection_flow(
+    admin_auth_client, mock_loan, mock_book_copies, test_session
+):
+    loan_id, barcode = mock_loan
+    _, bk_copies = mock_book_copies
+    book_copy = bk_copies[0]
+
+    form_data = {"bk_copy_barcode": barcode, "loan_id": loan_id}
+    response = await admin_auth_client.post(
+        f"{admin_auth_client.base_url}/books/loan-return", data=form_data
+    )
+    assert response.status_code == 200
+    await test_session.refresh(book_copy)
+    assert book_copy.status == BkCopyStatus.IN_CHECK
+
+    payload = {"book_copies": [{"copy_barcode": barcode, "status": "AVAILABLE"}]}
+    response_2 = await admin_auth_client.patch(
+        f"{admin_auth_client.base_url}/books/bk-copies", json=payload
+    )
+    assert response_2.status_code == 200
+    await test_session.refresh(book_copy)
+    assert book_copy.status == BkCopyStatus.AVAILABLE
+
+
+@pytest.mark.anyio
 async def test_return_overdue_book(admin_auth_client, overdue_loan):
     loan_id, barcode = overdue_loan
     form_data = {"bk_copy_barcode": barcode, "loan_id": loan_id}
