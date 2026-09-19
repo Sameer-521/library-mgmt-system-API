@@ -19,37 +19,103 @@
     <script src="../assets/js/layout.js" defer></script>
   </head>
   <body data-title="Staff dashboard">
-    <div id="admin-note-slot"></div>
-    <div class="page-head">
-      <div>
-        <h1>Staff dashboard</h1>
-        <p class="page-head__sub">
-          Loans desk, inventory and member management live here.
-        </p>
+    <div class="shell">
+      <aside class="sidebar" id="sidebar-nav">
+        <a class="sidebar__brand" href="../catalog.html">
+          <div>
+            <h2 class="sidebar__brand-name">Library</h2>
+            <p class="sidebar__brand-sub">Management System</p>
+          </div>
+        </a>
+        <nav class="sidebar__nav" aria-label="Main"></nav>
+        <footer class="sidebar__footer">
+          <button class="btn btn--block logout-btn" type="button">Logout</button>
+        </footer>
+      </aside>
+      <div class="main">
+        <header class="topbar">
+          <button
+            class="nav-toggle"
+            type="button"
+            aria-controls="sidebar-nav"
+            aria-expanded="false"
+            aria-label="Open navigation"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"
+              />
+            </svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+              hidden
+            >
+              <path
+                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708-.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
+              />
+            </svg>
+          </button>
+          <p class="topbar__title"></p>
+          <div class="topbar__user">
+            <span class="topbar__email"></span>
+            <span class="badge"></span>
+          </div>
+        </header>
+        <main class="content">
+          <div id="admin-note-slot"></div>
+          <div class="page-head">
+            <div>
+              <h1>Staff dashboard</h1>
+              <p class="page-head__sub">
+                Loans desk, inventory and member management live here.
+              </p>
+            </div>
+          </div>
+          <ul class="stub-grid">
+            <li>
+              <article class="card stub-tile">
+                <h2 class="stub-tile__title">Loans</h2>
+                <p class="stub-tile__text">
+                  Checkout, returns and active loans -
+                  <a href="loans.html">open the loans desk</a>.
+                </p>
+              </article>
+            </li>
+            <li>
+              <article class="card stub-tile">
+                <h2 class="stub-tile__title">Inventory</h2>
+                <p class="stub-tile__text">
+                  Add books, generate copies and run inspections -
+                  <a href="inventory.html">open inventory</a>.
+                </p>
+              </article>
+            </li>
+            <li>
+              <article class="card stub-tile">
+                <h2 class="stub-tile__title">Members</h2>
+                <p class="stub-tile__text">
+                  Browse library members and staff -
+                  <a href="members.html">open members</a>.
+                </p>
+              </article>
+            </li>
+          </ul>
+        </main>
       </div>
-    </div>
-    <div class="stub-grid">
-      <div class="card stub-tile">
-        <div class="stub-tile__title">Loans</div>
-        <div class="stub-tile__text">
-          Checkout, returns and active loans -
-          <a href="loans.html">open the loans desk</a>.
-        </div>
-      </div>
-      <div class="card stub-tile">
-        <div class="stub-tile__title">Inventory</div>
-        <div class="stub-tile__text">
-          Add books, generate copies and run inspections -
-          <a href="inventory.html">open inventory</a>.
-        </div>
-      </div>
-      <div class="card stub-tile">
-        <div class="stub-tile__title">Members</div>
-        <div class="stub-tile__text">
-          Browse library members and staff -
-          <a href="members.html">open members</a>.
-        </div>
-      </div>
+      <div class="scrim"></div>
     </div>
     <script type="module" src="../assets/js/pages/staff/dashboard.js"></script>
   </body>

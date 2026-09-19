@@ -15,61 +15,145 @@
     <script src="assets/js/layout.js" defer></script>
   </head>
   <body data-title="Catalog">
-    <div class="page-head">
-      <div>
-        <h1>Catalog</h1>
-        <p class="page-head__sub">Browse and search the library collection.</p>
-      </div>
-    </div>
+    <div class="shell">
+      <aside class="sidebar" id="sidebar-nav">
+        <a class="sidebar__brand" href="catalog.html">
+          <div>
+            <h2 class="sidebar__brand-name">Library</h2>
+            <p class="sidebar__brand-sub">Management System</p>
+          </div>
+        </a>
+        <nav class="sidebar__nav" aria-label="Main"></nav>
+        <footer class="sidebar__footer">
+          <button class="btn btn--block logout-btn" type="button">Logout</button>
+        </footer>
+      </aside>
+      <div class="main">
+        <header class="topbar">
+          <button
+            class="nav-toggle"
+            type="button"
+            aria-controls="sidebar-nav"
+            aria-expanded="false"
+            aria-label="Open navigation"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"
+              />
+            </svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+              hidden
+            >
+              <path
+                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708-.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
+              />
+            </svg>
+          </button>
+          <p class="topbar__title"></p>
+          <div class="topbar__user">
+            <span class="topbar__email"></span>
+            <span class="badge"></span>
+          </div>
+        </header>
+        <main class="content">
+          <div class="page-head">
+            <div>
+              <h1>Catalog</h1>
+              <p class="page-head__sub">
+                Browse and search the library collection.
+              </p>
+            </div>
+          </div>
 
-    <form class="toolbar" id="filter-form" novalidate>
-      <select class="select" id="filter-field" aria-label="Search field">
-        <option value="title">Title</option>
-        <option value="author">Author</option>
-        <option value="isbn">ISBN</option>
-      </select>
-      <input
-        class="input"
-        type="text"
-        id="filter-q"
-        placeholder="Search catalog"
-      />
-      <button class="btn btn--primary" type="submit">Search</button>
-      <button class="btn btn--secondary" type="button" id="clear-btn">
-        Clear
-      </button>
-    </form>
+          <form class="toolbar" id="filter-form" novalidate>
+            <select class="select" id="filter-field" aria-label="Search field">
+              <option value="title">Title</option>
+              <option value="author">Author</option>
+              <option value="isbn">ISBN</option>
+            </select>
+            <label class="sr-only" for="filter-q">Search query</label>
+            <input
+              class="input"
+              type="text"
+              id="filter-q"
+              placeholder="Search catalog"
+            />
+            <button class="btn btn--primary" type="submit">Search</button>
+            <button class="btn btn--secondary" type="button" id="clear-btn">
+              Clear
+            </button>
+          </form>
 
-    <div id="alert" class="alert" hidden></div>
+          <div id="alert" class="alert" role="alert" hidden></div>
 
-    <div class="card">
-      <div class="table-wrap">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Author</th>
-              <th>ISBN</th>
-              <th>Location</th>
-              <th>Availability</th>
-            </tr>
-          </thead>
-          <tbody id="book-rows"></tbody>
-        </table>
+          <div class="card">
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>ISBN</th>
+                    <th>Location</th>
+                    <th>Availability</th>
+                  </tr>
+                </thead>
+                <tbody id="book-rows"></tbody>
+              </table>
+            </div>
+            <div id="empty-state" class="empty-state" hidden>
+              <h2 class="empty-state__title">No books found</h2>
+              <p class="empty-state__text">No books match your filters.</p>
+              <p class="empty-state__link">
+                <a href="catalog.html">Clear filters</a>
+              </p>
+            </div>
+            <div id="loading-state" class="card__body muted">Loading...</div>
+            <nav
+              class="pagination"
+              aria-label="Pagination"
+              id="pagination"
+              hidden
+            >
+              <p class="pagination__info" id="page-info"></p>
+              <div class="pagination__controls">
+                <button
+                  class="btn btn--secondary"
+                  type="button"
+                  id="prev-btn"
+                  disabled
+                >
+                  Prev
+                </button>
+                <button
+                  class="btn btn--secondary"
+                  type="button"
+                  id="next-btn"
+                  disabled
+                >
+                  Next
+                </button>
+              </div>
+            </nav>
+          </div>
+        </main>
       </div>
-      <div id="empty-state" class="empty-state" hidden>
-        <div class="empty-state__title">No books found</div>
-        <div class="empty-state__text">No books match your filters.</div>
-        <p style="margin-top: 12px"><a href="catalog.html">Clear filters</a></p>
-      </div>
-      <div id="loading-state" class="card__body muted">Loading...</div>
-      <div class="pagination" id="pagination" hidden>
-        <span class="pagination__info" id="page-info"></span>
-        <div class="pagination__controls">
-          <a class="btn btn--secondary" id="prev-btn">Prev</a>
-          <a class="btn btn--secondary" id="next-btn">Next</a>
-        </div>
-      </div>
+      <div class="scrim"></div>
     </div>
     <script type="module" src="assets/js/pages/catalog.js"></script>
   </body>

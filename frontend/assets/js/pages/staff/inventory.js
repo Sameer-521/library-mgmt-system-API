@@ -267,11 +267,10 @@ function renderInspectionRows(items) {
 
     const bookCell = document.createElement("td");
     bookCell.className = "col-book";
-    const title = document.createElement("div");
+    const title = document.createElement("p");
     title.textContent = copy.book_title;
-    const isbn = document.createElement("div");
+    const isbn = document.createElement("p");
     isbn.className = "muted mono";
-    isbn.style.fontSize = "12.5px";
     isbn.textContent = copy.book_isbn;
     bookCell.append(title, isbn);
 
@@ -319,22 +318,17 @@ function renderInspectionPagination(total) {
   const to = Math.min(state.offset + PAGE_SIZE, total);
   inspectionPageInfo.textContent = `Showing ${from}-${to} of ${total}`;
 
-  if (state.offset > 0) {
-    inspectionPrev.href = buildUrl(Math.max(0, state.offset - PAGE_SIZE));
-    inspectionPrev.removeAttribute("aria-disabled");
-  } else {
-    inspectionPrev.removeAttribute("href");
-    inspectionPrev.setAttribute("aria-disabled", "true");
-  }
-
-  if (state.offset + PAGE_SIZE < total) {
-    inspectionNext.href = buildUrl(state.offset + PAGE_SIZE);
-    inspectionNext.removeAttribute("aria-disabled");
-  } else {
-    inspectionNext.removeAttribute("href");
-    inspectionNext.setAttribute("aria-disabled", "true");
-  }
+  inspectionPrev.disabled = state.offset <= 0;
+  inspectionNext.disabled = state.offset + PAGE_SIZE >= total;
 }
+
+inspectionPrev.addEventListener("click", () => {
+  window.location.href = buildUrl(Math.max(0, state.offset - PAGE_SIZE));
+});
+
+inspectionNext.addEventListener("click", () => {
+  window.location.href = buildUrl(state.offset + PAGE_SIZE);
+});
 
 async function loadInspection() {
   inspectionLoading.hidden = false;

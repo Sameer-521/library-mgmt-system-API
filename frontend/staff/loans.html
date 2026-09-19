@@ -19,131 +19,214 @@
     <script src="../assets/js/layout.js" defer></script>
   </head>
   <body data-title="Loans">
-    <div class="page-head">
-      <div>
-        <h1>Loans</h1>
-        <p class="page-head__sub">
-          Check out and return book copies for members.
-        </p>
-      </div>
-    </div>
-
-    <div id="alert" class="alert" hidden></div>
-
-    <div class="desk-grid">
-      <div class="card">
-        <div class="card__header">Checkout</div>
-        <div class="card__body">
-          <form id="checkout-form" novalidate>
-            <div class="field">
-              <label class="field__label" for="checkout-member">Member</label>
-              <input
-                class="input"
-                type="text"
-                id="checkout-member"
-                list="member-options"
-                placeholder="Start typing an email or user ID"
-                autocomplete="off"
-                required
-              />
-              <datalist id="member-options"></datalist>
-              <div class="field__hint">Pick a member from the list.</div>
-            </div>
-            <div class="field">
-              <label class="field__label" for="checkout-isbn">ISBN</label>
-              <input
-                class="input mono"
-                type="text"
-                id="checkout-isbn"
-                placeholder="e.g. 11223344"
-                required
-              />
-            </div>
-            <button
-              class="btn btn--primary btn--block"
-              type="submit"
-              id="checkout-submit"
+    <div class="shell">
+      <aside class="sidebar" id="sidebar-nav">
+        <a class="sidebar__brand" href="../catalog.html">
+          <div>
+            <h2 class="sidebar__brand-name">Library</h2>
+            <p class="sidebar__brand-sub">Management System</p>
+          </div>
+        </a>
+        <nav class="sidebar__nav" aria-label="Main"></nav>
+        <footer class="sidebar__footer">
+          <button class="btn btn--block logout-btn" type="button">Logout</button>
+        </footer>
+      </aside>
+      <div class="main">
+        <header class="topbar">
+          <button
+            class="nav-toggle"
+            type="button"
+            aria-controls="sidebar-nav"
+            aria-expanded="false"
+            aria-label="Open navigation"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
             >
-              Check out
-            </button>
-          </form>
-          <p class="muted desk-result" id="checkout-result" hidden></p>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card__header">Return</div>
-        <div class="card__body">
-          <form id="return-form" novalidate>
-            <div class="field">
-              <label class="field__label" for="return-loan-id">Loan ID</label>
-              <input
-                class="input mono"
-                type="text"
-                id="return-loan-id"
-                placeholder="e.g. LN-..."
-                required
+              <path
+                fill-rule="evenodd"
+                d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"
               />
-            </div>
-            <div class="field">
-              <label class="field__label" for="return-barcode"
-                >Copy barcode</label
-              >
-              <input
-                class="input mono"
-                type="text"
-                id="return-barcode"
-                placeholder="e.g. LIB-...-0001"
-                required
-              />
-            </div>
-            <button
-              class="btn btn--primary btn--block"
-              type="submit"
-              id="return-submit"
+            </svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+              hidden
             >
-              Return
-            </button>
-          </form>
-          <p class="muted desk-result" id="return-result" hidden></p>
-        </div>
-      </div>
-    </div>
+              <path
+                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708-.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
+              />
+            </svg>
+          </button>
+          <p class="topbar__title"></p>
+          <div class="topbar__user">
+            <span class="topbar__email"></span>
+            <span class="badge"></span>
+          </div>
+        </header>
+        <main class="content">
+          <div class="page-head">
+            <div>
+              <h1>Loans</h1>
+              <p class="page-head__sub">
+                Check out and return book copies for members.
+              </p>
+            </div>
+          </div>
 
-    <p class="muted" id="summary" style="margin-bottom: 12px" hidden></p>
+          <div id="alert" class="alert" role="alert" hidden></div>
 
-    <div class="card">
-      <div class="table-wrap">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Loan ID</th>
-              <th>Member</th>
-              <th>Book</th>
-              <th>Copy</th>
-              <th>Checked out</th>
-              <th>Due</th>
-              <th>Status</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="loan-rows"></tbody>
-        </table>
+          <div class="desk-grid">
+            <section class="card">
+              <h2 class="card__header">Checkout</h2>
+              <div class="card__body">
+                <form id="checkout-form" novalidate>
+                  <div class="field">
+                    <label class="field__label" for="checkout-member"
+                      >Member</label
+                    >
+                    <input
+                      class="input"
+                      type="text"
+                      id="checkout-member"
+                      list="member-options"
+                      placeholder="Start typing an email or user ID"
+                      autocomplete="off"
+                      required
+                    />
+                    <datalist id="member-options"></datalist>
+                    <div class="field__hint">Pick a member from the list.</div>
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="checkout-isbn">ISBN</label>
+                    <input
+                      class="input mono"
+                      type="text"
+                      id="checkout-isbn"
+                      placeholder="e.g. 11223344"
+                      required
+                    />
+                  </div>
+                  <button
+                    class="btn btn--primary btn--block"
+                    type="submit"
+                    id="checkout-submit"
+                  >
+                    Check out
+                  </button>
+                </form>
+                <p class="muted desk-result" id="checkout-result" hidden></p>
+              </div>
+            </section>
+
+            <section class="card">
+              <h2 class="card__header">Return</h2>
+              <div class="card__body">
+                <form id="return-form" novalidate>
+                  <div class="field">
+                    <label class="field__label" for="return-loan-id"
+                      >Loan ID</label
+                    >
+                    <input
+                      class="input mono"
+                      type="text"
+                      id="return-loan-id"
+                      placeholder="e.g. LN-..."
+                      required
+                    />
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="return-barcode"
+                      >Copy barcode</label
+                    >
+                    <input
+                      class="input mono"
+                      type="text"
+                      id="return-barcode"
+                      placeholder="e.g. LIB-...-0001"
+                      required
+                    />
+                  </div>
+                  <button
+                    class="btn btn--primary btn--block"
+                    type="submit"
+                    id="return-submit"
+                  >
+                    Return
+                  </button>
+                </form>
+                <p class="muted desk-result" id="return-result" hidden></p>
+              </div>
+            </section>
+          </div>
+
+          <p class="muted table-summary" id="summary" hidden></p>
+
+          <div class="card">
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Loan ID</th>
+                    <th>Member</th>
+                    <th>Book</th>
+                    <th>Copy</th>
+                    <th>Checked out</th>
+                    <th>Due</th>
+                    <th>Status</th>
+                    <th><span class="sr-only">Actions</span></th>
+                  </tr>
+                </thead>
+                <tbody id="loan-rows"></tbody>
+              </table>
+            </div>
+            <div id="empty-state" class="empty-state" hidden>
+              <h2 class="empty-state__title">No active loans</h2>
+              <p class="empty-state__text">
+                There are currently no copies on loan.
+              </p>
+            </div>
+            <div id="loading-state" class="card__body muted">Loading...</div>
+            <nav
+              class="pagination"
+              aria-label="Pagination"
+              id="pagination"
+              hidden
+            >
+              <p class="pagination__info" id="page-info"></p>
+              <div class="pagination__controls">
+                <button
+                  class="btn btn--secondary"
+                  type="button"
+                  id="prev-btn"
+                  disabled
+                >
+                  Prev
+                </button>
+                <button
+                  class="btn btn--secondary"
+                  type="button"
+                  id="next-btn"
+                  disabled
+                >
+                  Next
+                </button>
+              </div>
+            </nav>
+          </div>
+        </main>
       </div>
-      <div id="empty-state" class="empty-state" hidden>
-        <div class="empty-state__title">No active loans</div>
-        <div class="empty-state__text">
-          There are currently no copies on loan.
-        </div>
-      </div>
-      <div id="loading-state" class="card__body muted">Loading...</div>
-      <div class="pagination" id="pagination" hidden>
-        <span class="pagination__info" id="page-info"></span>
-        <div class="pagination__controls">
-          <a class="btn btn--secondary" id="prev-btn">Prev</a>
-          <a class="btn btn--secondary" id="next-btn">Next</a>
-        </div>
-      </div>
+      <div class="scrim"></div>
     </div>
     <script type="module" src="../assets/js/pages/staff/loans.js"></script>
   </body>

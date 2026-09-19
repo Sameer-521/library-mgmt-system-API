@@ -15,40 +15,100 @@
     <script src="assets/js/layout.js" defer></script>
   </head>
   <body data-title="My Reservations">
-    <div class="page-head">
-      <div>
-        <h1>My Reservations</h1>
-        <p class="page-head__sub">Copies you have placed on hold.</p>
-      </div>
-    </div>
+    <div class="shell">
+      <aside class="sidebar" id="sidebar-nav">
+        <a class="sidebar__brand" href="catalog.html">
+          <div>
+            <h2 class="sidebar__brand-name">Library</h2>
+            <p class="sidebar__brand-sub">Management System</p>
+          </div>
+        </a>
+        <nav class="sidebar__nav" aria-label="Main"></nav>
+        <footer class="sidebar__footer">
+          <button class="btn btn--block logout-btn" type="button">Logout</button>
+        </footer>
+      </aside>
+      <div class="main">
+        <header class="topbar">
+          <button
+            class="nav-toggle"
+            type="button"
+            aria-controls="sidebar-nav"
+            aria-expanded="false"
+            aria-label="Open navigation"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"
+              />
+            </svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+              hidden
+            >
+              <path
+                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708-.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
+              />
+            </svg>
+          </button>
+          <p class="topbar__title"></p>
+          <div class="topbar__user">
+            <span class="topbar__email"></span>
+            <span class="badge"></span>
+          </div>
+        </header>
+        <main class="content">
+          <div class="page-head">
+            <div>
+              <h1>My Reservations</h1>
+              <p class="page-head__sub">Copies you have placed on hold.</p>
+            </div>
+          </div>
 
-    <div id="alert" class="alert" hidden></div>
+          <div id="alert" class="alert" role="alert" hidden></div>
 
-    <p class="muted" id="summary" style="margin-bottom: 12px" hidden></p>
+          <p class="muted table-summary" id="summary" hidden></p>
 
-    <div class="card">
-      <div class="table-wrap">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Schedule ID</th>
-              <th>Book</th>
-              <th>Copy</th>
-              <th>Reserved at</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="reservation-rows"></tbody>
-        </table>
+          <div class="card">
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Schedule ID</th>
+                    <th>Book</th>
+                    <th>Copy</th>
+                    <th>Reserved at</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="reservation-rows"></tbody>
+              </table>
+            </div>
+            <div id="empty-state" class="empty-state" hidden>
+              <h2 class="empty-state__title">No reservations</h2>
+              <p class="empty-state__text">You have no reservations yet.</p>
+              <p class="empty-state__link">
+                <a href="catalog.html">Browse the catalog</a>
+              </p>
+            </div>
+            <div id="loading-state" class="card__body muted">Loading...</div>
+          </div>
+        </main>
       </div>
-      <div id="empty-state" class="empty-state" hidden>
-        <div class="empty-state__title">No reservations</div>
-        <div class="empty-state__text">You have no reservations yet.</div>
-        <p style="margin-top: 12px">
-          <a href="catalog.html">Browse the catalog</a>
-        </p>
-      </div>
-      <div id="loading-state" class="card__body muted">Loading...</div>
+      <div class="scrim"></div>
     </div>
     <script type="module" src="assets/js/pages/reservations.js"></script>
   </body>

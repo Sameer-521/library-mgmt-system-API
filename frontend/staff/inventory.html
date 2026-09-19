@@ -19,212 +19,332 @@
     <script src="../assets/js/layout.js" defer></script>
   </head>
   <body data-title="Inventory">
-    <div class="page-head">
-      <div>
-        <h1>Inventory</h1>
-        <p class="page-head__sub">Manage books, copies and inspections.</p>
-      </div>
-    </div>
-
-    <div id="alert" class="alert" hidden></div>
-
-    <div class="desk-grid">
-      <div class="card">
-        <div class="card__header">Add book</div>
-        <div class="card__body">
-          <form id="create-form" novalidate>
-            <div class="field">
-              <label class="field__label" for="create-title">Title</label>
-              <input class="input" type="text" id="create-title" required />
-            </div>
-            <div class="field">
-              <label class="field__label" for="create-author">Author</label>
-              <input class="input" type="text" id="create-author" required />
-            </div>
-            <div class="field">
-              <label class="field__label" for="create-isbn">ISBN</label>
-              <input class="input mono" type="text" id="create-isbn" required />
-            </div>
-            <div class="field">
-              <label class="field__label" for="create-location">Location</label>
-              <input
-                class="input"
-                type="text"
-                id="create-location"
-                placeholder="e.g. a3"
-                required
-              />
-            </div>
-            <div class="field field--inline">
-              <label for="create-available"
-                ><input type="checkbox" id="create-available" checked />
-                Available for loans</label
-              >
-            </div>
-            <button
-              class="btn btn--primary btn--block"
-              type="submit"
-              id="create-submit"
-            >
-              Add book
-            </button>
-          </form>
-          <p class="muted desk-result" id="create-result" hidden></p>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card__header">Edit book</div>
-        <div class="card__body">
-          <form id="edit-load-form" novalidate>
-            <div class="field">
-              <label class="field__label" for="edit-isbn">ISBN</label>
-              <div class="toolbar" style="margin-bottom: 0">
-                <input class="input mono" type="text" id="edit-isbn" required />
-                <button
-                  class="btn btn--secondary"
-                  type="submit"
-                  id="edit-load-btn"
-                >
-                  Load
-                </button>
-              </div>
-              <div class="field__hint">Load a book to edit its details.</div>
-            </div>
-          </form>
-          <form id="edit-form" novalidate hidden>
-            <div class="field">
-              <label class="field__label" for="edit-title">Title</label>
-              <input class="input" type="text" id="edit-title" />
-            </div>
-            <div class="field">
-              <label class="field__label" for="edit-author">Author</label>
-              <input class="input" type="text" id="edit-author" />
-            </div>
-            <div class="field">
-              <label class="field__label" for="edit-location">Location</label>
-              <input class="input" type="text" id="edit-location" />
-            </div>
-            <div class="field field--inline">
-              <label for="edit-available"
-                ><input type="checkbox" id="edit-available" /> Available for
-                loans</label
-              >
-            </div>
-            <button
-              class="btn btn--primary btn--block"
-              type="submit"
-              id="edit-submit"
-            >
-              Save changes
-            </button>
-          </form>
-          <p class="muted desk-result" id="edit-result" hidden></p>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card__header">Generate copies</div>
-        <div class="card__body">
-          <form id="copies-form" novalidate>
-            <div class="field">
-              <label class="field__label" for="copies-isbn">ISBN</label>
-              <input class="input mono" type="text" id="copies-isbn" required />
-            </div>
-            <div class="field">
-              <label class="field__label" for="copies-quantity">Quantity</label>
-              <input
-                class="input"
-                type="number"
-                id="copies-quantity"
-                min="1"
-                step="1"
-                required
-              />
-            </div>
-            <button
-              class="btn btn--primary btn--block"
-              type="submit"
-              id="copies-submit"
-            >
-              Generate
-            </button>
-          </form>
-          <p class="muted desk-result" id="copies-result" hidden></p>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card__header">Inspection</div>
-      <div class="card__body">
-        <p class="muted" style="margin-top: 0">
-          Returned copies wait here as IN_CHECK until staff mark them back to
-          AVAILABLE or write them off as LOST or DAMAGED.
-        </p>
-        <form class="toolbar" id="inspection-filter-form" novalidate>
-          <select
-            class="select"
-            id="inspection-status"
-            aria-label="Copy status"
+    <div class="shell">
+      <aside class="sidebar" id="sidebar-nav">
+        <a class="sidebar__brand" href="../catalog.html">
+          <div>
+            <h2 class="sidebar__brand-name">Library</h2>
+            <p class="sidebar__brand-sub">Management System</p>
+          </div>
+        </a>
+        <nav class="sidebar__nav" aria-label="Main"></nav>
+        <footer class="sidebar__footer">
+          <button class="btn btn--block logout-btn" type="button">Logout</button>
+        </footer>
+      </aside>
+      <div class="main">
+        <header class="topbar">
+          <button
+            class="nav-toggle"
+            type="button"
+            aria-controls="sidebar-nav"
+            aria-expanded="false"
+            aria-label="Open navigation"
           >
-            <option value="IN_CHECK" selected>IN_CHECK</option>
-            <option value="AVAILABLE">AVAILABLE</option>
-            <option value="BORROWED">BORROWED</option>
-            <option value="RESERVED">RESERVED</option>
-            <option value="LOST">LOST</option>
-            <option value="DAMAGED">DAMAGED</option>
-          </select>
-          <input
-            class="input mono"
-            type="text"
-            id="inspection-isbn"
-            placeholder="ISBN (optional)"
-          />
-          <button class="btn btn--primary" type="submit">Filter</button>
-        </form>
-        <div id="inspection-alert" class="alert" hidden></div>
-        <div class="table-wrap">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Barcode</th>
-                <th>Book</th>
-                <th>Status</th>
-                <th>Set status</th>
-              </tr>
-            </thead>
-            <tbody id="inspection-rows"></tbody>
-          </table>
-        </div>
-        <div id="inspection-empty" class="empty-state" hidden>
-          <div class="empty-state__title">No copies found</div>
-          <div class="empty-state__text">
-            Nothing matches this status and ISBN.
-          </div>
-        </div>
-        <div id="inspection-loading" class="muted" style="padding: 16px">
-          Loading...
-        </div>
-        <div
-          class="toolbar"
-          id="inspection-actions"
-          style="margin-bottom: 0"
-          hidden
-        >
-          <button class="btn btn--primary" type="button" id="inspection-apply">
-            Apply updates
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"
+              />
+            </svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+              hidden
+            >
+              <path
+                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708-.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
+              />
+            </svg>
           </button>
-          <span class="muted" id="inspection-pending"></span>
-        </div>
-        <div class="pagination" id="inspection-pagination" hidden>
-          <span class="pagination__info" id="inspection-page-info"></span>
-          <div class="pagination__controls">
-            <a class="btn btn--secondary" id="inspection-prev">Prev</a>
-            <a class="btn btn--secondary" id="inspection-next">Next</a>
+          <p class="topbar__title"></p>
+          <div class="topbar__user">
+            <span class="topbar__email"></span>
+            <span class="badge"></span>
           </div>
-        </div>
+        </header>
+        <main class="content">
+          <div class="page-head">
+            <div>
+              <h1>Inventory</h1>
+              <p class="page-head__sub">
+                Manage books, copies and inspections.
+              </p>
+            </div>
+          </div>
+
+          <div id="alert" class="alert" role="alert" hidden></div>
+
+          <div class="desk-grid">
+            <section class="card">
+              <h2 class="card__header">Add book</h2>
+              <div class="card__body">
+                <form id="create-form" novalidate>
+                  <div class="field">
+                    <label class="field__label" for="create-title">Title</label>
+                    <input class="input" type="text" id="create-title" required />
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="create-author">Author</label>
+                    <input
+                      class="input"
+                      type="text"
+                      id="create-author"
+                      required
+                    />
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="create-isbn">ISBN</label>
+                    <input
+                      class="input mono"
+                      type="text"
+                      id="create-isbn"
+                      required
+                    />
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="create-location"
+                      >Location</label
+                    >
+                    <input
+                      class="input"
+                      type="text"
+                      id="create-location"
+                      placeholder="e.g. a3"
+                      required
+                    />
+                  </div>
+                  <div class="field field--inline">
+                    <label for="create-available"
+                      ><input type="checkbox" id="create-available" checked />
+                      Available for loans</label
+                    >
+                  </div>
+                  <button
+                    class="btn btn--primary btn--block"
+                    type="submit"
+                    id="create-submit"
+                  >
+                    Add book
+                  </button>
+                </form>
+                <p class="muted desk-result" id="create-result" hidden></p>
+              </div>
+            </section>
+
+            <section class="card">
+              <h2 class="card__header">Edit book</h2>
+              <div class="card__body">
+                <form id="edit-load-form" novalidate>
+                  <div class="field">
+                    <label class="field__label" for="edit-isbn">ISBN</label>
+                    <div class="toolbar toolbar--flush">
+                      <input
+                        class="input mono"
+                        type="text"
+                        id="edit-isbn"
+                        required
+                      />
+                      <button
+                        class="btn btn--secondary"
+                        type="submit"
+                        id="edit-load-btn"
+                      >
+                        Load
+                      </button>
+                    </div>
+                    <div class="field__hint">
+                      Load a book to edit its details.
+                    </div>
+                  </div>
+                </form>
+                <form id="edit-form" novalidate hidden>
+                  <div class="field">
+                    <label class="field__label" for="edit-title">Title</label>
+                    <input class="input" type="text" id="edit-title" />
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="edit-author">Author</label>
+                    <input class="input" type="text" id="edit-author" />
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="edit-location"
+                      >Location</label
+                    >
+                    <input class="input" type="text" id="edit-location" />
+                  </div>
+                  <div class="field field--inline">
+                    <label for="edit-available"
+                      ><input type="checkbox" id="edit-available" /> Available
+                      for loans</label
+                    >
+                  </div>
+                  <button
+                    class="btn btn--primary btn--block"
+                    type="submit"
+                    id="edit-submit"
+                  >
+                    Save changes
+                  </button>
+                </form>
+                <p class="muted desk-result" id="edit-result" hidden></p>
+              </div>
+            </section>
+
+            <section class="card">
+              <h2 class="card__header">Generate copies</h2>
+              <div class="card__body">
+                <form id="copies-form" novalidate>
+                  <div class="field">
+                    <label class="field__label" for="copies-isbn">ISBN</label>
+                    <input
+                      class="input mono"
+                      type="text"
+                      id="copies-isbn"
+                      required
+                    />
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="copies-quantity"
+                      >Quantity</label
+                    >
+                    <input
+                      class="input"
+                      type="number"
+                      id="copies-quantity"
+                      min="1"
+                      step="1"
+                      required
+                    />
+                  </div>
+                  <button
+                    class="btn btn--primary btn--block"
+                    type="submit"
+                    id="copies-submit"
+                  >
+                    Generate
+                  </button>
+                </form>
+                <p class="muted desk-result" id="copies-result" hidden></p>
+              </div>
+            </section>
+          </div>
+
+          <section class="card">
+            <h2 class="card__header">Inspection</h2>
+            <div class="card__body">
+              <p class="muted">
+                Returned copies wait here as IN_CHECK until staff mark them back
+                to AVAILABLE or write them off as LOST or DAMAGED.
+              </p>
+              <form class="toolbar" id="inspection-filter-form" novalidate>
+                <select
+                  class="select"
+                  id="inspection-status"
+                  aria-label="Copy status"
+                >
+                  <option value="IN_CHECK" selected>IN_CHECK</option>
+                  <option value="AVAILABLE">AVAILABLE</option>
+                  <option value="BORROWED">BORROWED</option>
+                  <option value="RESERVED">RESERVED</option>
+                  <option value="LOST">LOST</option>
+                  <option value="DAMAGED">DAMAGED</option>
+                </select>
+                <label class="sr-only" for="inspection-isbn"
+                  >Filter by ISBN</label
+                >
+                <input
+                  class="input mono"
+                  type="text"
+                  id="inspection-isbn"
+                  placeholder="ISBN (optional)"
+                />
+                <button class="btn btn--primary" type="submit">Filter</button>
+              </form>
+              <div
+                id="inspection-alert"
+                class="alert"
+                role="alert"
+                hidden
+              ></div>
+              <div class="table-wrap">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Barcode</th>
+                      <th>Book</th>
+                      <th>Status</th>
+                      <th>Set status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="inspection-rows"></tbody>
+                </table>
+              </div>
+              <div id="inspection-empty" class="empty-state" hidden>
+                <h2 class="empty-state__title">No copies found</h2>
+                <p class="empty-state__text">
+                  Nothing matches this status and ISBN.
+                </p>
+              </div>
+              <div id="inspection-loading" class="muted loading-pad">
+                Loading...
+              </div>
+              <div
+                class="toolbar toolbar--flush"
+                id="inspection-actions"
+                hidden
+              >
+                <button
+                  class="btn btn--primary"
+                  type="button"
+                  id="inspection-apply"
+                >
+                  Apply updates
+                </button>
+                <span class="muted" id="inspection-pending"></span>
+              </div>
+              <nav
+                class="pagination"
+                aria-label="Pagination"
+                id="inspection-pagination"
+                hidden
+              >
+                <p class="pagination__info" id="inspection-page-info"></p>
+                <div class="pagination__controls">
+                  <button
+                    class="btn btn--secondary"
+                    type="button"
+                    id="inspection-prev"
+                    disabled
+                  >
+                    Prev
+                  </button>
+                  <button
+                    class="btn btn--secondary"
+                    type="button"
+                    id="inspection-next"
+                    disabled
+                  >
+                    Next
+                  </button>
+                </div>
+              </nav>
+            </div>
+          </section>
+        </main>
       </div>
+      <div class="scrim"></div>
     </div>
     <script type="module" src="../assets/js/pages/staff/inventory.js"></script>
   </body>

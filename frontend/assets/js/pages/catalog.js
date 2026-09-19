@@ -94,26 +94,21 @@ function renderPagination(total) {
   const to = Math.min(state.offset + PAGE_SIZE, total);
   pageInfo.textContent = `Showing ${from}-${to} of ${total}`;
 
-  if (state.offset > 0) {
-    prevBtn.href = buildUrl(
-      Math.max(0, state.offset - PAGE_SIZE),
-      state.field,
-      state.q
-    );
-    prevBtn.removeAttribute("aria-disabled");
-  } else {
-    prevBtn.removeAttribute("href");
-    prevBtn.setAttribute("aria-disabled", "true");
-  }
-
-  if (state.offset + PAGE_SIZE < total) {
-    nextBtn.href = buildUrl(state.offset + PAGE_SIZE, state.field, state.q);
-    nextBtn.removeAttribute("aria-disabled");
-  } else {
-    nextBtn.removeAttribute("href");
-    nextBtn.setAttribute("aria-disabled", "true");
-  }
+  prevBtn.disabled = state.offset <= 0;
+  nextBtn.disabled = state.offset + PAGE_SIZE >= total;
 }
+
+prevBtn.addEventListener("click", () => {
+  window.location.href = buildUrl(
+    Math.max(0, state.offset - PAGE_SIZE),
+    state.field,
+    state.q
+  );
+});
+
+nextBtn.addEventListener("click", () => {
+  window.location.href = buildUrl(state.offset + PAGE_SIZE, state.field, state.q);
+});
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();

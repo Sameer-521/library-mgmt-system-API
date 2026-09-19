@@ -49,96 +49,47 @@
     return node;
   }
 
-  function buildNavToggle() {
-    const button = el("button", "nav-toggle");
-    button.type = "button";
-    button.setAttribute("aria-controls", "sidebar-nav");
-    button.setAttribute("aria-expanded", "false");
-    button.setAttribute("aria-label", "Open navigation");
-    button.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-        <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
-      </svg>
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true" hidden>
-        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
-      </svg>`;
-    return button;
-  }
-
-  function buildSidebar() {
-    const sidebar = el("aside", "sidebar");
-    sidebar.id = "sidebar-nav";
-
-    const brand = el("div", "sidebar__brand");
-    const brandText = el("div");
-    brandText.appendChild(el("div", "sidebar__brand-name", "Library"));
-    brandText.appendChild(el("div", "sidebar__brand-sub", "Management System"));
-    brand.appendChild(brandText);
-    sidebar.appendChild(brand);
-
-    const nav = el("nav", "sidebar__nav");
+  function populateNav(nav) {
     const current =
       document.body.dataset.nav || window.location.pathname.split("/").pop();
     let activeSet = false;
+    const list = el("ul", "sidebar__list");
     for (const section of navItems().sections) {
-      nav.appendChild(el("div", "sidebar__section", section.label));
+      const sectionItem = el("li");
+      sectionItem.appendChild(el("span", "sidebar__section", section.label));
+      const group = el("ul", "sidebar__group");
       for (const item of section.items) {
+        const entry = el("li");
         const link = el("a", "sidebar__link", item.label);
         link.href = item.href;
         if (!activeSet && item.href.endsWith(current)) {
           link.classList.add("active");
           activeSet = true;
         }
-        nav.appendChild(link);
+        entry.appendChild(link);
+        group.appendChild(entry);
       }
+      sectionItem.appendChild(group);
+      list.appendChild(sectionItem);
     }
-    sidebar.appendChild(nav);
+    nav.appendChild(list);
+  }
 
-    const footer = el("div", "sidebar__footer");
-    const logout = el("button", "btn btn--block logout-btn", "Logout");
-    logout.type = "button";
+  function enhanceTopbar(topbar) {
+    topbar.querySelector(".topbar__title").textContent =
+      document.body.dataset.title || "";
+    topbar.querySelector(".topbar__email").textContent = Session.email() || "";
+    const badge = topbar.querySelector(".badge");
+    badge.classList.add(`badge--${Session.isStaffLike() ? "blue" : "gray"}`);
+    badge.textContent = Session.getRole();
+  }
+
+  function wireLogout(sidebar) {
+    const logout = sidebar.querySelector(".logout-btn");
     logout.addEventListener("click", () => {
       Session.clear();
       window.location.replace(Session.loginPath());
     });
-    footer.appendChild(logout);
-    sidebar.appendChild(footer);
-
-    return sidebar;
-  }
-
-  function buildTopbar() {
-    const topbar = el("header", "topbar");
-    topbar.appendChild(buildNavToggle());
-    const title = document.body.dataset.title || "";
-    topbar.appendChild(el("div", "topbar__title", title));
-
-    const user = el("div", "topbar__user");
-    user.appendChild(el("span", "topbar__email", Session.email() || ""));
-    user.appendChild(
-      el(
-        "span",
-        `badge badge--${Session.isStaffLike() ? "blue" : "gray"}`,
-        Session.getRole()
-      )
-    );
-    topbar.appendChild(user);
-    return topbar;
-  }
-
-  function buildShell(pageNodes) {
-    const shell = el("div", "shell");
-    shell.appendChild(buildSidebar());
-
-    const main = el("div", "main");
-    main.appendChild(buildTopbar());
-
-    const content = el("main", "content");
-    pageNodes.forEach((node) => content.appendChild(node));
-    main.appendChild(content);
-
-    shell.appendChild(main);
-    return shell;
   }
 
   function setupDrawer(topbar, sidebar, scrim) {
@@ -206,21 +157,16 @@
   document.addEventListener("DOMContentLoaded", () => {
     if (document.body.dataset.layout === "auth") return;
 
-    const pageNodes = Array.from(document.body.children).filter(
-      (node) => node.tagName !== "SCRIPT" && node.tagName !== "LINK"
-    );
-    document.body.textContent = "";
+    const sidebar = document.querySelector(".sidebar");
+    const topbar = document.querySelector(".topbar");
+    const content = document.querySelector(".content");
+    const scrim = document.querySelector(".scrim");
 
-    const shell = buildShell(pageNodes);
-    const scrim = el("div", "scrim");
-    shell.appendChild(scrim);
-    document.body.appendChild(shell);
-
-    setupDrawer(
-      shell.querySelector(".topbar"),
-      shell.querySelector(".sidebar"),
-      scrim
-    );
-    showFineBanner(shell.querySelector(".content"));
+    sidebar.querySelector(".sidebar__brand").href = Session.landingPath();
+    populateNav(sidebar.querySelector(".sidebar__nav"));
+    enhanceTopbar(topbar);
+    wireLogout(sidebar);
+    setupDrawer(topbar, sidebar, scrim);
+    showFineBanner(content);
   });
 })();

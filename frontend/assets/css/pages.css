@@ -2,6 +2,9 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 16px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .stub-tile {
@@ -9,6 +12,8 @@
 }
 
 .stub-tile__title {
+  font-size: inherit;
+  line-height: inherit;
   font-weight: 600;
   margin-bottom: 4px;
 }
@@ -88,4 +93,33 @@
   border: 1.5px solid var(--border-strong);
   object-fit: cover;
   background: var(--bg);
+}
+
+.profile-actions {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#pay-fine-btn {
+  margin-left: 8px;
+}
+
+#balance-amount {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+#book-title {
+  font-size: 17px;
+}
+
+.signup-info {
+  margin-bottom: 14px;
+}
+
+a.signup-cta,
+a.signup-cta:hover {
+  text-decoration: none;
 }

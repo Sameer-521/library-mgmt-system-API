@@ -15,17 +15,77 @@
     <script src="assets/js/layout.js" defer></script>
   </head>
   <body data-title="Not available yet">
-    <div class="card">
-      <div class="card__body empty-state">
-        <div class="empty-state__title">Not available yet</div>
-        <div class="empty-state__text">
-          This part of the UI needs a backend endpoint that doesn't exist yet.
-          It will light up once the backend adds it.
-        </div>
-        <p style="margin-top: 16px">
-          <a href="catalog.html">Back to catalog</a>
-        </p>
+    <div class="shell">
+      <aside class="sidebar" id="sidebar-nav">
+        <a class="sidebar__brand" href="catalog.html">
+          <div>
+            <h2 class="sidebar__brand-name">Library</h2>
+            <p class="sidebar__brand-sub">Management System</p>
+          </div>
+        </a>
+        <nav class="sidebar__nav" aria-label="Main"></nav>
+        <footer class="sidebar__footer">
+          <button class="btn btn--block logout-btn" type="button">Logout</button>
+        </footer>
+      </aside>
+      <div class="main">
+        <header class="topbar">
+          <button
+            class="nav-toggle"
+            type="button"
+            aria-controls="sidebar-nav"
+            aria-expanded="false"
+            aria-label="Open navigation"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"
+              />
+            </svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+              hidden
+            >
+              <path
+                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708-.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
+              />
+            </svg>
+          </button>
+          <p class="topbar__title"></p>
+          <div class="topbar__user">
+            <span class="topbar__email"></span>
+            <span class="badge"></span>
+          </div>
+        </header>
+        <main class="content">
+          <div class="card">
+            <div class="card__body empty-state">
+              <h1 class="empty-state__title">Not available yet</h1>
+              <p class="empty-state__text">
+                This part of the UI needs a backend endpoint that doesn't exist
+                yet. It will light up once the backend adds it.
+              </p>
+              <p class="empty-state__link empty-state__link--spaced">
+                <a href="catalog.html">Back to catalog</a>
+              </p>
+            </div>
+          </div>
+        </main>
       </div>
+      <div class="scrim"></div>
     </div>
   </body>
 </html>
