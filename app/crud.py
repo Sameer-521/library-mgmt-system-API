@@ -2,7 +2,16 @@ from fastapi_pagination.ext.sqlalchemy import apaginate
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Audit, BkCopySchedule, Book, BookCopy, Loan, LoanStatus, User
+from app.models import (
+    Audit,
+    BkCopySchedule,
+    BkCopyStatus,
+    Book,
+    BookCopy,
+    Loan,
+    LoanStatus,
+    User,
+)
 
 
 async def get_book_by_id(db: AsyncSession, book_id: int):
@@ -288,6 +297,35 @@ async def create_schedule(db: AsyncSession, schedule: BkCopySchedule):
 async def add_audit(db: AsyncSession, audit: Audit):
     db.add(audit)
     await db.flush()
+
+
+async def get_bk_copies(
+    db: AsyncSession,
+    status: BkCopyStatus | None = None,
+    isbn: str | None = None,
+):
+    stmt = (
+        select(BookCopy, Book)
+        .join(Book, BookCopy.book_isbn == Book.isbn)
+        .order_by(BookCopy.copy_id)
+    )
+    if status:
+        stmt = stmt.where(BookCopy.status == status)
+    if isbn:
+        stmt = stmt.where(BookCopy.book_isbn == isbn)
+
+    async def transform(rows):
+        return [
+            {
+                "copy_barcode": book_copy.copy_barcode,
+                "book_isbn": book.isbn,
+                "status": book_copy.status,
+                "book_title": book.title,
+            }
+            for book_copy, book in rows
+        ]
+
+    return await apaginate(db, stmt, transformer=transform)
 
 
 async def get_bk_copies_by_barcode(db: AsyncSession, barcodes: set[str]):

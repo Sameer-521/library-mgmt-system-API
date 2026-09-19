@@ -11,9 +11,10 @@ from app.core.auth import (
     get_current_staff_user,
 )
 from app.core.database import AsyncSession, get_session
-from app.models import User
+from app.models import BkCopyStatus, User
 from app.schemas.book import (
     ActiveLoanItem,
+    BkCopyItem,
     BkCopyLoanResponse,
     BkCopyScheduleInfo,
     BkCopyUpdateResponse,
@@ -154,6 +155,19 @@ async def schedule_book(
         request, db, isbn, current_user
     )
     return schedule_info
+
+
+@books_router.get(
+    "/bk-copies", response_model=LimitOffsetPage[BkCopyItem], tags=["staff"]
+)
+async def get_bk_copies(
+    request: Request,
+    status: Annotated[BkCopyStatus | None, Query()] = None,
+    isbn: Annotated[str | None, Query()] = None,
+    staff_user: User = Depends(get_current_staff_user),
+    db: AsyncSession = Depends(get_session),
+):
+    return await services.get_bk_copies_service(request, db, status, isbn)
 
 
 @books_router.patch("/bk-copies", response_model=BkCopyUpdateResponse, tags=["staff"])

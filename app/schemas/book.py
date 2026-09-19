@@ -90,6 +90,10 @@ class BkCopyLoanResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class BkCopyItem(BkCopyResponse):
+    book_title: str
+
+
 class BkCopyScheduleInfo(BaseModel):
     user_uid: str
     bk_copy_barcode: str

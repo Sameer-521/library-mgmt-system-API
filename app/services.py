@@ -604,6 +604,24 @@ async def create_staff_user_service(
         return msg
 
 
+async def get_bk_copies_service(
+    request: Request,
+    db: AsyncSession,
+    status: BkCopyStatus | None = None,
+    isbn: str | None = None,
+):
+    try:
+        page = await crud.get_bk_copies(db, status, isbn)
+        return page
+    except HTTPException:
+        await db.rollback()
+        raise
+    except SQLAlchemyError as e:
+        await db.rollback()
+        logger.error(f"DataBase error fetching book copies: {e}")
+        raise internal_error_exception
+
+
 async def update_bk_copies_status(request: Request, db: AsyncSession, data: list[dict]):
     try:
         barcodes = {item["copy_barcode"] for item in data}  # remove duplicates

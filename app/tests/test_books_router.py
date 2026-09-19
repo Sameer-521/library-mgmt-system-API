@@ -481,3 +481,62 @@ async def test_get_active_loans_requires_token(client):
 async def test_get_active_loans_requires_staff(auth_client):
     response = await auth_client.get(f"{auth_client.base_url}/books/loans/active")
     assert response.status_code == 403
+
+
+@pytest.mark.anyio
+async def test_get_bk_copies_in_check(admin_auth_client, mock_loan):
+    loan_id, barcode = mock_loan
+
+    form_data = {"bk_copy_barcode": barcode, "loan_id": loan_id}
+    return_response = await admin_auth_client.post(
+        f"{admin_auth_client.base_url}/books/loan-return", data=form_data
+    )
+    assert return_response.status_code == 200
+
+    response = await admin_auth_client.get(
+        f"{admin_auth_client.base_url}/books/bk-copies?status=IN_CHECK&limit=10&offset=0"
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total"] == 1
+    assert len(data["items"]) == 1
+    item = data["items"][0]
+    assert item["copy_barcode"] == barcode
+    assert item["status"] == "IN_CHECK"
+    assert item["book_isbn"] == "11223344"
+    assert item["book_title"] == "mock1"
+
+
+@pytest.mark.anyio
+async def test_get_bk_copies_filtered_by_isbn(admin_auth_client, mock_book_copies):
+    isbn, bk_copies = mock_book_copies
+
+    response = await admin_auth_client.get(
+        f"{admin_auth_client.base_url}/books/bk-copies?isbn={isbn}&limit=10&offset=0"
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total"] == 5
+    assert {item["copy_barcode"] for item in data["items"]} == {
+        bk.copy_barcode for bk in bk_copies
+    }
+
+    response_2 = await admin_auth_client.get(
+        f"{admin_auth_client.base_url}/books/bk-copies?isbn=00001111&limit=10&offset=0"
+    )
+    assert response_2.status_code == 200
+    data_2 = response_2.json()
+    assert data_2["total"] == 0
+    assert data_2["items"] == []
+
+
+@pytest.mark.anyio
+async def test_get_bk_copies_requires_token(client):
+    response = await client.get(f"{client.base_url}/books/bk-copies")
+    assert response.status_code == 401
+
+
+@pytest.mark.anyio
+async def test_get_bk_copies_requires_staff(auth_client):
+    response = await auth_client.get(f"{auth_client.base_url}/books/bk-copies")
+    assert response.status_code == 403
