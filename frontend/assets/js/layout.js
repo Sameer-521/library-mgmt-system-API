@@ -169,6 +169,28 @@
     });
   }
 
+  async function showFineBanner(content) {
+    // Members only: warn about outstanding fines on every page.
+    if (Session.isStaffLike()) return;
+    try {
+      const response = await fetch(`${window.CONFIG.API_BASE_URL}/users/me`, {
+        headers: { Authorization: `Bearer ${Session.getToken()}` },
+      });
+      if (!response.ok) return;
+      const profile = await response.json();
+      if (!(profile.fine_balance > 0)) return;
+      const banner = el(
+        "div",
+        "banner banner--warning",
+        `You have an outstanding fine of ₦${Number(profile.fine_balance).toLocaleString()}. Online payment is coming soon - please pay at the library desk to restore reservation privileges.`
+      );
+      banner.setAttribute("role", "status");
+      content.prepend(banner);
+    } catch {
+      // The banner is a nicety; never break a page over it.
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     if (document.body.dataset.layout === "auth") return;
 
@@ -183,5 +205,6 @@
     document.body.appendChild(shell);
 
     setupDrawer(shell.querySelector(".topbar"), shell.querySelector(".sidebar"), scrim);
+    showFineBanner(shell.querySelector(".content"));
   });
 })();

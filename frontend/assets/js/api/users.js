@@ -7,4 +7,9 @@ export const UsersApi = {
   me() {
     return request("GET", "/users/me");
   },
+  uploadProfilePicture(file) {
+    return request("POST", "/users/me/profile-picture", {
+      multipart: { file },
+    });
+  },
 };

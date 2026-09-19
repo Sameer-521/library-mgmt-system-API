@@ -2,7 +2,7 @@ import { BooksApi } from "../../api/books.js";
 import { UsersApi } from "../../api/users.js";
 import { confirmDialog, modalBody } from "../../core/modal.js";
 import { $, showAlert, hideAlert, setSubmitting } from "../../utils/dom.js";
-import { formatDateTime } from "../../utils/format.js";
+import { formatDateTime, formatMoney } from "../../utils/format.js";
 
 const PAGE_SIZE = 20;
 const LATE_FEE_PER_DAY = 100; // client-side estimate, matches backend fine rule
@@ -63,7 +63,7 @@ function statusCellContent(loan) {
     fine.className = "muted";
     fine.style.fontSize = "12.5px";
     fine.style.marginTop = "2px";
-    fine.textContent = `est. fine ${late * LATE_FEE_PER_DAY}`;
+    fine.textContent = `est. fine ${formatMoney(late * LATE_FEE_PER_DAY)}`;
     cell.append(badge, fine);
   } else {
     const badge = document.createElement("span");
@@ -298,7 +298,7 @@ returnForm.addEventListener("submit", async (event) => {
       `Loan ${loan_id}`,
       `Copy ${bk_copy_barcode}`,
       ...(late > 0
-        ? [`Overdue by ${late} ${late === 1 ? "day" : "days"} - est. fine ${late * LATE_FEE_PER_DAY}.`]
+        ? [`Overdue by ${late} ${late === 1 ? "day" : "days"} - est. fine ${formatMoney(late * LATE_FEE_PER_DAY)}.`]
         : ["Returned copies move to IN_CHECK for staff inspection."])
     ),
     confirmLabel: "Return",
@@ -311,7 +311,7 @@ returnForm.addEventListener("submit", async (event) => {
     if ("fine" in data) {
       showAlert(
         alertBox,
-        `Late return - fine applied: ${data.fine} (${data["delay time"]}). ${data.message}`,
+        `Late return - fine applied: ${formatMoney(Number(data.fine))} (${data["delay time"]}). ${data.message}`,
         "warning"
       );
     } else {

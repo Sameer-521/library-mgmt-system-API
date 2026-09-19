@@ -82,6 +82,81 @@ export function confirmDialog({
   });
 }
 
+/**
+ * Show an informational dialog with a single dismiss button.
+ * Resolves when the user closes it (button, backdrop or Escape).
+ */
+export function infoDialog({ title, body, closeLabel = "OK" }) {
+  return new Promise((resolve) => {
+    titleCounter += 1;
+    const titleId = `info-dialog-title-${titleCounter}`;
+    const previousFocus = document.activeElement;
+
+    const scrim = document.createElement("div");
+    scrim.className = "modal-scrim";
+
+    const modal = document.createElement("div");
+    modal.className = "modal";
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-labelledby", titleId);
+
+    const header = document.createElement("div");
+    header.className = "modal__header";
+    const heading = document.createElement("h3");
+    heading.id = titleId;
+    heading.textContent = title;
+    header.appendChild(heading);
+
+    const bodyEl = document.createElement("div");
+    bodyEl.className = "modal__body";
+    if (body) {
+      const line = document.createElement("p");
+      line.textContent = body;
+      bodyEl.appendChild(line);
+    }
+
+    const actions = document.createElement("div");
+    actions.className = "modal__actions";
+    const closeBtn = document.createElement("button");
+    closeBtn.type = "button";
+    closeBtn.className = "btn btn--primary";
+    closeBtn.textContent = closeLabel;
+    actions.appendChild(closeBtn);
+
+    modal.append(header, bodyEl, actions);
+    scrim.appendChild(modal);
+    document.body.appendChild(scrim);
+    document.body.classList.add("no-scroll");
+    closeBtn.focus();
+
+    let settled = false;
+
+    function close() {
+      if (settled) return;
+      settled = true;
+      document.removeEventListener("keydown", onKeydown, true);
+      scrim.remove();
+      document.body.classList.remove("no-scroll");
+      if (previousFocus && previousFocus.isConnected) previousFocus.focus();
+      resolve();
+    }
+
+    function onKeydown(event) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        close();
+      }
+    }
+
+    closeBtn.addEventListener("click", close);
+    scrim.addEventListener("click", (event) => {
+      if (event.target === scrim) close();
+    });
+    document.addEventListener("keydown", onKeydown, true);
+  });
+}
+
 /** Build a minimal dialog body: one lead line plus muted detail lines. */
 export function modalBody(lead, ...details) {
   const wrap = document.createElement("div");

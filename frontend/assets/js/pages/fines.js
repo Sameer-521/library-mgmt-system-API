@@ -1,5 +1,6 @@
 import { UsersApi } from "../api/users.js";
 import { $, showAlert } from "../utils/dom.js";
+import { formatMoney } from "../utils/format.js";
 
 const alertBox = $("#alert");
 const loadingState = $("#loading-state");
@@ -13,10 +14,10 @@ async function loadBalance() {
     loadingState.hidden = true;
 
     if (profile.fine_balance > 0) {
-      balanceAmount.textContent = String(profile.fine_balance);
+      balanceAmount.textContent = formatMoney(profile.fine_balance);
       balanceAmount.style.color = "var(--danger)";
       balanceNote.textContent =
-        "Please settle this balance at the front desk. A balance of 10 or more blocks borrowing and reserving.";
+        "Please settle this balance at the front desk. A balance of 10 or more blocks borrowing and reserving. Online payment is coming soon - please pay at the library desk.";
     } else {
       balanceAmount.textContent = "No outstanding fines";
       balanceAmount.style.color = "var(--success)";

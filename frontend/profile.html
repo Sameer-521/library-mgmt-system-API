@@ -1,49 +1,106 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profile - Library</title>
-  <link rel="stylesheet" href="assets/css/base.css">
-  <link rel="stylesheet" href="assets/css/layout.css">
-  <link rel="stylesheet" href="assets/css/components.css">
-  <link rel="stylesheet" href="assets/css/pages.css">
-  <link rel="icon" type="image/png" href="assets/icons/library.png">
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/core/session.js"></script>
-  <script src="assets/js/core/guard.js" data-auth="required"></script>
-  <script src="assets/js/layout.js" defer></script>
-</head>
-<body data-title="Profile">
-  <div class="page-head">
-    <div>
-      <h1>Profile</h1>
-      <p class="page-head__sub">Your library account details.</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile - Library</title>
+    <link rel="stylesheet" href="assets/css/base.css" />
+    <link rel="stylesheet" href="assets/css/layout.css" />
+    <link rel="stylesheet" href="assets/css/components.css" />
+    <link rel="stylesheet" href="assets/css/pages.css" />
+    <link rel="icon" type="image/png" href="assets/icons/library.png" />
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/core/session.js"></script>
+    <script src="assets/js/core/guard.js" data-auth="required"></script>
+    <script src="assets/js/layout.js" defer></script>
+  </head>
+  <body data-title="Profile">
+    <div class="page-head">
+      <div>
+        <h1>Profile</h1>
+        <p class="page-head__sub">Your library account details.</p>
+      </div>
     </div>
-  </div>
 
-  <div id="alert" class="alert" hidden></div>
+    <div id="alert" class="alert" hidden></div>
 
-  <div class="card" style="max-width: 560px">
-    <div class="card__header">Account</div>
-    <div class="card__body">
-      <div id="loading-state" class="muted">Loading...</div>
-      <dl class="dl" id="profile-view" hidden>
-        <dt>Full name</dt>
-        <dd id="profile-name"></dd>
-        <dt>Email</dt>
-        <dd id="profile-email"></dd>
-        <dt>User ID</dt>
-        <dd id="profile-uid" class="mono"></dd>
-        <dt>Card number</dt>
-        <dd id="profile-card" class="mono"></dd>
-        <dt>Member since</dt>
-        <dd id="profile-joined"></dd>
-        <dt>Fine balance</dt>
-        <dd id="profile-fines"></dd>
-      </dl>
+    <div class="card" style="max-width: 560px">
+      <div class="card__header">Account</div>
+      <div class="card__body">
+        <div id="loading-state" class="muted">Loading...</div>
+        <div id="profile-view" hidden>
+          <div class="profile-photo">
+            <img
+              class="avatar"
+              id="avatar-img"
+              src="assets/icons/avatar-default.svg"
+              alt="Profile picture"
+            />
+            <div class="profile-photo__controls">
+              <label class="btn btn--secondary" for="photo-input"
+                >Choose photo</label
+              >
+              <input
+                type="file"
+                id="photo-input"
+                accept="image/png,image/jpeg,image/webp"
+                hidden
+              />
+              <button
+                class="btn btn--primary"
+                type="button"
+                id="photo-upload"
+                hidden
+              >
+                Upload photo
+              </button>
+              <div class="field__hint">PNG, JPEG or WebP, up to 2 MB.</div>
+            </div>
+          </div>
+          <dl class="dl">
+            <dt>Full name</dt>
+            <dd id="profile-name"></dd>
+            <dt>Email</dt>
+            <dd id="profile-email"></dd>
+            <dt>User ID</dt>
+            <dd id="profile-uid" class="mono"></dd>
+            <dt>Card number</dt>
+            <dd id="profile-card" class="mono"></dd>
+            <dt>Member since</dt>
+            <dd id="profile-joined"></dd>
+            <dt>Fine balance</dt>
+            <dd>
+              <span id="profile-fines"></span>
+              <button
+                class="btn btn--secondary"
+                type="button"
+                id="pay-fine-btn"
+                style="margin-left: 8px"
+                disabled
+              >
+                Pay fine
+              </button>
+            </dd>
+          </dl>
+          <div
+            style="
+              margin-top: 16px;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            "
+          >
+            <button class="btn btn--secondary" type="button" disabled>
+              Edit profile
+            </button>
+            <button class="btn btn--secondary" type="button" disabled>
+              Change password
+            </button>
+            <span class="muted" style="font-size: 13px">Coming soon.</span>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-  <script type="module" src="assets/js/pages/profile.js"></script>
-</body>
+    <script type="module" src="assets/js/pages/profile.js"></script>
+  </body>
 </html>

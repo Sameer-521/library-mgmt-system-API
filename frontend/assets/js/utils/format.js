@@ -18,3 +18,9 @@ export function formatDateTime(value) {
 export function daysBetween(from, to) {
   return Math.floor((to.getTime() - from.getTime()) / 86400000);
 }
+
+const CURRENCY_SYMBOL = "₦";
+
+export function formatMoney(amount) {
+  return `${CURRENCY_SYMBOL}${Number(amount).toLocaleString()}`;
+}

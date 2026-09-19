@@ -322,6 +322,12 @@
   margin-bottom: 20px;
 }
 
+.banner--warning {
+  border-color: #fde68a;
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
 .page-head {
   display: flex;
   align-items: center;

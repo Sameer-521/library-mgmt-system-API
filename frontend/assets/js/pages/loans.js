@@ -1,6 +1,6 @@
 import { BooksApi } from "../api/books.js";
 import { $, showAlert } from "../utils/dom.js";
-import { formatDateTime } from "../utils/format.js";
+import { formatDateTime, formatMoney } from "../utils/format.js";
 
 const PAGE_SIZE = 20;
 const LATE_FEE_PER_DAY = 100; // client-side estimate, matches backend fine rule
@@ -47,7 +47,7 @@ function statusCellContent(loan) {
       fine.className = "muted";
       fine.style.fontSize = "12.5px";
       fine.style.marginTop = "2px";
-      fine.textContent = `est. fine on return ${late * LATE_FEE_PER_DAY}`;
+      fine.textContent = `est. fine on return ${formatMoney(late * LATE_FEE_PER_DAY)}`;
       cell.append(badge, fine);
       return cell;
     }

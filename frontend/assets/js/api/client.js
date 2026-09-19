@@ -44,7 +44,7 @@ async function parseBody(response) {
   }
 }
 
-export async function request(method, path, { query, form, json } = {}) {
+export async function request(method, path, { query, form, json, multipart } = {}) {
   let url = BASE_URL + path;
   if (query) {
     const params = new URLSearchParams(query);
@@ -63,6 +63,11 @@ export async function request(method, path, { query, form, json } = {}) {
   } else if (json !== undefined) {
     options.headers["Content-Type"] = "application/json";
     options.body = JSON.stringify(json);
+  } else if (multipart) {
+    // No Content-Type header: the browser sets the multipart boundary.
+    const body = new FormData();
+    for (const [key, value] of Object.entries(multipart)) body.append(key, value);
+    options.body = body;
   }
 
   let response;
