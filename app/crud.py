@@ -163,8 +163,11 @@ async def create_loan(db: AsyncSession, loan: Loan):
     return loan
 
 
-async def get_all_non_staff_users(db: AsyncSession):
-    stmt = select(User).where(~User.is_staff, ~User.is_superuser).order_by(User.id)
+async def get_all_non_staff_users(db: AsyncSession, role: str | None = None):
+    if role == "staff":
+        stmt = select(User).where(User.is_staff, ~User.is_superuser).order_by(User.id)
+    else:
+        stmt = select(User).where(~User.is_staff, ~User.is_superuser).order_by(User.id)
     return await apaginate(db, stmt)
 
 

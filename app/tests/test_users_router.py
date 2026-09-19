@@ -50,3 +50,49 @@ async def test_get_users_pagination(admin_auth_client, test_session):
     first_page_ids = {u["user_uid"] for u in data["items"]}
     second_page_ids = {u["user_uid"] for u in data_2["items"]}
     assert first_page_ids.isdisjoint(second_page_ids)
+
+
+@pytest.mark.anyio
+async def test_get_users_includes_full_name(admin_auth_client, mock_user):
+    response = await admin_auth_client.get(f"{admin_auth_client.base_url}/users")
+    assert response.status_code == 200
+    items = response.json()["items"]
+    assert items[0]["full_name"] == mock_user.full_name
+
+
+@pytest.mark.anyio
+async def test_get_users_staff_role(admin_auth_client, mock_user, test_session):
+    staff_user = User(
+        full_name="Staff Member",
+        email="staffmember@example.com",
+        password=hash_password("mockuser123"),
+        is_staff=True,
+        is_superuser=False,
+    )
+    test_session.add(staff_user)
+    await test_session.flush()
+    await test_session.refresh(staff_user)
+
+    # staff-only listing for admin
+    response = await admin_auth_client.get(
+        f"{admin_auth_client.base_url}/users?role=staff&limit=10&offset=0"
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total"] == 1
+    item = data["items"][0]
+    assert item["user_uid"] == staff_user.user_uid
+    assert item["full_name"] == "Staff Member"
+
+    # default listing excludes staff
+    response_2 = await admin_auth_client.get(
+        f"{admin_auth_client.base_url}/users?limit=10&offset=0"
+    )
+    assert response_2.status_code == 200
+    assert {u["user_uid"] for u in response_2.json()["items"]} == {mock_user.user_uid}
+
+
+@pytest.mark.anyio
+async def test_get_users_staff_role_requires_admin(auth_client):
+    response = await auth_client.get(f"{auth_client.base_url}/users?role=staff")
+    assert response.status_code == 403

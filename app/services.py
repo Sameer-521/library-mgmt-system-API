@@ -352,9 +352,10 @@ async def login_user_service(
 async def get_all_non_staff_users_service(
     request: Request,
     db: AsyncSession,
+    role: str | None = None,
 ):
     try:
-        users = await crud.get_all_non_staff_users(db)
+        users = await crud.get_all_non_staff_users(db, role)
         return users
     except HTTPException:
         await db.rollback()

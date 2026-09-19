@@ -1,6 +1,6 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends, Form, Request, status
+from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request, status
 from fastapi_pagination import LimitOffsetPage
 
 from app import services
@@ -17,10 +17,13 @@ users_router = APIRouter(prefix="/users", tags=["users"])
 @users_router.get("", response_model=LimitOffsetPage[UserResponse], tags=["staff"])
 async def get_all_non_staff_users(
     request: Request,
+    role: Annotated[Literal["staff"] | None, Query()] = None,
     staff_user: User = Depends(get_current_staff_user),
     db: AsyncSession = Depends(get_session),
 ):
-    return await services.get_all_non_staff_users_service(request, db)
+    if role == "staff" and not staff_user.is_superuser:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Not enough privileges")
+    return await services.get_all_non_staff_users_service(request, db, role)
 
 
 @users_router.post("/create-staff-user", tags=["admin"])

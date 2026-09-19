@@ -18,6 +18,7 @@ class UserLogin(UserBase):
 
 class UserResponse(UserBase):
     user_uid: str
+    full_name: str
     card_number: str
     is_active: bool
     # is_staff: bool
