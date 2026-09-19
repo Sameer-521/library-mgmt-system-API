@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Members - Library</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+  <link rel="stylesheet" href="../assets/css/pages.css">
+  <link rel="icon" type="image/png" href="../assets/icons/library.png">
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/core/session.js"></script>
+  <script src="../assets/js/core/guard.js" data-auth="required" data-role="staff"></script>
+  <script src="../assets/js/layout.js" defer></script>
+</head>
+<body data-title="Members">
+  <div class="page-head">
+    <div>
+      <h1>Members</h1>
+      <p class="page-head__sub">Library members registered through the sign-up form.</p>
+    </div>
+  </div>
+
+  <div id="alert" class="alert" hidden></div>
+
+  <div class="seg" id="role-tabs" hidden>
+    <button class="seg__btn" type="button" id="tab-members" aria-pressed="true">Members</button>
+    <button class="seg__btn" type="button" id="tab-staff" aria-pressed="false">Staff</button>
+  </div>
+
+  <div class="card">
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>User ID</th>
+            <th>Card number</th>
+            <th>Joined</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="member-rows"></tbody>
+      </table>
+    </div>
+    <div id="empty-state" class="empty-state" hidden>
+      <div class="empty-state__title">No users found</div>
+      <div class="empty-state__text">This category is empty.</div>
+    </div>
+    <div id="loading-state" class="card__body muted">Loading...</div>
+    <div class="pagination" id="pagination" hidden>
+      <span class="pagination__info" id="page-info"></span>
+      <div class="pagination__controls">
+        <a class="btn btn--secondary" id="prev-btn">Prev</a>
+        <a class="btn btn--secondary" id="next-btn">Next</a>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="../assets/js/pages/staff/members.js"></script>
+</body>
+</html>

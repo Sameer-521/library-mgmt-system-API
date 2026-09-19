@@ -13,7 +13,7 @@
               { label: "Dashboard", href: p + "staff/dashboard.html" },
               { label: "Loans", href: p + "staff/loans.html" },
               { label: "Inventory", href: p + "staff/inventory.html" },
-              { label: "Members", href: p + "placeholder.html" },
+              { label: "Members", href: p + "staff/members.html" },
             ],
           },
           {
