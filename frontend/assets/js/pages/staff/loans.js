@@ -1,5 +1,6 @@
 import { BooksApi } from "../../api/books.js";
 import { UsersApi } from "../../api/users.js";
+import { confirmDialog, modalBody } from "../../core/modal.js";
 import { $, showAlert, hideAlert, setSubmitting } from "../../utils/dom.js";
 import { formatDateTime } from "../../utils/format.js";
 
@@ -22,6 +23,7 @@ const prevBtn = $("#prev-btn");
 const nextBtn = $("#next-btn");
 
 const members = new Map(); // user_uid -> user
+const inViewLoans = new Map(); // loan_id -> row data from the active loans table
 
 const checkoutForm = $("#checkout-form");
 const checkoutMember = $("#checkout-member");
@@ -74,7 +76,9 @@ function statusCellContent(loan) {
 
 function renderRows(items) {
   rowsBody.textContent = "";
+  inViewLoans.clear();
   for (const loan of items) {
+    inViewLoans.set(loan.loan_id, loan);
     const row = document.createElement("tr");
 
     const idCell = document.createElement("td");
@@ -243,11 +247,22 @@ checkoutForm.addEventListener("submit", async (event) => {
     return;
   }
 
+  const member = members.get(uid);
+  const who = member ? `${member.email}` : uid;
+  const confirmed = await confirmDialog({
+    title: "Check out this book?",
+    body: modalBody(
+      `ISBN ${isbn} to ${who}`,
+      `User ID ${uid}`,
+      "If the member has an active reservation for this book, it is fulfilled automatically."
+    ),
+    confirmLabel: "Check out",
+  });
+  if (!confirmed) return;
+
   setSubmitting(checkoutSubmit, true);
   try {
     const data = await BooksApi.loanBook({ user_uid: uid, isbn });
-    const user = members.get(uid);
-    const who = user ? user.email : uid;
     let text = `Loan ${data.loan.loan_id} - copy ${data.loan.bk_copy_barcode} checked out to ${who}, due ${formatDateTime(data.loan.due_at)}.`;
     if (data.was_scheduled) {
       text += " Fulfilled the member's active reservation.";
@@ -274,6 +289,21 @@ returnForm.addEventListener("submit", async (event) => {
     showAlert(alertBox, "Enter both the loan ID and the copy barcode.");
     return;
   }
+
+  const known = inViewLoans.get(loan_id);
+  const late = known ? daysLate(known.due_at) : 0;
+  const confirmed = await confirmDialog({
+    title: "Return this copy?",
+    body: modalBody(
+      `Loan ${loan_id}`,
+      `Copy ${bk_copy_barcode}`,
+      ...(late > 0
+        ? [`Overdue by ${late} ${late === 1 ? "day" : "days"} - est. fine ${late * LATE_FEE_PER_DAY}.`]
+        : ["Returned copies move to IN_CHECK for staff inspection."])
+    ),
+    confirmLabel: "Return",
+  });
+  if (!confirmed) return;
 
   setSubmitting(returnSubmit, true);
   try {

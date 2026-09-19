@@ -61,6 +61,15 @@ function renderRows(items) {
     link.href = `book.html?isbn=${encodeURIComponent(book.isbn)}`;
     link.textContent = book.title;
     titleCell.appendChild(link);
+    if (window.Session.isStaffLike()) {
+      const middot = document.createElement("span");
+      middot.className = "muted";
+      middot.textContent = " · ";
+      const editLink = document.createElement("a");
+      editLink.href = `staff/inventory.html?edit=${encodeURIComponent(book.isbn)}`;
+      editLink.textContent = "Edit";
+      titleCell.append(middot, editLink);
+    }
 
     const authorCell = document.createElement("td");
     authorCell.textContent = book.author;

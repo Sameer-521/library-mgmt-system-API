@@ -24,4 +24,25 @@ export const BooksApi = {
       form: { bk_copy_barcode, loan_id },
     });
   },
+  create({ title, author, isbn, location, available }) {
+    return request("POST", "/books", {
+      form: { title, author, isbn, location, available },
+    });
+  },
+  update(isbn, fields) {
+    return request("PUT", `/books/${encodeURIComponent(isbn)}`, { form: fields });
+  },
+  generateCopies({ isbn, quantity }) {
+    return request("POST", "/books/generate-copies", {
+      form: { isbn, quantity: String(quantity) },
+    });
+  },
+  bkCopies(params = {}) {
+    return request("GET", "/books/bk-copies", { query: params });
+  },
+  updateBkCopies(bookCopies) {
+    return request("PATCH", "/books/bk-copies", {
+      json: { book_copies: bookCopies },
+    });
+  },
 };

@@ -43,6 +43,7 @@
     </div>
     <div class="card__header" style="border-top: 1px solid var(--border)">
       <button class="btn btn--primary" type="button" id="reserve-btn">Reserve</button>
+      <a class="btn btn--secondary" id="edit-book-link" hidden>Edit</a>
       <span class="muted" id="reserve-note" hidden></span>
     </div>
   </div>
@@ -52,21 +53,6 @@
     <div class="card__body">
       <div id="reserve-alert" class="alert alert--success"></div>
       <dl class="dl" id="reserve-details"></dl>
-    </div>
-  </div>
-
-  <div class="modal-scrim" id="reserve-modal" hidden>
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="reserve-modal-title">
-      <div class="modal__header"><h3 id="reserve-modal-title">Reserve this book?</h3></div>
-      <div class="modal__body">
-        <p><strong id="modal-book-title"></strong></p>
-        <p class="muted" id="modal-book-meta"></p>
-        <p class="muted">The copy will be held for you until 6pm.</p>
-      </div>
-      <div class="modal__actions">
-        <button class="btn btn--secondary" id="modal-cancel" type="button">Cancel</button>
-        <button class="btn btn--primary" id="modal-confirm" type="button">Reserve</button>
-      </div>
     </div>
   </div>
 

@@ -1,4 +1,5 @@
 import { BooksApi } from "../api/books.js";
+import { confirmDialog, modalBody } from "../core/modal.js";
 import { $, showAlert, hideAlert } from "../utils/dom.js";
 import { formatDateTime } from "../utils/format.js";
 
@@ -12,9 +13,6 @@ const reserveNote = $("#reserve-note");
 const reserveResult = $("#reserve-result");
 const reserveAlert = $("#reserve-alert");
 const reserveDetails = $("#reserve-details");
-const modal = $("#reserve-modal");
-const modalConfirm = $("#modal-confirm");
-const modalCancel = $("#modal-cancel");
 let currentBook = null;
 
 function availabilityBadge(copies) {
@@ -31,6 +29,11 @@ function availabilityBadge(copies) {
 function renderBook(book) {
   currentBook = book;
   document.title = `${book.title} - Library`;
+  if (window.Session.isStaffLike()) {
+    const editLink = $("#edit-book-link");
+    editLink.href = `staff/inventory.html?edit=${encodeURIComponent(book.isbn)}`;
+    editLink.hidden = false;
+  }
   $("#book-title").textContent = book.title;
   $("#book-author").textContent = book.author;
   $("#book-isbn").textContent = book.isbn;
@@ -73,40 +76,19 @@ function renderReserveSuccess(data) {
   reserveBtn.textContent = "Reserved";
 }
 
-function openModal() {
-  $("#modal-book-title").textContent = currentBook.title;
-  $("#modal-book-meta").textContent = `${currentBook.author} · ISBN ${currentBook.isbn}`;
-  modal.hidden = false;
-  document.body.classList.add("no-scroll");
-  modalCancel.focus();
-}
-
-function closeModal({ returnFocus = false } = {}) {
-  modal.hidden = true;
-  document.body.classList.remove("no-scroll");
-  if (returnFocus) reserveBtn.focus();
-}
-
-reserveBtn.addEventListener("click", () => {
+reserveBtn.addEventListener("click", async () => {
   hideAlert(alertBox);
-  openModal();
-});
+  const confirmed = await confirmDialog({
+    title: "Reserve this book?",
+    body: modalBody(
+      currentBook.title,
+      `${currentBook.author} · ISBN ${currentBook.isbn}`,
+      "The copy will be held for you until 6pm."
+    ),
+    confirmLabel: "Reserve",
+  });
+  if (!confirmed) return;
 
-modalCancel.addEventListener("click", () => closeModal({ returnFocus: true }));
-
-modal.addEventListener("click", (event) => {
-  if (event.target === modal) closeModal({ returnFocus: true });
-});
-
-document.addEventListener("keydown", (event) => {
-  if (!modal.hidden && event.key === "Escape") {
-    closeModal({ returnFocus: true });
-  }
-});
-
-modalConfirm.addEventListener("click", async () => {
-  hideAlert(alertBox);
-  closeModal();
   reserveBtn.disabled = true;
   try {
     const data = await BooksApi.schedule(isbn);

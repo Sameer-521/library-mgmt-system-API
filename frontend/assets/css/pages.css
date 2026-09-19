@@ -29,3 +29,10 @@
   font-size: 13px;
   margin-top: 12px;
 }
+
+.field--inline label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
