@@ -17,3 +17,15 @@
   color: var(--text-muted);
   font-size: 13px;
 }
+
+.desk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.desk-result {
+  font-size: 13px;
+  margin-top: 12px;
+}

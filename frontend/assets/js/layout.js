@@ -11,7 +11,7 @@
             label: "Staff",
             items: [
               { label: "Dashboard", href: p + "staff/dashboard.html" },
-              { label: "Loans", href: p + "placeholder.html" },
+              { label: "Loans", href: p + "staff/loans.html" },
               { label: "Inventory", href: p + "placeholder.html" },
               { label: "Members", href: p + "placeholder.html" },
             ],
