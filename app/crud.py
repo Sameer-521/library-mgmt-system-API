@@ -194,8 +194,33 @@ async def get_user_schedules(db: AsyncSession, user_uid: str):
 
 
 async def get_all_active_loans(db: AsyncSession):
-    stmt = select(Loan).where(Loan.status == LoanStatus.ACTIVE).order_by(Loan.id)
-    return await apaginate(db, stmt)
+    stmt = (
+        select(Loan, User, Book)
+        .join(User, Loan.user_uid == User.user_uid)
+        .join(BookCopy, Loan.bk_copy_barcode == BookCopy.copy_barcode)
+        .join(Book, BookCopy.book_isbn == Book.isbn)
+        .where(Loan.status == LoanStatus.ACTIVE)
+        .order_by(Loan.id)
+    )
+
+    async def transform(rows):
+        return [
+            {
+                "loan_id": loan.loan_id,
+                "user_uid": loan.user_uid,
+                "bk_copy_barcode": loan.bk_copy_barcode,
+                "status": loan.status,
+                "checked_out_at": loan.checked_out_at,
+                "due_at": loan.due_at,
+                "book_isbn": book.isbn,
+                "book_title": book.title,
+                "user_full_name": user.full_name,
+                "user_email": user.email,
+            }
+            for loan, user, book in rows
+        ]
+
+    return await apaginate(db, stmt, transformer=transform)
 
 
 async def get_loan_by_loan_id(db: AsyncSession, _loan_id: str):

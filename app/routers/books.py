@@ -13,6 +13,7 @@ from app.core.auth import (
 from app.core.database import AsyncSession, get_session
 from app.models import User
 from app.schemas.book import (
+    ActiveLoanItem,
     BkCopyLoanResponse,
     BkCopyScheduleInfo,
     BkCopyUpdateResponse,
@@ -178,7 +179,7 @@ async def get_user_schedules(
 
 
 @books_router.get(
-    "/loans/active", response_model=LimitOffsetPage[LoanResponse], tags=["staff"]
+    "/loans/active", response_model=LimitOffsetPage[ActiveLoanItem], tags=["staff"]
 )
 async def get_active_loans(
     request: Request,

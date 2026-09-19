@@ -60,6 +60,13 @@ class LoanResponse(LoanBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class ActiveLoanItem(LoanResponse):
+    book_isbn: str
+    book_title: str
+    user_full_name: str
+    user_email: str
+
+
 class LoanModel(BaseModel):
     pass
 

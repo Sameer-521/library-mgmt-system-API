@@ -453,6 +453,25 @@ async def test_get_active_loans(
 
 
 @pytest.mark.anyio
+async def test_get_active_loans_enriched(
+    admin_auth_client, mock_user, mock_loan, test_session
+):
+    loan_id, bk_copy_barcode = mock_loan
+
+    response = await admin_auth_client.get(
+        f"{admin_auth_client.base_url}/books/loans/active?limit=10&offset=0"
+    )
+    assert response.status_code == 200
+    item = response.json()["items"][0]
+    assert item["loan_id"] == loan_id
+    assert item["bk_copy_barcode"] == bk_copy_barcode
+    assert item["book_isbn"] == "11223344"
+    assert item["book_title"] == "mock1"
+    assert item["user_full_name"] == mock_user.full_name
+    assert item["user_email"] == mock_user.email
+
+
+@pytest.mark.anyio
 async def test_get_active_loans_requires_token(client):
     response = await client.get(f"{client.base_url}/books/loans/active")
     assert response.status_code == 401

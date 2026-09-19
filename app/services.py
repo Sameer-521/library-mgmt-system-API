@@ -420,8 +420,8 @@ async def get_all_active_loans_service(
     db: AsyncSession,
 ):
     try:
-        loans = await crud.get_all_active_loans(db)
-        return loans
+        page = await crud.get_all_active_loans(db)
+        return page
     except HTTPException:
         await db.rollback()
         raise
