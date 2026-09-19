@@ -7,7 +7,7 @@
   width: 220px;
   flex-shrink: 0;
   background: var(--surface);
-  border-right: 1px solid var(--border);
+  border-right: 1px solid var(--border-emphasis);
   display: flex;
   flex-direction: column;
   position: sticky;
@@ -96,6 +96,10 @@
   transition: all 0.2s ease-in-out;
 }
 
+.logout-btn svg {
+  display: block;
+}
+
 .logout-btn:hover:not(:disabled) {
   color: #991b1b;
   background-color: var(--danger-soft);
@@ -114,7 +118,7 @@
   flex-shrink: 0;
   min-width: 0;
   background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-emphasis);
   display: flex;
   align-items: center;
   gap: 12px;
