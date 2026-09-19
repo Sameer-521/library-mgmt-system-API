@@ -106,8 +106,25 @@
   margin-left: 8px;
 }
 
+.fine-card {
+  max-width: 520px;
+  border-radius: var(--radius);
+}
+
+.fine-card .card__body {
+  padding: 24px;
+}
+
+.fine-balance__label {
+  color: #6b7280;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+
 #balance-amount {
-  font-size: 28px;
+  font-size: 2.25rem;
   font-weight: 700;
 }
 

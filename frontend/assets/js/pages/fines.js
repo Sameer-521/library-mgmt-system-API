@@ -17,7 +17,7 @@ async function loadBalance() {
       balanceAmount.textContent = formatMoney(profile.fine_balance);
       balanceAmount.classList.add("text-danger");
       balanceNote.textContent =
-        "Please settle this balance at the front desk. A balance of 10 or more blocks borrowing and reserving. Online payment is coming soon - please pay at the library desk.";
+        "A balance of ₦10 or more restricts borrowing and reserving.";
     } else {
       balanceAmount.textContent = "No outstanding fines";
       balanceAmount.classList.add("text-success");
