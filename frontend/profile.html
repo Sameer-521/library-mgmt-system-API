@@ -15,91 +15,162 @@
     <script src="assets/js/layout.js" defer></script>
   </head>
   <body data-title="Profile">
-    <div class="page-head">
-      <div>
-        <h1>Profile</h1>
-        <p class="page-head__sub">Your library account details.</p>
-      </div>
-    </div>
-
-    <div id="alert" class="alert" hidden></div>
-
-    <div class="card" style="max-width: 560px">
-      <div class="card__header">Account</div>
-      <div class="card__body">
-        <div id="loading-state" class="muted">Loading...</div>
-        <div id="profile-view" hidden>
-          <div class="profile-photo">
-            <img
-              class="avatar"
-              id="avatar-img"
-              src="assets/icons/avatar-default.svg"
-              alt="Profile picture"
-            />
-            <div class="profile-photo__controls">
-              <label class="btn btn--secondary" for="photo-input"
-                >Choose photo</label
-              >
-              <input
-                type="file"
-                id="photo-input"
-                accept="image/png,image/jpeg,image/webp"
-                hidden
+    <div class="shell">
+      <aside class="sidebar" id="sidebar-nav">
+        <a class="sidebar__brand" href="catalog.html">
+          <div>
+            <h2 class="sidebar__brand-name">Library</h2>
+            <p class="sidebar__brand-sub">Management System</p>
+          </div>
+        </a>
+        <nav class="sidebar__nav" aria-label="Main"></nav>
+        <footer class="sidebar__footer">
+          <button class="btn btn--block logout-btn" type="button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0z"
               />
-              <button
-                class="btn btn--primary"
-                type="button"
-                id="photo-upload"
-                hidden
-              >
-                Upload photo
-              </button>
-              <div class="field__hint">PNG, JPEG or WebP, up to 2 MB.</div>
+              <path
+                fill-rule="evenodd"
+                d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708z"
+              />
+            </svg>
+            Logout
+          </button>
+        </footer>
+      </aside>
+      <div class="main">
+        <header class="topbar">
+          <button
+            class="nav-toggle"
+            type="button"
+            aria-controls="sidebar-nav"
+            aria-expanded="false"
+            aria-label="Open navigation"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"
+              />
+            </svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+              hidden
+            >
+              <path
+                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708-.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
+              />
+            </svg>
+          </button>
+          <p class="topbar__title"></p>
+          <div class="topbar__user">
+            <span class="topbar__email"></span>
+            <span class="badge"></span>
+          </div>
+        </header>
+        <main class="content">
+          <div class="page-head">
+            <div>
+              <h1>Profile</h1>
+              <p class="page-head__sub">Your library account details.</p>
             </div>
           </div>
-          <dl class="dl">
-            <dt>Full name</dt>
-            <dd id="profile-name"></dd>
-            <dt>Email</dt>
-            <dd id="profile-email"></dd>
-            <dt>User ID</dt>
-            <dd id="profile-uid" class="mono"></dd>
-            <dt>Card number</dt>
-            <dd id="profile-card" class="mono"></dd>
-            <dt>Member since</dt>
-            <dd id="profile-joined"></dd>
-            <dt>Fine balance</dt>
-            <dd>
-              <span id="profile-fines"></span>
-              <button
-                class="btn btn--secondary"
-                type="button"
-                id="pay-fine-btn"
-                style="margin-left: 8px"
-                disabled
-              >
-                Pay fine
-              </button>
-            </dd>
-          </dl>
-          <div
-            style="
-              margin-top: 16px;
-              display: flex;
-              align-items: center;
-              gap: 8px;
-            "
-          >
-            <button class="btn btn--secondary" type="button" disabled>
-              Edit profile
-            </button>
-            <button class="btn btn--secondary" type="button" disabled>
-              Change password
-            </button>
-            <span class="muted" style="font-size: 13px">Coming soon.</span>
-          </div>
-        </div>
+
+          <div id="alert" class="alert" role="alert" hidden></div>
+
+          <section class="card card--md">
+            <h2 class="card__header">Account</h2>
+            <div class="card__body">
+              <div id="loading-state" class="muted">Loading...</div>
+              <div id="profile-view" hidden>
+                <div class="profile-photo">
+                  <img
+                    class="avatar"
+                    id="avatar-img"
+                    src="assets/icons/avatar-default.svg"
+                    alt="Profile picture"
+                  />
+                  <div class="profile-photo__controls">
+                    <label class="btn btn--secondary" for="photo-input"
+                      >Choose photo</label
+                    >
+                    <input
+                      type="file"
+                      id="photo-input"
+                      accept="image/png,image/jpeg,image/webp"
+                      hidden
+                    />
+                    <button
+                      class="btn btn--primary"
+                      type="button"
+                      id="photo-upload"
+                      hidden
+                    >
+                      Upload photo
+                    </button>
+                    <div class="field__hint">PNG, JPEG or WebP, up to 2 MB.</div>
+                  </div>
+                </div>
+                <dl class="dl">
+                  <dt>Full name</dt>
+                  <dd id="profile-name"></dd>
+                  <dt>Email</dt>
+                  <dd id="profile-email"></dd>
+                  <dt>User ID</dt>
+                  <dd id="profile-uid" class="mono"></dd>
+                  <dt>Card number</dt>
+                  <dd id="profile-card" class="mono"></dd>
+                  <dt>Member since</dt>
+                  <dd id="profile-joined"></dd>
+                  <dt>Fine balance</dt>
+                  <dd>
+                    <span id="profile-fines"></span>
+                    <button
+                      class="btn btn--secondary"
+                      type="button"
+                      id="pay-fine-btn"
+                      disabled
+                    >
+                      Pay fine
+                    </button>
+                  </dd>
+                </dl>
+                <div class="profile-actions">
+                  <button class="btn btn--secondary" type="button" disabled>
+                    Edit profile
+                  </button>
+                  <button class="btn btn--secondary" type="button" disabled>
+                    Change password
+                  </button>
+                  <span class="muted text-sm">Coming soon.</span>
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
       </div>
+      <div class="scrim"></div>
     </div>
     <script type="module" src="assets/js/pages/profile.js"></script>
   </body>

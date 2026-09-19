@@ -41,11 +41,10 @@ function renderRows(schedules) {
 
     const bookCell = document.createElement("td");
     bookCell.className = "col-book";
-    const title = document.createElement("div");
+    const title = document.createElement("p");
     title.textContent = s.book_title;
-    const author = document.createElement("div");
-    author.className = "muted";
-    author.style.fontSize = "12.5px";
+    const author = document.createElement("p");
+    author.className = "muted cell-sub";
     author.textContent = s.book_author;
     bookCell.append(title, author);
 

@@ -27,7 +27,8 @@ export function confirmDialog({
 
     const header = document.createElement("div");
     header.className = "modal__header";
-    const heading = document.createElement("h3");
+    const heading = document.createElement("h2");
+    heading.className = "modal__title";
     heading.id = titleId;
     heading.textContent = title;
     header.appendChild(heading);
@@ -103,7 +104,8 @@ export function infoDialog({ title, body, closeLabel = "OK" }) {
 
     const header = document.createElement("div");
     header.className = "modal__header";
-    const heading = document.createElement("h3");
+    const heading = document.createElement("h2");
+    heading.className = "modal__title";
     heading.id = titleId;
     heading.textContent = title;
     header.appendChild(heading);

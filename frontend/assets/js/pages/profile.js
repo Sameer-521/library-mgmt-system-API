@@ -96,7 +96,7 @@ async function loadProfile() {
     fines.textContent =
       profile.fine_balance > 0 ? formatMoney(profile.fine_balance) : "None";
     if (profile.fine_balance > 0) {
-      fines.style.color = "var(--danger)";
+      fines.classList.add("text-danger");
       payFineBtn.disabled = false;
     }
 

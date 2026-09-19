@@ -44,11 +44,10 @@ function renderRows(items) {
 
     const nameCell = document.createElement("td");
     nameCell.className = "col-book";
-    const name = document.createElement("div");
+    const name = document.createElement("p");
     name.textContent = user.full_name;
-    const email = document.createElement("div");
-    email.className = "muted";
-    email.style.fontSize = "12.5px";
+    const email = document.createElement("p");
+    email.className = "muted cell-sub";
     email.textContent = user.email;
     nameCell.append(name, email);
 
@@ -79,22 +78,20 @@ function renderPagination(total) {
   const to = Math.min(state.offset + PAGE_SIZE, total);
   pageInfo.textContent = `Showing ${from}-${to} of ${total}`;
 
-  if (state.offset > 0) {
-    prevBtn.href = buildUrl(state.role, Math.max(0, state.offset - PAGE_SIZE));
-    prevBtn.removeAttribute("aria-disabled");
-  } else {
-    prevBtn.removeAttribute("href");
-    prevBtn.setAttribute("aria-disabled", "true");
-  }
-
-  if (state.offset + PAGE_SIZE < total) {
-    nextBtn.href = buildUrl(state.role, state.offset + PAGE_SIZE);
-    nextBtn.removeAttribute("aria-disabled");
-  } else {
-    nextBtn.removeAttribute("href");
-    nextBtn.setAttribute("aria-disabled", "true");
-  }
+  prevBtn.disabled = state.offset <= 0;
+  nextBtn.disabled = state.offset + PAGE_SIZE >= total;
 }
+
+prevBtn.addEventListener("click", () => {
+  window.location.href = buildUrl(
+    state.role,
+    Math.max(0, state.offset - PAGE_SIZE)
+  );
+});
+
+nextBtn.addEventListener("click", () => {
+  window.location.href = buildUrl(state.role, state.offset + PAGE_SIZE);
+});
 
 async function loadUsers() {
   loadingState.hidden = false;

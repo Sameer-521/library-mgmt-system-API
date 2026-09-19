@@ -60,10 +60,8 @@ function statusCellContent(loan) {
     const badge = document.createElement("span");
     badge.className = "badge badge--red";
     badge.textContent = `${late} ${late === 1 ? "day" : "days"} overdue`;
-    const fine = document.createElement("div");
-    fine.className = "muted";
-    fine.style.fontSize = "12.5px";
-    fine.style.marginTop = "2px";
+    const fine = document.createElement("p");
+    fine.className = "muted cell-sub cell-sub--stack";
     fine.textContent = `est. fine ${formatMoney(late * LATE_FEE_PER_DAY)}`;
     cell.append(badge, fine);
   } else {
@@ -87,21 +85,19 @@ function renderRows(items) {
     idCell.textContent = loan.loan_id;
 
     const memberCell = document.createElement("td");
-    const name = document.createElement("div");
+    const name = document.createElement("p");
     name.textContent = loan.user_full_name;
-    const email = document.createElement("div");
-    email.className = "muted";
-    email.style.fontSize = "12.5px";
+    const email = document.createElement("p");
+    email.className = "muted cell-sub";
     email.textContent = loan.user_email;
     memberCell.append(name, email);
 
     const bookCell = document.createElement("td");
     bookCell.className = "col-book";
-    const title = document.createElement("div");
+    const title = document.createElement("p");
     title.textContent = loan.book_title;
-    const isbn = document.createElement("div");
+    const isbn = document.createElement("p");
     isbn.className = "muted mono";
-    isbn.style.fontSize = "12.5px";
     isbn.textContent = loan.book_isbn;
     bookCell.append(title, isbn);
 
@@ -150,22 +146,17 @@ function renderPagination(total) {
   const to = Math.min(state.offset + PAGE_SIZE, total);
   pageInfo.textContent = `Showing ${from}-${to} of ${total}`;
 
-  if (state.offset > 0) {
-    prevBtn.href = buildUrl(Math.max(0, state.offset - PAGE_SIZE));
-    prevBtn.removeAttribute("aria-disabled");
-  } else {
-    prevBtn.removeAttribute("href");
-    prevBtn.setAttribute("aria-disabled", "true");
-  }
-
-  if (state.offset + PAGE_SIZE < total) {
-    nextBtn.href = buildUrl(state.offset + PAGE_SIZE);
-    nextBtn.removeAttribute("aria-disabled");
-  } else {
-    nextBtn.removeAttribute("href");
-    nextBtn.setAttribute("aria-disabled", "true");
-  }
+  prevBtn.disabled = state.offset <= 0;
+  nextBtn.disabled = state.offset + PAGE_SIZE >= total;
 }
+
+prevBtn.addEventListener("click", () => {
+  window.location.href = buildUrl(Math.max(0, state.offset - PAGE_SIZE));
+});
+
+nextBtn.addEventListener("click", () => {
+  window.location.href = buildUrl(state.offset + PAGE_SIZE);
+});
 
 async function loadLoans() {
   loadingState.hidden = false;

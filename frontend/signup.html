@@ -14,15 +14,15 @@
     <script src="assets/js/core/guard.js" data-auth="guest"></script>
   </head>
   <body data-layout="auth">
-    <div class="auth-wrap">
+    <main class="auth-wrap">
       <div class="auth-card">
         <div class="auth-card__brand">
-          <div class="auth-card__brand-name">Library</div>
-          <div class="auth-card__brand-sub">Create your member account</div>
+          <h1 class="auth-card__brand-name">Library</h1>
+          <p class="auth-card__brand-sub">Create your member account</p>
         </div>
         <div class="card">
           <div class="card__body" id="signup-body">
-            <div id="alert" class="alert" hidden></div>
+            <div id="alert" class="alert" role="alert" hidden></div>
             <form id="signup-form" novalidate>
               <div class="field">
                 <label class="field__label" for="full-name">Full name</label>
@@ -114,7 +114,7 @@
         </div>
         <p class="auth-alt">Already a member? <a href="index.html">Login</a></p>
       </div>
-    </div>
+    </main>
     <script type="module" src="assets/js/pages/signup.js"></script>
   </body>
 </html>

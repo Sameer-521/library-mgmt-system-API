@@ -15,51 +15,139 @@
     <script src="assets/js/layout.js" defer></script>
   </head>
   <body data-title="Book details" data-nav="catalog.html">
-    <p><a href="catalog.html" id="back-link">Back to catalog</a></p>
-    <div id="alert" class="alert" hidden></div>
+    <div class="shell">
+      <aside class="sidebar" id="sidebar-nav">
+        <a class="sidebar__brand" href="catalog.html">
+          <div>
+            <h2 class="sidebar__brand-name">Library</h2>
+            <p class="sidebar__brand-sub">Management System</p>
+          </div>
+        </a>
+        <nav class="sidebar__nav" aria-label="Main"></nav>
+        <footer class="sidebar__footer">
+          <button class="btn btn--block logout-btn" type="button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0z"
+              />
+              <path
+                fill-rule="evenodd"
+                d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708z"
+              />
+            </svg>
+            Logout
+          </button>
+        </footer>
+      </aside>
+      <div class="main">
+        <header class="topbar">
+          <button
+            class="nav-toggle"
+            type="button"
+            aria-controls="sidebar-nav"
+            aria-expanded="false"
+            aria-label="Open navigation"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"
+              />
+            </svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+              hidden
+            >
+              <path
+                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708-.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
+              />
+            </svg>
+          </button>
+          <p class="topbar__title"></p>
+          <div class="topbar__user">
+            <span class="topbar__email"></span>
+            <span class="badge"></span>
+          </div>
+        </header>
+        <main class="content">
+          <p><a href="catalog.html" id="back-link">Back to catalog</a></p>
+          <div id="alert" class="alert" role="alert" hidden></div>
 
-    <div id="loading-state" class="card">
-      <div class="card__body muted">Loading...</div>
+          <div id="loading-state" class="card">
+            <div class="card__body muted">Loading...</div>
+          </div>
+
+          <div class="card" id="book-card" hidden>
+            <div class="card__masthead">
+              <h1 id="book-title"></h1>
+              <span id="book-badge"></span>
+            </div>
+            <div class="card__body">
+              <dl class="dl">
+                <dt>Author</dt>
+                <dd id="book-author"></dd>
+                <dt>ISBN</dt>
+                <dd class="mono" id="book-isbn"></dd>
+                <dt>Library barcode</dt>
+                <dd class="mono" id="book-barcode"></dd>
+                <dt>Location</dt>
+                <dd id="book-location"></dd>
+                <dt>Added</dt>
+                <dd id="book-added"></dd>
+                <dt>Updated</dt>
+                <dd id="book-updated"></dd>
+              </dl>
+            </div>
+            <div class="card__actions">
+              <button class="btn btn--primary" type="button" id="reserve-btn">
+                Reserve
+              </button>
+              <a
+                class="btn btn--secondary"
+                id="edit-book-link"
+                href="staff/inventory.html"
+                hidden
+                >Edit</a
+              >
+              <span class="muted" id="reserve-note" hidden></span>
+            </div>
+          </div>
+
+          <div class="card" id="reserve-result" hidden>
+            <h2 class="card__header card__title">Reservation</h2>
+            <div class="card__body">
+              <div
+                id="reserve-alert"
+                class="alert alert--success"
+                role="alert"
+              ></div>
+              <dl class="dl" id="reserve-details"></dl>
+            </div>
+          </div>
+        </main>
+      </div>
+      <div class="scrim"></div>
     </div>
-
-    <div class="card" id="book-card" hidden>
-      <div class="card__header">
-        <h2 id="book-title"></h2>
-        <span id="book-badge"></span>
-      </div>
-      <div class="card__body">
-        <dl class="dl">
-          <dt>Author</dt>
-          <dd id="book-author"></dd>
-          <dt>ISBN</dt>
-          <dd class="mono" id="book-isbn"></dd>
-          <dt>Library barcode</dt>
-          <dd class="mono" id="book-barcode"></dd>
-          <dt>Location</dt>
-          <dd id="book-location"></dd>
-          <dt>Added</dt>
-          <dd id="book-added"></dd>
-          <dt>Updated</dt>
-          <dd id="book-updated"></dd>
-        </dl>
-      </div>
-      <div class="card__header" style="border-top: 1px solid var(--border)">
-        <button class="btn btn--primary" type="button" id="reserve-btn">
-          Reserve
-        </button>
-        <a class="btn btn--secondary" id="edit-book-link" hidden>Edit</a>
-        <span class="muted" id="reserve-note" hidden></span>
-      </div>
-    </div>
-
-    <div class="card" id="reserve-result" hidden>
-      <div class="card__header"><h3>Reservation</h3></div>
-      <div class="card__body">
-        <div id="reserve-alert" class="alert alert--success"></div>
-        <dl class="dl" id="reserve-details"></dl>
-      </div>
-    </div>
-
     <script type="module" src="assets/js/pages/book.js"></script>
   </body>
 </html>

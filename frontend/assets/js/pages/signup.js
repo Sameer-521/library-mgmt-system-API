@@ -43,18 +43,16 @@ function showSuccess(userUid) {
   alert.className = "alert alert--success";
   alert.textContent = "Account created successfully.";
   const info = document.createElement("p");
-  info.className = "muted";
-  info.style.marginBottom = "14px";
+  info.className = "muted signup-info";
   info.append("Your member ID: ");
   const code = document.createElement("span");
   code.className = "mono";
   code.textContent = userUid || "-";
   info.appendChild(code);
   const link = document.createElement("a");
-  link.className = "btn btn--primary btn--block";
+  link.className = "btn btn--primary btn--block signup-cta";
   link.href = "index.html";
   link.textContent = "Go to login";
-  link.style.textDecoration = "none";
   body.append(alert, info, link);
 }
 

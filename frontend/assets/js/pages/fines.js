@@ -15,12 +15,12 @@ async function loadBalance() {
 
     if (profile.fine_balance > 0) {
       balanceAmount.textContent = formatMoney(profile.fine_balance);
-      balanceAmount.style.color = "var(--danger)";
+      balanceAmount.classList.add("text-danger");
       balanceNote.textContent =
         "Please settle this balance at the front desk. A balance of 10 or more blocks borrowing and reserving. Online payment is coming soon - please pay at the library desk.";
     } else {
       balanceAmount.textContent = "No outstanding fines";
-      balanceAmount.style.color = "var(--success)";
+      balanceAmount.classList.add("text-success");
       balanceNote.textContent = "Your account is in good standing.";
     }
     balanceView.hidden = false;
