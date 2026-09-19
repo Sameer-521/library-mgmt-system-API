@@ -16,6 +16,9 @@ export const BooksApi = {
   activeLoans(params = {}) {
     return request("GET", "/books/loans/active", { query: params });
   },
+  myLoans(params = {}) {
+    return request("GET", "/books/loans/me", { query: params });
+  },
   loanBook({ user_uid, isbn }) {
     return request("POST", "/books/loan-book", { form: { user_uid, isbn } });
   },

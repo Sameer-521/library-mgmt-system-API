@@ -4,4 +4,7 @@ export const UsersApi = {
   list(params = {}) {
     return request("GET", "/users", { query: params });
   },
+  me() {
+    return request("GET", "/users/me");
+  },
 };

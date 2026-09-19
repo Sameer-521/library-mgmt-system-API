@@ -205,7 +205,7 @@ async function loadMembers() {
       members.set(user.user_uid, user);
       const option = document.createElement("option");
       option.value = user.user_uid;
-      option.label = `${user.email} · ${user.card_number}`;
+      option.label = `${user.full_name} · ${user.email} · ${user.card_number}`;
       options.appendChild(option);
     }
   } catch {

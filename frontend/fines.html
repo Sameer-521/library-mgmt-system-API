@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fines - Library</title>
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/pages.css">
+  <link rel="icon" type="image/png" href="assets/icons/library.png">
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/core/session.js"></script>
+  <script src="assets/js/core/guard.js" data-auth="required"></script>
+  <script src="assets/js/layout.js" defer></script>
+</head>
+<body data-title="Fines">
+  <div class="page-head">
+    <div>
+      <h1>Fines</h1>
+      <p class="page-head__sub">Your current fine balance with the library.</p>
+    </div>
+  </div>
+
+  <div id="alert" class="alert" hidden></div>
+
+  <div class="card" style="max-width: 480px">
+    <div class="card__header">Fine balance</div>
+    <div class="card__body">
+      <div id="loading-state" class="muted">Loading...</div>
+      <div id="balance-view" hidden>
+        <div id="balance-amount" style="font-size: 28px; font-weight: 700"></div>
+        <p class="muted" style="margin-top: 8px; font-size: 13px" id="balance-note"></p>
+        <p class="muted" style="margin-top: 8px; font-size: 13px">
+          Fines are added to your balance when overdue books are returned.
+          Overdue books still on loan accrue a fine per day late, charged on return.
+        </p>
+        <p style="margin-top: 12px; font-size: 13px"><a href="loans.html">View my loans</a></p>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="assets/js/pages/fines.js"></script>
+</body>
+</html>

@@ -33,9 +33,9 @@
           items: [
             { label: "Catalog", href: p + "catalog.html" },
             { label: "My Reservations", href: p + "reservations.html" },
-            { label: "My Loans", href: p + "placeholder.html" },
-            { label: "Fines", href: p + "placeholder.html" },
-            { label: "Profile", href: p + "placeholder.html" },
+            { label: "My Loans", href: p + "loans.html" },
+            { label: "Fines", href: p + "fines.html" },
+            { label: "Profile", href: p + "profile.html" },
           ],
         },
       ],

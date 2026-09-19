@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - Library</title>
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/pages.css">
+  <link rel="icon" type="image/png" href="assets/icons/library.png">
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/core/session.js"></script>
+  <script src="assets/js/core/guard.js" data-auth="required"></script>
+  <script src="assets/js/layout.js" defer></script>
+</head>
+<body data-title="Profile">
+  <div class="page-head">
+    <div>
+      <h1>Profile</h1>
+      <p class="page-head__sub">Your library account details.</p>
+    </div>
+  </div>
+
+  <div id="alert" class="alert" hidden></div>
+
+  <div class="card" style="max-width: 560px">
+    <div class="card__header">Account</div>
+    <div class="card__body">
+      <div id="loading-state" class="muted">Loading...</div>
+      <dl class="dl" id="profile-view" hidden>
+        <dt>Full name</dt>
+        <dd id="profile-name"></dd>
+        <dt>Email</dt>
+        <dd id="profile-email"></dd>
+        <dt>User ID</dt>
+        <dd id="profile-uid" class="mono"></dd>
+        <dt>Card number</dt>
+        <dd id="profile-card" class="mono"></dd>
+        <dt>Member since</dt>
+        <dd id="profile-joined"></dd>
+        <dt>Fine balance</dt>
+        <dd id="profile-fines"></dd>
+      </dl>
+    </div>
+  </div>
+  <script type="module" src="assets/js/pages/profile.js"></script>
+</body>
+</html>
