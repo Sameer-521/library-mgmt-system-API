@@ -3,7 +3,14 @@ import { confirmDialog, modalBody } from "../../core/modal.js";
 import { $, showAlert, hideAlert, setSubmitting } from "../../utils/dom.js";
 
 const PAGE_SIZE = 20;
-const COPY_STATUSES = ["IN_CHECK", "AVAILABLE", "BORROWED", "RESERVED", "LOST", "DAMAGED"];
+const COPY_STATUSES = [
+  "IN_CHECK",
+  "AVAILABLE",
+  "BORROWED",
+  "RESERVED",
+  "LOST",
+  "DAMAGED",
+];
 const INSPECTION_TARGETS = ["AVAILABLE", "LOST", "DAMAGED"];
 
 const STATUS_BADGES = {
@@ -104,7 +111,13 @@ createForm.addEventListener("submit", async (event) => {
 
   setSubmitting(createSubmit, true);
   try {
-    const data = await BooksApi.create({ title, author, isbn, location, available });
+    const data = await BooksApi.create({
+      title,
+      author,
+      isbn,
+      location,
+      available,
+    });
     createResult.textContent = `${data.message} (ISBN ${isbn}).`;
     createResult.hidden = false;
     createForm.reset();
@@ -164,7 +177,8 @@ editForm.addEventListener("submit", async (event) => {
   const fields = {};
   if (current.title !== loadedBook.title) fields.title = current.title;
   if (current.author !== loadedBook.author) fields.author = current.author;
-  if (current.location !== loadedBook.location) fields.location = current.location;
+  if (current.location !== loadedBook.location)
+    fields.location = current.location;
   if (current.available !== Boolean(loadedBook.available)) {
     fields.available = current.available ? "true" : "false";
   }
@@ -290,7 +304,9 @@ function syncPending() {
     inspectionRows.querySelectorAll("select[data-barcode]")
   ).filter((select) => select.value !== "");
   inspectionPending.textContent =
-    pending.length === 0 ? "" : `${pending.length} update${pending.length === 1 ? "" : "s"} staged`;
+    pending.length === 0
+      ? ""
+      : `${pending.length} update${pending.length === 1 ? "" : "s"} staged`;
   inspectionActions.hidden = inspectionRows.childElementCount === 0;
 }
 
@@ -392,7 +408,9 @@ inspectionApply.addEventListener("click", async () => {
       `Updating ${updates.length} ${updates.length === 1 ? "copy" : "copies"}`,
       ...lines,
       ...(writeOff > 0
-        ? [`${writeOff} ${writeOff === 1 ? "copy is" : "copies are"} being written off as lost or damaged.`]
+        ? [
+            `${writeOff} ${writeOff === 1 ? "copy is" : "copies are"} being written off as lost or damaged.`,
+          ]
         : [])
     ),
     confirmLabel: applyConfirmLabel(writeOff, updates.length),

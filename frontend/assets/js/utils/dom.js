@@ -29,7 +29,10 @@ export function attachPasswordToggle(input, button) {
     iconEye.toggleAttribute("hidden", !visible);
     iconSlash.toggleAttribute("hidden", visible);
     button.setAttribute("aria-pressed", String(visible));
-    button.setAttribute("aria-label", visible ? "Hide password" : "Show password");
+    button.setAttribute(
+      "aria-label",
+      visible ? "Hide password" : "Show password"
+    );
   }
 
   button.addEventListener("click", () => {

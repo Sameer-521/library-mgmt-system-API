@@ -77,7 +77,8 @@
     sidebar.appendChild(brand);
 
     const nav = el("nav", "sidebar__nav");
-    const current = document.body.dataset.nav || window.location.pathname.split("/").pop();
+    const current =
+      document.body.dataset.nav || window.location.pathname.split("/").pop();
     let activeSet = false;
     for (const section of navItems().sections) {
       nav.appendChild(el("div", "sidebar__section", section.label));
@@ -114,7 +115,13 @@
 
     const user = el("div", "topbar__user");
     user.appendChild(el("span", "topbar__email", Session.email() || ""));
-    user.appendChild(el("span", `badge badge--${Session.isStaffLike() ? "blue" : "gray"}`, Session.getRole()));
+    user.appendChild(
+      el(
+        "span",
+        `badge badge--${Session.isStaffLike() ? "blue" : "gray"}`,
+        Session.getRole()
+      )
+    );
     topbar.appendChild(user);
     return topbar;
   }
@@ -142,7 +149,10 @@
     function setOpen(shouldOpen, { returnFocus = false } = {}) {
       open = shouldOpen;
       toggle.setAttribute("aria-expanded", String(open));
-      toggle.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
+      toggle.setAttribute(
+        "aria-label",
+        open ? "Close navigation" : "Open navigation"
+      );
       iconMenu.toggleAttribute("hidden", open);
       iconClose.toggleAttribute("hidden", !open);
       sidebar.classList.toggle("open", open);
@@ -157,7 +167,9 @@
     }
 
     toggle.addEventListener("click", () => setOpen(!open));
-    scrim.addEventListener("click", () => setOpen(false, { returnFocus: true }));
+    scrim.addEventListener("click", () =>
+      setOpen(false, { returnFocus: true })
+    );
     document.addEventListener("keydown", (event) => {
       if (open && event.key === "Escape") setOpen(false, { returnFocus: true });
     });
@@ -204,7 +216,11 @@
     shell.appendChild(scrim);
     document.body.appendChild(shell);
 
-    setupDrawer(shell.querySelector(".topbar"), shell.querySelector(".sidebar"), scrim);
+    setupDrawer(
+      shell.querySelector(".topbar"),
+      shell.querySelector(".sidebar"),
+      scrim
+    );
     showFineBanner(shell.querySelector(".content"));
   });
 })();

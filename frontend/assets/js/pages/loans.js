@@ -24,7 +24,8 @@ function dateOnly(date) {
 }
 
 function daysLate(dueAt) {
-  const diff = dateOnly(new Date()).getTime() - dateOnly(new Date(dueAt)).getTime();
+  const diff =
+    dateOnly(new Date()).getTime() - dateOnly(new Date(dueAt)).getTime();
   return Math.max(0, Math.round(diff / 86400000));
 }
 
@@ -91,9 +92,18 @@ function renderRows(items) {
     dueCell.textContent = formatDateTime(loan.due_at);
 
     const returnedCell = document.createElement("td");
-    returnedCell.textContent = loan.returned_at ? formatDateTime(loan.returned_at) : "-";
+    returnedCell.textContent = loan.returned_at
+      ? formatDateTime(loan.returned_at)
+      : "-";
 
-    row.append(bookCell, copyCell, checkedOutCell, dueCell, returnedCell, statusCellContent(loan));
+    row.append(
+      bookCell,
+      copyCell,
+      checkedOutCell,
+      dueCell,
+      returnedCell,
+      statusCellContent(loan)
+    );
     rowsBody.appendChild(row);
   }
 }
@@ -127,7 +137,10 @@ async function loadLoans() {
   pagination.hidden = true;
 
   try {
-    const data = await BooksApi.myLoans({ limit: PAGE_SIZE, offset: state.offset });
+    const data = await BooksApi.myLoans({
+      limit: PAGE_SIZE,
+      offset: state.offset,
+    });
     loadingState.hidden = true;
 
     if (data.items.length === 0) {

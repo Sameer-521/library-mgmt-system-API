@@ -57,7 +57,9 @@
       return this.prefix() + "index.html";
     },
     landingPath() {
-      return this.isStaffLike() ? this.prefix() + "staff/dashboard.html" : this.prefix() + "catalog.html";
+      return this.isStaffLike()
+        ? this.prefix() + "staff/dashboard.html"
+        : this.prefix() + "catalog.html";
     },
   };
 })();

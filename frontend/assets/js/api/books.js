@@ -33,7 +33,9 @@ export const BooksApi = {
     });
   },
   update(isbn, fields) {
-    return request("PUT", `/books/${encodeURIComponent(isbn)}`, { form: fields });
+    return request("PUT", `/books/${encodeURIComponent(isbn)}`, {
+      form: fields,
+    });
   },
   generateCopies({ isbn, quantity }) {
     return request("POST", "/books/generate-copies", {

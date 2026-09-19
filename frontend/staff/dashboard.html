@@ -1,41 +1,56 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard – Library</title>
-  <link rel="stylesheet" href="../assets/css/base.css">
-  <link rel="stylesheet" href="../assets/css/layout.css">
-  <link rel="stylesheet" href="../assets/css/components.css">
-  <link rel="stylesheet" href="../assets/css/pages.css">
-  <link rel="icon" type="image/png" href="../assets/icons/library.png">
-  <script src="../assets/js/config.js"></script>
-  <script src="../assets/js/core/session.js"></script>
-  <script src="../assets/js/core/guard.js" data-auth="required" data-role="staff"></script>
-  <script src="../assets/js/layout.js" defer></script>
-</head>
-<body data-title="Staff dashboard">
-  <div id="admin-note-slot"></div>
-  <div class="page-head">
-    <div>
-      <h1>Staff dashboard</h1>
-      <p class="page-head__sub">Loans desk, inventory and member management live here.</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard – Library</title>
+    <link rel="stylesheet" href="../assets/css/base.css" />
+    <link rel="stylesheet" href="../assets/css/layout.css" />
+    <link rel="stylesheet" href="../assets/css/components.css" />
+    <link rel="stylesheet" href="../assets/css/pages.css" />
+    <link rel="icon" type="image/png" href="../assets/icons/library.png" />
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/core/session.js"></script>
+    <script
+      src="../assets/js/core/guard.js"
+      data-auth="required"
+      data-role="staff"
+    ></script>
+    <script src="../assets/js/layout.js" defer></script>
+  </head>
+  <body data-title="Staff dashboard">
+    <div id="admin-note-slot"></div>
+    <div class="page-head">
+      <div>
+        <h1>Staff dashboard</h1>
+        <p class="page-head__sub">
+          Loans desk, inventory and member management live here.
+        </p>
+      </div>
     </div>
-  </div>
-  <div class="stub-grid">
-    <div class="card stub-tile">
-      <div class="stub-tile__title">Loans</div>
-      <div class="stub-tile__text">Checkout, returns and active loans - <a href="loans.html">open the loans desk</a>.</div>
+    <div class="stub-grid">
+      <div class="card stub-tile">
+        <div class="stub-tile__title">Loans</div>
+        <div class="stub-tile__text">
+          Checkout, returns and active loans -
+          <a href="loans.html">open the loans desk</a>.
+        </div>
+      </div>
+      <div class="card stub-tile">
+        <div class="stub-tile__title">Inventory</div>
+        <div class="stub-tile__text">
+          Add books, generate copies and run inspections -
+          <a href="inventory.html">open inventory</a>.
+        </div>
+      </div>
+      <div class="card stub-tile">
+        <div class="stub-tile__title">Members</div>
+        <div class="stub-tile__text">
+          Browse library members and staff -
+          <a href="members.html">open members</a>.
+        </div>
+      </div>
     </div>
-    <div class="card stub-tile">
-      <div class="stub-tile__title">Inventory</div>
-      <div class="stub-tile__text">Add books, generate copies and run inspections - <a href="inventory.html">open inventory</a>.</div>
-    </div>
-    <div class="card stub-tile">
-      <div class="stub-tile__title">Members</div>
-      <div class="stub-tile__text">Browse library members and staff - <a href="members.html">open members</a>.</div>
-    </div>
-  </div>
-  <script type="module" src="../assets/js/pages/staff/dashboard.js"></script>
-</body>
+    <script type="module" src="../assets/js/pages/staff/dashboard.js"></script>
+  </body>
 </html>

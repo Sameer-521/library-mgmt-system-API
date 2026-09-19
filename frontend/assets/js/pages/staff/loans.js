@@ -42,7 +42,8 @@ function dateOnly(date) {
 }
 
 function daysLate(dueAt) {
-  const diff = dateOnly(new Date()).getTime() - dateOnly(new Date(dueAt)).getTime();
+  const diff =
+    dateOnly(new Date()).getTime() - dateOnly(new Date(dueAt)).getTime();
   return Math.max(0, Math.round(diff / 86400000));
 }
 
@@ -174,7 +175,10 @@ async function loadLoans() {
   summary.hidden = true;
 
   try {
-    const data = await BooksApi.activeLoans({ limit: PAGE_SIZE, offset: state.offset });
+    const data = await BooksApi.activeLoans({
+      limit: PAGE_SIZE,
+      offset: state.offset,
+    });
     loadingState.hidden = true;
 
     if (data.items.length === 0) {
@@ -298,7 +302,9 @@ returnForm.addEventListener("submit", async (event) => {
       `Loan ${loan_id}`,
       `Copy ${bk_copy_barcode}`,
       ...(late > 0
-        ? [`Overdue by ${late} ${late === 1 ? "day" : "days"} - est. fine ${formatMoney(late * LATE_FEE_PER_DAY)}.`]
+        ? [
+            `Overdue by ${late} ${late === 1 ? "day" : "days"} - est. fine ${formatMoney(late * LATE_FEE_PER_DAY)}.`,
+          ]
         : ["Returned copies move to IN_CHECK for staff inspection."])
     ),
     confirmLabel: "Return",

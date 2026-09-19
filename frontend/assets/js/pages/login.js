@@ -1,5 +1,11 @@
 import { AuthApi } from "../api/auth.js";
-import { $, showAlert, hideAlert, setSubmitting, attachPasswordToggle } from "../utils/dom.js";
+import {
+  $,
+  showAlert,
+  hideAlert,
+  setSubmitting,
+  attachPasswordToggle,
+} from "../utils/dom.js";
 
 const form = $("#login-form");
 const alertBox = $("#alert");

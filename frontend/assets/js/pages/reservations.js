@@ -26,8 +26,7 @@ function renderSummary(schedules) {
   for (const s of schedules) {
     counts[s.status] = (counts[s.status] || 0) + 1;
   }
-  summary.textContent =
-    `${counts.active} active · ${counts.consumed} consumed · ${counts.expired} expired`;
+  summary.textContent = `${counts.active} active · ${counts.consumed} consumed · ${counts.expired} expired`;
   summary.hidden = false;
 }
 

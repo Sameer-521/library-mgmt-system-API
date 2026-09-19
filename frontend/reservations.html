@@ -1,53 +1,55 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Reservations - Library</title>
-  <link rel="stylesheet" href="assets/css/base.css">
-  <link rel="stylesheet" href="assets/css/layout.css">
-  <link rel="stylesheet" href="assets/css/components.css">
-  <link rel="stylesheet" href="assets/css/pages.css">
-  <link rel="icon" type="image/png" href="assets/icons/library.png">
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/core/session.js"></script>
-  <script src="assets/js/core/guard.js" data-auth="required"></script>
-  <script src="assets/js/layout.js" defer></script>
-</head>
-<body data-title="My Reservations">
-  <div class="page-head">
-    <div>
-      <h1>My Reservations</h1>
-      <p class="page-head__sub">Copies you have placed on hold.</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Reservations - Library</title>
+    <link rel="stylesheet" href="assets/css/base.css" />
+    <link rel="stylesheet" href="assets/css/layout.css" />
+    <link rel="stylesheet" href="assets/css/components.css" />
+    <link rel="stylesheet" href="assets/css/pages.css" />
+    <link rel="icon" type="image/png" href="assets/icons/library.png" />
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/core/session.js"></script>
+    <script src="assets/js/core/guard.js" data-auth="required"></script>
+    <script src="assets/js/layout.js" defer></script>
+  </head>
+  <body data-title="My Reservations">
+    <div class="page-head">
+      <div>
+        <h1>My Reservations</h1>
+        <p class="page-head__sub">Copies you have placed on hold.</p>
+      </div>
     </div>
-  </div>
 
-  <div id="alert" class="alert" hidden></div>
+    <div id="alert" class="alert" hidden></div>
 
-  <p class="muted" id="summary" style="margin-bottom: 12px" hidden></p>
+    <p class="muted" id="summary" style="margin-bottom: 12px" hidden></p>
 
-  <div class="card">
-    <div class="table-wrap">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Schedule ID</th>
-            <th>Book</th>
-            <th>Copy</th>
-            <th>Reserved at</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="reservation-rows"></tbody>
-      </table>
+    <div class="card">
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Schedule ID</th>
+              <th>Book</th>
+              <th>Copy</th>
+              <th>Reserved at</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="reservation-rows"></tbody>
+        </table>
+      </div>
+      <div id="empty-state" class="empty-state" hidden>
+        <div class="empty-state__title">No reservations</div>
+        <div class="empty-state__text">You have no reservations yet.</div>
+        <p style="margin-top: 12px">
+          <a href="catalog.html">Browse the catalog</a>
+        </p>
+      </div>
+      <div id="loading-state" class="card__body muted">Loading...</div>
     </div>
-    <div id="empty-state" class="empty-state" hidden>
-      <div class="empty-state__title">No reservations</div>
-      <div class="empty-state__text">You have no reservations yet.</div>
-      <p style="margin-top: 12px"><a href="catalog.html">Browse the catalog</a></p>
-    </div>
-    <div id="loading-state" class="card__body muted">Loading...</div>
-  </div>
-  <script type="module" src="assets/js/pages/reservations.js"></script>
-</body>
+    <script type="module" src="assets/js/pages/reservations.js"></script>
+  </body>
 </html>

@@ -16,13 +16,17 @@ function extractDetail(data) {
   if (Array.isArray(data.detail)) {
     return data.detail
       .map((item) => {
-        const loc = (item.loc || []).filter((part) => part !== "body").join(".");
+        const loc = (item.loc || [])
+          .filter((part) => part !== "body")
+          .join(".");
         return loc ? `${loc}: ${item.msg}` : item.msg;
       })
       .join("; ");
   }
   if (typeof data.detail === "object" && data.detail !== null) {
-    return data.detail.message || data.detail.code || JSON.stringify(data.detail);
+    return (
+      data.detail.message || data.detail.code || JSON.stringify(data.detail)
+    );
   }
   return typeof data === "string" ? data : JSON.stringify(data);
 }
@@ -44,7 +48,11 @@ async function parseBody(response) {
   }
 }
 
-export async function request(method, path, { query, form, json, multipart } = {}) {
+export async function request(
+  method,
+  path,
+  { query, form, json, multipart } = {}
+) {
   let url = BASE_URL + path;
   if (query) {
     const params = new URLSearchParams(query);
@@ -66,7 +74,8 @@ export async function request(method, path, { query, form, json, multipart } = {
   } else if (multipart) {
     // No Content-Type header: the browser sets the multipart boundary.
     const body = new FormData();
-    for (const [key, value] of Object.entries(multipart)) body.append(key, value);
+    for (const [key, value] of Object.entries(multipart))
+      body.append(key, value);
     options.body = body;
   }
 
@@ -74,7 +83,10 @@ export async function request(method, path, { query, form, json, multipart } = {
   try {
     response = await fetch(url, options);
   } catch {
-    throw new ApiError(0, "Network error. Is the API running at " + BASE_URL + "?");
+    throw new ApiError(
+      0,
+      "Network error. Is the API running at " + BASE_URL + "?"
+    );
   }
 
   if (response.status === 401 && hadToken) {
@@ -86,7 +98,11 @@ export async function request(method, path, { query, form, json, multipart } = {
   const data = await parseBody(response);
 
   if (!response.ok) {
-    throw new ApiError(response.status, extractDetail(data), extractErrorCode(data));
+    throw new ApiError(
+      response.status,
+      extractDetail(data),
+      extractErrorCode(data)
+    );
   }
 
   return data;

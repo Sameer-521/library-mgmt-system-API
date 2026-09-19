@@ -1,69 +1,76 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catalog - Library</title>
-  <link rel="stylesheet" href="assets/css/base.css">
-  <link rel="stylesheet" href="assets/css/layout.css">
-  <link rel="stylesheet" href="assets/css/components.css">
-  <link rel="stylesheet" href="assets/css/pages.css">
-  <link rel="icon" type="image/png" href="assets/icons/library.png">
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/core/session.js"></script>
-  <script src="assets/js/core/guard.js" data-auth="required"></script>
-  <script src="assets/js/layout.js" defer></script>
-</head>
-<body data-title="Catalog">
-  <div class="page-head">
-    <div>
-      <h1>Catalog</h1>
-      <p class="page-head__sub">Browse and search the library collection.</p>
-    </div>
-  </div>
-
-  <form class="toolbar" id="filter-form" novalidate>
-    <select class="select" id="filter-field" aria-label="Search field">
-      <option value="title">Title</option>
-      <option value="author">Author</option>
-      <option value="isbn">ISBN</option>
-    </select>
-    <input class="input" type="text" id="filter-q" placeholder="Search catalog">
-    <button class="btn btn--primary" type="submit">Search</button>
-    <button class="btn btn--secondary" type="button" id="clear-btn">Clear</button>
-  </form>
-
-  <div id="alert" class="alert" hidden></div>
-
-  <div class="card">
-    <div class="table-wrap">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Author</th>
-            <th>ISBN</th>
-            <th>Location</th>
-            <th>Availability</th>
-          </tr>
-        </thead>
-        <tbody id="book-rows"></tbody>
-      </table>
-    </div>
-    <div id="empty-state" class="empty-state" hidden>
-      <div class="empty-state__title">No books found</div>
-      <div class="empty-state__text">No books match your filters.</div>
-      <p style="margin-top: 12px"><a href="catalog.html">Clear filters</a></p>
-    </div>
-    <div id="loading-state" class="card__body muted">Loading...</div>
-    <div class="pagination" id="pagination" hidden>
-      <span class="pagination__info" id="page-info"></span>
-      <div class="pagination__controls">
-        <a class="btn btn--secondary" id="prev-btn">Prev</a>
-        <a class="btn btn--secondary" id="next-btn">Next</a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Catalog - Library</title>
+    <link rel="stylesheet" href="assets/css/base.css" />
+    <link rel="stylesheet" href="assets/css/layout.css" />
+    <link rel="stylesheet" href="assets/css/components.css" />
+    <link rel="stylesheet" href="assets/css/pages.css" />
+    <link rel="icon" type="image/png" href="assets/icons/library.png" />
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/core/session.js"></script>
+    <script src="assets/js/core/guard.js" data-auth="required"></script>
+    <script src="assets/js/layout.js" defer></script>
+  </head>
+  <body data-title="Catalog">
+    <div class="page-head">
+      <div>
+        <h1>Catalog</h1>
+        <p class="page-head__sub">Browse and search the library collection.</p>
       </div>
     </div>
-  </div>
-  <script type="module" src="assets/js/pages/catalog.js"></script>
-</body>
+
+    <form class="toolbar" id="filter-form" novalidate>
+      <select class="select" id="filter-field" aria-label="Search field">
+        <option value="title">Title</option>
+        <option value="author">Author</option>
+        <option value="isbn">ISBN</option>
+      </select>
+      <input
+        class="input"
+        type="text"
+        id="filter-q"
+        placeholder="Search catalog"
+      />
+      <button class="btn btn--primary" type="submit">Search</button>
+      <button class="btn btn--secondary" type="button" id="clear-btn">
+        Clear
+      </button>
+    </form>
+
+    <div id="alert" class="alert" hidden></div>
+
+    <div class="card">
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Author</th>
+              <th>ISBN</th>
+              <th>Location</th>
+              <th>Availability</th>
+            </tr>
+          </thead>
+          <tbody id="book-rows"></tbody>
+        </table>
+      </div>
+      <div id="empty-state" class="empty-state" hidden>
+        <div class="empty-state__title">No books found</div>
+        <div class="empty-state__text">No books match your filters.</div>
+        <p style="margin-top: 12px"><a href="catalog.html">Clear filters</a></p>
+      </div>
+      <div id="loading-state" class="card__body muted">Loading...</div>
+      <div class="pagination" id="pagination" hidden>
+        <span class="pagination__info" id="page-info"></span>
+        <div class="pagination__controls">
+          <a class="btn btn--secondary" id="prev-btn">Prev</a>
+          <a class="btn btn--secondary" id="next-btn">Next</a>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="assets/js/pages/catalog.js"></script>
+  </body>
 </html>

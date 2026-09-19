@@ -146,9 +146,17 @@
     linear-gradient(to left, var(--surface), transparent),
     linear-gradient(to right, rgba(15, 23, 42, 0.1), rgba(15, 23, 42, 0)),
     linear-gradient(to left, rgba(15, 23, 42, 0.1), rgba(15, 23, 42, 0));
-  background-position: 0 0, 100% 0, 0 0, 100% 0;
+  background-position:
+    0 0,
+    100% 0,
+    0 0,
+    100% 0;
   background-repeat: no-repeat;
-  background-size: 24px 100%, 24px 100%, 10px 100%, 10px 100%;
+  background-size:
+    24px 100%,
+    24px 100%,
+    10px 100%,
+    10px 100%;
   background-attachment: local, local, scroll, scroll;
 }
 
@@ -266,13 +274,17 @@
     z-index: 40;
     visibility: hidden;
     transform: translateX(-100%);
-    transition: transform 0.2s ease, visibility 0s linear 0.2s;
+    transition:
+      transform 0.2s ease,
+      visibility 0s linear 0.2s;
   }
 
   .sidebar.open {
     visibility: visible;
     transform: translateX(0);
-    transition: transform 0.2s ease, visibility 0s;
+    transition:
+      transform 0.2s ease,
+      visibility 0s;
   }
 
   .scrim {
@@ -283,13 +295,17 @@
     background: rgba(15, 23, 42, 0.4);
     visibility: hidden;
     opacity: 0;
-    transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+    transition:
+      opacity 0.2s ease,
+      visibility 0s linear 0.2s;
   }
 
   .scrim.visible {
     visibility: visible;
     opacity: 1;
-    transition: opacity 0.2s ease, visibility 0s;
+    transition:
+      opacity 0.2s ease,
+      visibility 0s;
   }
 }
 

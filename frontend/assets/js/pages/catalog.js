@@ -95,7 +95,11 @@ function renderPagination(total) {
   pageInfo.textContent = `Showing ${from}-${to} of ${total}`;
 
   if (state.offset > 0) {
-    prevBtn.href = buildUrl(Math.max(0, state.offset - PAGE_SIZE), state.field, state.q);
+    prevBtn.href = buildUrl(
+      Math.max(0, state.offset - PAGE_SIZE),
+      state.field,
+      state.q
+    );
     prevBtn.removeAttribute("aria-disabled");
   } else {
     prevBtn.removeAttribute("href");
