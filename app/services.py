@@ -432,6 +432,23 @@ async def get_all_active_loans_service(
         raise internal_error_exception
 
 
+async def get_user_loans_service(
+    request: Request,
+    db: AsyncSession,
+    user_uid: str,
+):
+    try:
+        page = await crud.get_user_loans(db, user_uid)
+        return page
+    except HTTPException:
+        await db.rollback()
+        raise
+    except SQLAlchemyError as e:
+        await db.rollback()
+        logger.error(f"DataBase error fetching user loans: {e}")
+        raise internal_error_exception
+
+
 async def return_book_loan_service(
     request: Request,
     db: AsyncSession,

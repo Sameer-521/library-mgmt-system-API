@@ -67,6 +67,12 @@ class ActiveLoanItem(LoanResponse):
     user_email: str
 
 
+class MyLoanItem(LoanResponse):
+    returned_at: datetime | None = None
+    book_isbn: str
+    book_title: str
+
+
 class LoanModel(BaseModel):
     pass
 

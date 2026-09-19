@@ -96,3 +96,33 @@ async def test_get_users_staff_role(admin_auth_client, mock_user, test_session):
 async def test_get_users_staff_role_requires_admin(auth_client):
     response = await auth_client.get(f"{auth_client.base_url}/users?role=staff")
     assert response.status_code == 403
+
+
+@pytest.mark.anyio
+async def test_get_my_profile(auth_client, mock_user):
+    response = await auth_client.get(f"{auth_client.base_url}/users/me")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["user_uid"] == mock_user.user_uid
+    assert data["email"] == mock_user.email
+    assert data["full_name"] == mock_user.full_name
+    assert data["card_number"] == mock_user.card_number
+    assert data["is_active"] is True
+    assert "created_at" in data
+    assert data["fine_balance"] == 0
+
+
+@pytest.mark.anyio
+async def test_get_my_profile_fine_balance(auth_client, mock_user, test_session):
+    mock_user.fine_balance = 300
+    await test_session.flush()
+
+    response = await auth_client.get(f"{auth_client.base_url}/users/me")
+    assert response.status_code == 200
+    assert response.json()["fine_balance"] == 300
+
+
+@pytest.mark.anyio
+async def test_get_my_profile_requires_token(client):
+    response = await client.get(f"{client.base_url}/users/me")
+    assert response.status_code == 401

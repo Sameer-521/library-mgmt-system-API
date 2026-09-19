@@ -145,6 +145,7 @@ _EVENT_RULES: tuple[tuple[str, str, bool, Event], ...] = (
     ("GET", "/books/fetch", False, Event.FETCH_BOOK),
     ("GET", "/books/schedules/me", False, Event.FETCH_USER_SCHEDULES),
     ("GET", "/books/loans/active", False, Event.FETCH_ACTIVE_LOANS),
+    ("GET", "/books/loans/me", False, Event.FETCH_USER_LOANS),
     ("PATCH", "/books/bk-copies", False, Event.UPDATE_BOOK_COPIES),
     ("GET", "/books", False, Event.FETCH_BOOKS),
     ("POST", "/books", False, Event.CREATE_BOOK),
@@ -152,6 +153,7 @@ _EVENT_RULES: tuple[tuple[str, str, bool, Event], ...] = (
     ("DELETE", "/books/", True, Event.DELETE_BOOK),
     # users
     ("GET", "/users", False, Event.FETCH_USER),
+    ("GET", "/users/me", False, Event.FETCH_USER_PROFILE),
     ("POST", "/users/sign-up", False, Event.CREATE_USER),
     ("POST", "/users/create-staff-user", False, Event.CREATE_STAFF_USER),
 )

@@ -27,6 +27,7 @@ from app.schemas.book import (
     LoanForm,
     LoanResponse,
     LoanReturnForm,
+    MyLoanItem,
 )
 
 books_router = APIRouter(prefix="/books", tags=["books"])
@@ -190,6 +191,17 @@ async def get_user_schedules(
     db: AsyncSession = Depends(get_session),
 ):
     return await services.get_user_schedules_service(request, db, current_user.user_uid)
+
+
+@books_router.get(
+    "/loans/me", response_model=LimitOffsetPage[MyLoanItem], tags=["user"]
+)
+async def get_my_loans(
+    request: Request,
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_session),
+):
+    return await services.get_user_loans_service(request, db, current_user.user_uid)
 
 
 @books_router.get(

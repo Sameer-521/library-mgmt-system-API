@@ -37,6 +37,8 @@ class Event(enum.Enum):
     FETCH_BOOKS = "fetch_books"
     DELETE_BOOK = "delete_book"
     FETCH_USER_SCHEDULES = "fetch_user_schedules"
+    FETCH_USER_PROFILE = "fetch_user_profile"
+    FETCH_USER_LOANS = "fetch_user_loans"
     FETCH_ACTIVE_LOANS = "fetch_active_loans"
     CREATE_STAFF_USER = "create_staff_user"
     ROOT = "root"

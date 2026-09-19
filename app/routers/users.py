@@ -4,12 +4,23 @@ from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request, sta
 from fastapi_pagination import LimitOffsetPage
 
 from app import services
-from app.core.auth import get_current_admin_user, get_current_staff_user
+from app.core.auth import (
+    get_current_active_user,
+    get_current_admin_user,
+    get_current_staff_user,
+)
 from app.core.database import AsyncSession, get_session
 from app.models import User
-from app.schemas.user import UserCreate, UserResponse
+from app.schemas.user import UserCreate, UserProfileResponse, UserResponse
 
 users_router = APIRouter(prefix="/users", tags=["users"])
+
+
+@users_router.get("/me", response_model=UserProfileResponse, tags=["user"])
+async def get_my_profile(
+    current_user: User = Depends(get_current_active_user),
+):
+    return current_user
 
 
 #

@@ -540,3 +540,81 @@ async def test_get_bk_copies_requires_token(client):
 async def test_get_bk_copies_requires_staff(auth_client):
     response = await auth_client.get(f"{auth_client.base_url}/books/bk-copies")
     assert response.status_code == 403
+
+
+@pytest.mark.anyio
+async def test_get_my_loans(auth_client, mock_loan):
+    loan_id, bk_copy_barcode = mock_loan
+
+    response = await auth_client.get(
+        f"{auth_client.base_url}/books/loans/me?limit=10&offset=0"
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total"] == 1
+    assert data["limit"] == 10
+    assert data["offset"] == 0
+    item = data["items"][0]
+    assert item["loan_id"] == loan_id
+    assert item["bk_copy_barcode"] == bk_copy_barcode
+    assert item["status"] == "active"
+    assert item["returned_at"] is None
+    assert item["book_isbn"] == "11223344"
+    assert item["book_title"] == "mock1"
+
+
+@pytest.mark.anyio
+async def test_get_my_loans_excludes_other_users(
+    auth_client, mock_loan, mock_user, mock_book_copies, test_session
+):
+    loan_id, _ = mock_loan
+    _, bk_copies = mock_book_copies
+    other_copy = bk_copies[1]
+    other_copy.status = BkCopyStatus.BORROWED
+    test_session.add(
+        Loan(user_uid="USER-OTHER-00000000", bk_copy_barcode=other_copy.copy_barcode)
+    )
+    await test_session.flush()
+
+    response = await auth_client.get(
+        f"{auth_client.base_url}/books/loans/me?limit=10&offset=0"
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total"] == 1
+    item = data["items"][0]
+    assert item["loan_id"] == loan_id
+    assert item["user_uid"] == mock_user.user_uid
+
+
+@pytest.mark.anyio
+async def test_get_my_loans_newest_first(
+    auth_client, mock_user, mock_loan, mock_book_copies, test_session
+):
+    older_loan_id, _ = mock_loan
+    _, bk_copies = mock_book_copies
+    newer_copy = bk_copies[1]
+    newer_copy.status = BkCopyStatus.BORROWED
+    newer_loan = Loan(
+        user_uid=mock_user.user_uid,
+        bk_copy_barcode=newer_copy.copy_barcode,
+        checked_out_at=datetime.now(UTC) + timedelta(days=1),
+    )
+    test_session.add(newer_loan)
+    await test_session.flush()
+    await test_session.refresh(newer_loan)
+
+    response = await auth_client.get(
+        f"{auth_client.base_url}/books/loans/me?limit=10&offset=0"
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total"] == 2
+    assert data["items"][0]["loan_id"] == newer_loan.loan_id
+    assert data["items"][1]["loan_id"] == older_loan_id
+
+
+@pytest.mark.anyio
+async def test_get_my_loans_requires_token(client):
+    response = await client.get(f"{client.base_url}/books/loans/me")
+    assert response.status_code == 401
