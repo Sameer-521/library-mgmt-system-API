@@ -17,7 +17,7 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     async with AsyncSessionLocal() as session:
-        if not settings.test_mode:
+        if not settings.audit_enabled:
             await create_superuser(session)
         if settings.seed_books:
             await seed_books(session)
@@ -47,7 +47,7 @@ app.add_middleware(
 
 audit_enabled = settings.audit_enabled
 if audit_enabled is None:
-    audit_enabled = not settings.test_mode
+    audit_enabled = not settings.audit_enabled
 if audit_enabled:
     app.add_middleware(AuditMiddleware)
 

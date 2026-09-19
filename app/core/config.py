@@ -15,7 +15,6 @@ class Settings(BaseSettings):
     secret_key: str = ""
     access_token_expire_minutes: int = 15
 
-    test_mode: bool = False
     audit_enabled: bool | None = None
 
     mock_admin_email: str = ""

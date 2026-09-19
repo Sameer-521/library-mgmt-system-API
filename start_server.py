@@ -3,8 +3,8 @@ import uvicorn
 from app.core.config import settings
 
 if __name__ == "__main__":
-    if settings.test_mode:
-        print(f"Starting server | test_mode: {settings.test_mode}")
+    if settings.audit_enabled:
+        print(f"Starting server | test_mode: {settings.audit_enabled}")
 
     uvicorn.run(
         app="app.main:app",
