@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     secret_key: str = ""
     access_token_expire_minutes: int = 15
 
+    base_upload_path: str = ""
+    profile_pic_max_bytes: int = 2 * 1024 * 1024
     audit_enabled: bool | None = None
 
     mock_admin_email: str = ""

@@ -1,6 +1,17 @@
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Query,
+    Request,
+    UploadFile,
+    status,
+)
+from fastapi.responses import FileResponse
 from fastapi_pagination import LimitOffsetPage
 
 from app import services
@@ -11,7 +22,12 @@ from app.core.auth import (
 )
 from app.core.database import AsyncSession, get_session
 from app.models import User
-from app.schemas.user import UserCreate, UserProfileResponse, UserResponse
+from app.schemas.user import (
+    ProfilePicResponse,
+    UserCreate,
+    UserProfileResponse,
+    UserResponse,
+)
 
 users_router = APIRouter(prefix="/users", tags=["users"])
 
@@ -58,6 +74,28 @@ async def create_new_user(
     request.state.actor = {"email": data["email"]}  # safety net
 
     return await services.create_user_service(request, db, form_data.model_dump())
+
+
+@users_router.post(
+    "/me/profile-picture",
+    response_model=ProfilePicResponse,
+    tags=["user"],
+)
+async def save_user_profile_pic(
+    file: Annotated[UploadFile, File()],
+    user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_session),
+):
+    return await services.save_user_profile_service(user, file, db)
+
+
+@users_router.get("/me/profile-picture", tags=["user"])
+async def get_user_profile_pic(
+    user: User = Depends(get_current_active_user),
+):
+    file_path, media_type = await services.get_user_profile_service(user)
+
+    return FileResponse(path=file_path, media_type=media_type)
 
 
 # Note: You can inject request object in dependency signature

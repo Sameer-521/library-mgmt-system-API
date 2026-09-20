@@ -182,7 +182,7 @@ async def get_all_active_books(
     author: str | None = None,
     isbn: str | None = None,
 ):
-    stmt = select(Book).where(Book.is_active == True)
+    stmt = select(Book).where(Book.is_active)
     if title:
         stmt = stmt.where(Book.title.ilike(f"%{title}%"))
     if author:
@@ -371,4 +371,9 @@ async def update_bk_copies_status(
     for i, data in enumerate(update_data):
         for key, value in data.items():
             setattr(bk_copies[i], key, value)
+    await db.flush()
+
+
+async def save_profile_pic(db: AsyncSession, user: User, filename: str):
+    setattr(user, "profile_pic", filename)
     await db.flush()

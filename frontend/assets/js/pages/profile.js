@@ -5,6 +5,7 @@ import { formatDate, formatMoney } from "../utils/format.js";
 
 const MAX_PHOTO_BYTES = 2 * 1024 * 1024; // 2 MB
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
+const DEFAULT_AVATAR = "assets/icons/avatar-default.svg";
 
 const alertBox = $("#alert");
 const loadingState = $("#loading-state");
@@ -14,12 +15,48 @@ const photoInput = $("#photo-input");
 const photoUpload = $("#photo-upload");
 const payFineBtn = $("#pay-fine-btn");
 
-let previewUrl = null;
+let avatarObjectUrl = null; // object URL currently shown (preview or served pic)
+
+function clearAvatarObjectUrl() {
+  if (avatarObjectUrl) {
+    URL.revokeObjectURL(avatarObjectUrl);
+    avatarObjectUrl = null;
+  }
+}
+
+function showDefaultAvatar() {
+  clearAvatarObjectUrl();
+  avatarImg.onerror = null;
+  avatarImg.src = DEFAULT_AVATAR;
+}
+
+async function showAvatarFromApi() {
+  const blob = await UsersApi.fetchProfilePicture();
+  clearAvatarObjectUrl();
+  avatarImg.onerror = null;
+  avatarObjectUrl = URL.createObjectURL(blob);
+  avatarImg.src = avatarObjectUrl;
+}
+
+// Fallback chain: authed API endpoint -> default avatar (404, network error,
+// expired session, missing picture).
+async function renderAvatar(urlPath) {
+  if (!urlPath) {
+    showDefaultAvatar();
+    return;
+  }
+  try {
+    await showAvatarFromApi();
+  } catch {
+    showDefaultAvatar();
+  }
+}
 
 function setPreview(file) {
-  if (previewUrl) URL.revokeObjectURL(previewUrl);
-  previewUrl = URL.createObjectURL(file);
-  avatarImg.src = previewUrl;
+  clearAvatarObjectUrl();
+  avatarImg.onerror = null;
+  avatarObjectUrl = URL.createObjectURL(file);
+  avatarImg.src = avatarObjectUrl;
 }
 
 photoInput.addEventListener("change", () => {
@@ -51,19 +88,21 @@ photoUpload.addEventListener("click", async () => {
   setSubmitting(photoUpload, true);
   try {
     const data = await UsersApi.uploadProfilePicture(file);
-    if (data && data.profile_picture_url) {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-      previewUrl = null;
-      avatarImg.src = window.CONFIG.API_BASE_URL + data.profile_picture_url;
-    }
     photoUpload.hidden = true;
     photoInput.value = "";
+    await renderAvatar(data && data.profile_picture_url);
     showAlert(alertBox, "Profile picture updated.", "success");
   } catch (error) {
-    const message =
-      error.status === 404
-        ? "Profile picture uploads are not available yet."
-        : error.detail || "Could not upload the photo.";
+    let message;
+    if (error.status === 413) {
+      message = "Image must be 2 MB or smaller.";
+    } else if (error.status === 422) {
+      message = "That file doesn't look like a valid PNG, JPEG or WebP image.";
+    } else if (error.status === 404) {
+      message = "Profile picture uploads are not available yet.";
+    } else {
+      message = error.detail || "Could not upload the photo.";
+    }
     showAlert(alertBox, message);
   } finally {
     setSubmitting(photoUpload, false);
@@ -82,9 +121,7 @@ async function loadProfile() {
     const profile = await UsersApi.me();
     loadingState.hidden = true;
 
-    if (profile.profile_picture_url) {
-      avatarImg.src = window.CONFIG.API_BASE_URL + profile.profile_picture_url;
-    }
+    renderAvatar(profile.profile_picture_url);
 
     $("#profile-name").textContent = profile.full_name;
     $("#profile-email").textContent = profile.email;

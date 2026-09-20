@@ -7,6 +7,7 @@ from urllib.parse import parse_qs
 
 from fastapi import BackgroundTasks, Request
 from jose.exceptions import ExpiredSignatureError, JWTError
+from starlette.datastructures import UploadFile as StarletteUploadFile
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request as StarletteRequest
 from starlette.responses import Response
@@ -90,7 +91,7 @@ async def extract_form_data(request: Request) -> dict[str, Any]:
     Safely extract form fields (urlencoded or multipart) from `request`
     without preventing downstream code (FastAPI/Dependencies) from reading
     the body. Returns a dict where repeated fields become lists and file
-    uploads are returned as UploadFile instances.
+    uploads are reduced to their filenames (never the file contents).
     """
     # snapshot body
     body = await request.body()
@@ -121,6 +122,9 @@ async def extract_form_data(request: Request) -> dict[str, Any]:
         form = await temp_req.form()
         data: dict[str, Any] = {}
         for key, val in form.multi_items():
+            if isinstance(val, StarletteUploadFile):
+                # UploadFile handles are not serializable, so convert to filename
+                val = val.filename
             if key not in data:
                 data[key] = val
             else:
@@ -156,6 +160,7 @@ _EVENT_RULES: tuple[tuple[str, str, bool, Event], ...] = (
     ("GET", "/users/me", False, Event.FETCH_USER_PROFILE),
     ("POST", "/users/sign-up", False, Event.CREATE_USER),
     ("POST", "/users/create-staff-user", False, Event.CREATE_STAFF_USER),
+    ("POST", "/users/me/profile-picture", False, Event.UPDATE_PROFILE_PICTURE),
 )
 
 

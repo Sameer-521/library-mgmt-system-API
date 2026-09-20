@@ -126,3 +126,131 @@ async def test_get_my_profile_fine_balance(auth_client, mock_user, test_session)
 async def test_get_my_profile_requires_token(client):
     response = await client.get(f"{client.base_url}/users/me")
     assert response.status_code == 401
+
+
+PNG_BYTES = b"\x89PNG\r\n\x1a\n" + b"\x00" * 32
+JPEG_BYTES = b"\xff\xd8\xff\xe0" + b"\x00" * 32
+
+
+def upload_url(client) -> str:
+    return f"{client.base_url}/users/me/profile-picture"
+
+
+@pytest.mark.anyio
+async def test_upload_profile_picture(auth_client, mock_user, upload_dir):
+    response = await auth_client.post(
+        upload_url(auth_client),
+        files={"file": ("holiday photo.png", PNG_BYTES, "image/png")},
+    )
+    assert response.status_code == 200
+    assert response.json()["profile_picture_url"] == "/users/me/profile-picture"
+
+    saved = upload_dir / f"{mock_user.user_uid}.png"
+    assert saved.is_file()
+    assert saved.read_bytes() == PNG_BYTES
+
+
+@pytest.mark.anyio
+async def test_uploaded_picture_exposed_on_profile(auth_client, mock_user, upload_dir):
+    response = await auth_client.post(
+        upload_url(auth_client),
+        files={"file": ("me.png", PNG_BYTES, "image/png")},
+    )
+    url = response.json()["profile_picture_url"]
+
+    me = await auth_client.get(f"{auth_client.base_url}/users/me")
+    assert me.status_code == 200
+    assert me.json()["profile_picture_url"] == url
+
+
+@pytest.mark.anyio
+async def test_get_profile_picture_requires_token(client, upload_dir):
+    response = await client.get(upload_url(client))
+    assert response.status_code == 401
+
+
+@pytest.mark.anyio
+async def test_get_profile_picture_404_when_none(auth_client, upload_dir):
+    response = await auth_client.get(upload_url(auth_client))
+    assert response.status_code == 404
+
+
+@pytest.mark.anyio
+async def test_get_profile_picture_serves_file(auth_client, upload_dir):
+    await auth_client.post(
+        upload_url(auth_client),
+        files={"file": ("a.png", PNG_BYTES, "image/png")},
+    )
+    response = await auth_client.get(upload_url(auth_client))
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "image/png"
+    assert response.content == PNG_BYTES
+
+
+@pytest.mark.anyio
+async def test_upload_profile_picture_rejects_disallowed_type(auth_client, upload_dir):
+    response = await auth_client.post(
+        upload_url(auth_client),
+        files={"file": ("notes.txt", b"just text", "text/plain")},
+    )
+    assert response.status_code == 422
+    assert not any(upload_dir.iterdir())
+
+
+@pytest.mark.anyio
+async def test_upload_profile_picture_rejects_spoofed_content_type(
+    auth_client, upload_dir
+):
+    # claims to be a png but the magic bytes say otherwise
+    response = await auth_client.post(
+        upload_url(auth_client),
+        files={"file": ("evil.png", b"#!/bin/sh\nrm -rf /\n", "image/png")},
+    )
+    assert response.status_code == 422
+    assert not any(upload_dir.iterdir())
+
+
+@pytest.mark.anyio
+async def test_upload_profile_picture_rejects_oversized(auth_client, upload_dir):
+    big = PNG_BYTES + b"0" * (2 * 1024 * 1024)
+    response = await auth_client.post(
+        upload_url(auth_client),
+        files={"file": ("big.png", big, "image/png")},
+    )
+    assert response.status_code == 413
+    assert not any(upload_dir.iterdir())
+
+
+@pytest.mark.anyio
+async def test_upload_profile_picture_ignores_client_filename(
+    auth_client, mock_user, upload_dir, tmp_path
+):
+    response = await auth_client.post(
+        upload_url(auth_client),
+        files={"file": ("../../escape.png", PNG_BYTES, "image/png")},
+    )
+    assert response.status_code == 200
+    assert "../" not in response.json()["profile_picture_url"]
+    assert (upload_dir / f"{mock_user.user_uid}.png").is_file()
+    # nothing was written outside the profile-pics dir
+    assert [p.name for p in tmp_path.iterdir()] == ["profile-pics"]
+
+
+@pytest.mark.anyio
+async def test_reupload_replaces_old_file(auth_client, mock_user, upload_dir):
+    await auth_client.post(
+        upload_url(auth_client),
+        files={"file": ("first.png", PNG_BYTES, "image/png")},
+    )
+    response = await auth_client.post(
+        upload_url(auth_client),
+        files={"file": ("second.jpg", JPEG_BYTES, "image/jpeg")},
+    )
+    assert response.status_code == 200
+    assert response.json()["profile_picture_url"] == "/users/me/profile-picture"
+
+    assert (upload_dir / f"{mock_user.user_uid}.jpg").is_file()
+    assert not (upload_dir / f"{mock_user.user_uid}.png").exists()
+
+    me = await auth_client.get(f"{auth_client.base_url}/users/me")
+    assert me.json()["profile_picture_url"] == "/users/me/profile-picture"

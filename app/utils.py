@@ -3,8 +3,34 @@ import secrets
 import string
 from datetime import UTC, datetime, timedelta
 from logging import Logger
+from pathlib import Path
+
+from fastapi import UploadFile
 
 logger = Logger(__name__)
+
+PROFILE_PIC_DIR = "profile-pics"
+PROFILE_PIC_URL = "/users/me/profile-picture"
+
+IMAGE_EXT_BY_MIME = {
+    "image/png": ".png",
+    "image/jpeg": ".jpg",
+    "image/webp": ".webp",
+}
+
+IMAGE_MIME_BY_EXT = {
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".webp": "image/webp",
+}
+
+UPLOAD_CHUNK_SIZE = 64 * 1024
+IMAGE_SNIFF_LEN = 12
+
+
+class FileTooLargeError(Exception):
+    pass
 
 
 class BkCopyStatus(enum.Enum):
@@ -78,3 +104,42 @@ def generate_schedule_id():
 
 def default_loan_due_date():
     return datetime.now(UTC) + timedelta(days=7)
+
+
+def sniff_image_mime(header: bytes) -> str | None:
+    if header.startswith(b"\x89PNG\r\n\x1a\n"):
+        return "image/png"
+    if header.startswith(b"\xff\xd8\xff"):
+        return "image/jpeg"
+    if (
+        len(header) >= IMAGE_SNIFF_LEN
+        and header[:4] == b"RIFF"
+        and header[8:12] == b"WEBP"
+    ):
+        return "image/webp"
+    return None
+
+
+def save_file(uploaded_file: UploadFile, dst_path: str | Path, max_bytes: int) -> int:
+    uploaded_file.file.seek(0)
+    written = 0
+    with open(dst_path, "wb") as buffer:
+        while chunk := uploaded_file.file.read(UPLOAD_CHUNK_SIZE):
+            written += len(chunk)
+            if written > max_bytes:
+                raise FileTooLargeError(f"upload exceeds limit of {max_bytes} bytes")
+            buffer.write(chunk)
+    return written
+
+
+def remove_file(path: str | Path, base_dir: Path | None = None) -> None:
+    try:
+        file_path = Path(path)
+        if base_dir is not None:
+            resolved = file_path.resolve()
+            if not resolved.is_relative_to(Path(base_dir).resolve()):
+                logger.warning(f"Refusing to remove file outside base dir: {path}")
+                return
+        file_path.unlink(missing_ok=True)
+    except OSError as e:
+        logger.warning(f"Could not remove file {path}: {e}")

@@ -6,6 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
 from app.utils import (
+    PROFILE_PIC_URL,
     default_loan_due_date,
     generate_barcode,
     generate_library_cardnumber,
@@ -34,6 +35,7 @@ class Event(enum.Enum):
     SCHEDULE_BOOK = "schedule_book"
     UPDATE_BOOK = "update_book"
     UPDATE_BOOK_COPIES = "update_book_copies"
+    UPDATE_PROFILE_PICTURE = "update_profile_picture"
     FETCH_BOOKS = "fetch_books"
     DELETE_BOOK = "delete_book"
     FETCH_USER_SCHEDULES = "fetch_user_schedules"
@@ -101,6 +103,7 @@ class User(Base):
     card_number: Mapped[str] = mapped_column(
         String(50), unique=True, default=generate_library_cardnumber
     )
+    profile_pic: Mapped[str] = mapped_column(String(100), nullable=True)
     fine_balance: Mapped[int] = mapped_column(Integer, default=0)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
     is_staff: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
@@ -113,6 +116,12 @@ class User(Base):
     )
 
     loans = relationship("Loan", back_populates="user")
+
+    @property
+    def profile_picture_url(self) -> str | None:
+        if not self.profile_pic:
+            return None
+        return PROFILE_PIC_URL
 
 
 class Loan(Base):

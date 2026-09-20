@@ -1,4 +1,3 @@
-
 import os
 from datetime import datetime, timedelta, UTC
 
@@ -14,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from app.core import middleware
 from app.core.auth import hash_password
+from app.core.config import settings
 from app.core.database import Base, get_session
 from app.main import app
 from app.models import Book, User, BookCopy, Loan, BkCopyStatus
@@ -184,6 +184,18 @@ async def overdue_loan(test_session, mock_user, mock_book_copies) -> tuple[str, 
 @pytest.fixture(scope="function")
 def book_creation_data():
     return {"title": "mock1", "author": "hitler", "location": "a3", "isbn": "11223344"}
+
+
+@pytest.fixture(scope="function")
+def upload_dir(tmp_path, monkeypatch):
+    """
+    Redirects profile-pic storage to a throwaway dir so tests never touch
+    the real ./uploads tree.
+    """
+    pics_dir = tmp_path / "profile-pics"
+    pics_dir.mkdir()
+    monkeypatch.setattr(settings, "base_upload_path", str(tmp_path))
+    return pics_dir
 
 
 @pytest.fixture(scope="function")

@@ -1,7 +1,8 @@
 import logging
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 
-from fastapi import HTTPException, Request, status
+from fastapi import HTTPException, Request, UploadFile, status
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,9 +21,18 @@ from app.models import (
     User,
 )
 from app.utils import (
+    IMAGE_EXT_BY_MIME,
+    IMAGE_MIME_BY_EXT,
+    IMAGE_SNIFF_LEN,
+    PROFILE_PIC_DIR,
+    PROFILE_PIC_URL,
+    FileTooLargeError,
     generate_book_copy_barcode,
     generate_staff_id,
+    remove_file,
     safe_datetime_compare,
+    save_file,
+    sniff_image_mime,
 )
 
 logger = logging.getLogger(__name__)
@@ -45,6 +55,16 @@ user_not_found_exception = HTTPException(
 
 internal_error_exception = HTTPException(
     status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An internal error occured"
+)
+
+profile_pic_invalid_exception = HTTPException(
+    status.HTTP_422_UNPROCESSABLE_CONTENT,
+    detail="Only PNG, JPEG or WebP images are allowed",
+)
+
+profile_pic_too_large_exception = HTTPException(
+    status.HTTP_413_CONTENT_TOO_LARGE,
+    detail="Profile picture must be 2 MB or smaller",
 )
 
 book_integrity_exception = HTTPException(
@@ -675,3 +695,61 @@ async def update_bk_copies_status(request: Request, db: AsyncSession, data: list
         }
         request.state.msg = msg
         return msg
+
+
+def get_profile_pic_dir() -> Path:
+    base = (Path(settings.base_upload_path) / PROFILE_PIC_DIR).resolve()
+    base.mkdir(parents=True, exist_ok=True)
+    return base
+
+
+async def save_user_profile_service(
+    user: User, uploaded_file: UploadFile, db: AsyncSession
+):
+    content_type = (uploaded_file.content_type or "").lower()
+    if content_type not in IMAGE_EXT_BY_MIME:
+        raise profile_pic_invalid_exception
+
+    header = uploaded_file.file.read(IMAGE_SNIFF_LEN)
+    uploaded_file.file.seek(0)
+    if sniff_image_mime(header) != content_type:
+        raise profile_pic_invalid_exception
+
+    filename = f"{user.user_uid}{IMAGE_EXT_BY_MIME[content_type]}"
+    base = get_profile_pic_dir()
+    dst_path = base / filename
+
+    try:
+        save_file(uploaded_file, dst_path, settings.profile_pic_max_bytes)
+        old_filename = user.profile_pic
+        await crud.save_profile_pic(db, user, filename)
+    except FileTooLargeError:
+        remove_file(dst_path)
+        raise profile_pic_too_large_exception
+    except HTTPException:
+        remove_file(dst_path)
+        raise
+    except SQLAlchemyError as e:
+        logger.error(f"DataBase error saving profile-pic path: {e}")
+        remove_file(dst_path)
+        await db.rollback()
+        raise internal_error_exception  # update exceptions
+    else:
+        await db.commit()
+        if old_filename and old_filename != filename:
+            remove_file(base / old_filename, base_dir=base)
+        return {"profile_picture_url": PROFILE_PIC_URL}
+
+
+async def get_user_profile_service(user: User) -> tuple[Path, str]:
+    if not user.profile_pic:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Profile pic not found")
+    base = get_profile_pic_dir()
+    file_path = (base / user.profile_pic).resolve()
+    print(file_path)
+    if not file_path.is_relative_to(base) or not file_path.is_file():
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Profile pic not found")
+    media_type = IMAGE_MIME_BY_EXT.get(
+        file_path.suffix.lower(), "application/octet-stream"
+    )
+    return file_path, media_type

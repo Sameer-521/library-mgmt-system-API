@@ -31,3 +31,8 @@ class UserResponse(UserBase):
 
 class UserProfileResponse(UserResponse):
     fine_balance: int
+    profile_picture_url: str | None = None
+
+
+class ProfilePicResponse(BaseModel):
+    profile_picture_url: str
