@@ -91,6 +91,8 @@ photoUpload.addEventListener("click", async () => {
     photoUpload.hidden = true;
     photoInput.value = "";
     await renderAvatar(data && data.profile_picture_url);
+    // The topbar avatar chip (layout.js) re-fetches its own blob on this.
+    document.dispatchEvent(new CustomEvent("avatar:updated"));
     showAlert(alertBox, "Profile picture updated.", "success");
   } catch (error) {
     let message;
@@ -129,12 +131,20 @@ async function loadProfile() {
     $("#profile-card").textContent = profile.card_number;
     $("#profile-joined").textContent = formatDate(profile.created_at);
 
-    const fines = $("#profile-fines");
-    fines.textContent =
-      profile.fine_balance > 0 ? formatMoney(profile.fine_balance) : "None";
-    if (profile.fine_balance > 0) {
-      fines.classList.add("text-danger");
-      payFineBtn.disabled = false;
+    // Staff/admin accounts are never fined (backend skips accrual) — the
+    // fine row + pay button leave the profile entirely for staff.
+    if (Session.isStaffLike()) {
+      const finesDd = $("#profile-fines").closest("dd");
+      finesDd.previousElementSibling?.remove(); // "Fine balance" dt
+      finesDd.remove(); // dd carrying the Pay fine button
+    } else {
+      const fines = $("#profile-fines");
+      fines.textContent =
+        profile.fine_balance > 0 ? formatMoney(profile.fine_balance) : "None";
+      if (profile.fine_balance > 0) {
+        fines.classList.add("text-danger");
+        payFineBtn.disabled = false;
+      }
     }
 
     profileView.hidden = false;

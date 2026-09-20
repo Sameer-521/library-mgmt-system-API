@@ -9,11 +9,11 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     full_name: str = Field(min_length=3, max_length=30)
-    password: str = Field(min_length=8, max_length=30, pattern=r"^[a-zA-Z0-9_@!]+$")
+    password: str = Field(min_length=8, max_length=30, pattern=r"^[a-zA-Z0-9_@!#]+$")
 
 
 class UserLogin(UserBase):
-    password: str  # = Field(pattern=r'^[a-zA-Z0-9_@!]*$')
+    password: str
 
 
 class UserResponse(UserBase):

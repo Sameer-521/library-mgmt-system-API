@@ -182,6 +182,29 @@ async def overdue_loan(test_session, mock_user, mock_book_copies) -> tuple[str, 
 
 
 @pytest.fixture(scope="function")
+async def overdue_staff_loan(
+    test_session, mock_admin, mock_book_copies
+) -> tuple[str, str]:
+    """Overdue loan borrowed by a staff account (staff are never fined)."""
+    _, mock_bks = mock_book_copies
+    first_bk: BookCopy = mock_bks[0]
+    first_bk.status = BkCopyStatus.BORROWED
+
+    await test_session.flush()
+    await test_session.refresh(first_bk)
+
+    loan = Loan(
+        user_uid=mock_admin.user_uid,
+        bk_copy_barcode=first_bk.copy_barcode,
+        due_at=datetime.now(UTC) - timedelta(days=3),  # now - 3 days
+    )
+    test_session.add(loan)
+    await test_session.flush()
+    await test_session.refresh(loan)
+    return loan.loan_id, loan.bk_copy_barcode
+
+
+@pytest.fixture(scope="function")
 def book_creation_data():
     return {"title": "mock1", "author": "hitler", "location": "a3", "isbn": "11223344"}
 

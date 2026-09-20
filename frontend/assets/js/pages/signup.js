@@ -18,7 +18,7 @@ const NAME_MIN = 3;
 const NAME_MAX = 30;
 const PASS_MIN = 8;
 const PASS_MAX = 30;
-const PASS_PATTERN = /^[A-Za-z0-9_@!]+$/;
+const PASS_PATTERN = /^[A-Za-z0-9_@!#]+$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function validate(fullName, email, password) {
@@ -32,7 +32,7 @@ function validate(fullName, email, password) {
     return `Password must be ${PASS_MIN}–${PASS_MAX} characters.`;
   }
   if (!PASS_PATTERN.test(password)) {
-    return "Password can only contain letters, numbers and _ @ !.";
+    return "Password can only contain letters, numbers and _ @ ! #.";
   }
   return null;
 }

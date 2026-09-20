@@ -507,12 +507,16 @@ async def return_book_loan_service(
             days_deltas = (returned_at.date() - loan.due_at.date()).days
             fine = 100 * days_deltas
             fine_fee = fine
-            fined = True
             user = await crud.get_user_by_uid(db, loan.user_uid)
             if not user:
                 raise user_not_found_exception
-            updated_fine = fine + user.fine_balance
-            await crud.update_user(db, user, update_data={"fine_balance": updated_fine})
+            # Staff/admin borrowers are never fined; members accrue as before.
+            if not user.is_staff:
+                fined = True
+                updated_fine = fine + user.fine_balance
+                await crud.update_user(
+                    db, user, update_data={"fine_balance": updated_fine}
+                )
 
         loan_data = {"status": loan_status, "returned_at": returned_at}
         await crud.update_loan(db, loan, loan_data)

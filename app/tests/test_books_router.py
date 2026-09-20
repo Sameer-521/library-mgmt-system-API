@@ -300,6 +300,25 @@ async def test_return_overdue_book(admin_auth_client, overdue_loan):
 
 
 @pytest.mark.anyio
+async def test_return_overdue_staff_book(
+    admin_auth_client, overdue_staff_loan, test_session, mock_admin
+):
+    """Overdue return by a staff borrower: late status, but never fined."""
+    loan_id, barcode = overdue_staff_loan
+    form_data = {"bk_copy_barcode": barcode, "loan_id": loan_id}
+    response = await admin_auth_client.post(
+        f"{admin_auth_client.base_url}/books/loan-return", data=form_data
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        "message": "User loan cleared, awaiting staff inspection"
+    }
+
+    await test_session.refresh(mock_admin)
+    assert mock_admin.fine_balance == 0
+
+
+@pytest.mark.anyio
 async def test_soft_delete_book(
     admin_auth_client, mock_book, mock_book_copies, test_session
 ):
