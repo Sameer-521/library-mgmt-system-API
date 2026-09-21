@@ -65,12 +65,14 @@ class ActiveLoanItem(LoanResponse):
     book_title: str
     user_full_name: str
     user_email: str
+    estimated_fine: int
 
 
 class MyLoanItem(LoanResponse):
     returned_at: datetime | None = None
     book_isbn: str
     book_title: str
+    estimated_fine: int
 
 
 class LoanModel(BaseModel):

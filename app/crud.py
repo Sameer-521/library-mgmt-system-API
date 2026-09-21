@@ -12,6 +12,7 @@ from app.models import (
     LoanStatus,
     User,
 )
+from app.utils import estimate_late_fine
 
 
 async def get_book_by_id(db: AsyncSession, book_id: int):
@@ -224,6 +225,7 @@ async def get_all_active_loans(db: AsyncSession):
                 "status": loan.status,
                 "checked_out_at": loan.checked_out_at,
                 "due_at": loan.due_at,
+                "estimated_fine": estimate_late_fine(loan.due_at),
                 "book_isbn": book.isbn,
                 "book_title": book.title,
                 "user_full_name": user.full_name,
@@ -254,6 +256,11 @@ async def get_user_loans(db: AsyncSession, user_uid: str):
                 "checked_out_at": loan.checked_out_at,
                 "due_at": loan.due_at,
                 "returned_at": loan.returned_at,
+                "estimated_fine": (
+                    estimate_late_fine(loan.due_at)
+                    if loan.status == LoanStatus.ACTIVE
+                    else 0
+                ),
                 "book_isbn": book.isbn,
                 "book_title": book.title,
             }

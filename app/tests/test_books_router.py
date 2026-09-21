@@ -508,6 +508,16 @@ async def test_get_active_loans_enriched(
 
 
 @pytest.mark.anyio
+async def test_get_active_loans_estimated_fine(admin_auth_client, overdue_loan):
+    response = await admin_auth_client.get(
+        f"{admin_auth_client.base_url}/books/loans/active?limit=10&offset=0"
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["items"][0]["estimated_fine"] == 300
+
+
+@pytest.mark.anyio
 async def test_get_active_loans_requires_token(client):
     response = await client.get(f"{client.base_url}/books/loans/active")
     assert response.status_code == 401
@@ -594,9 +604,34 @@ async def test_get_my_loans(auth_client, mock_loan):
     assert item["loan_id"] == loan_id
     assert item["bk_copy_barcode"] == bk_copy_barcode
     assert item["status"] == "active"
+    assert item["estimated_fine"] == 0
     assert item["returned_at"] is None
     assert item["book_isbn"] == "11223344"
     assert item["book_title"] == "mock1"
+
+
+@pytest.mark.anyio
+async def test_get_my_loans_estimated_fine(auth_client, overdue_loan):
+    response = await auth_client.get(
+        f"{auth_client.base_url}/books/loans/me?limit=10&offset=0"
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["items"][0]["status"] == "active"
+    assert data["items"][0]["estimated_fine"] == 300
+
+
+@pytest.mark.anyio
+async def test_get_my_loans_estimated_fine_custom_fee(
+    auth_client, overdue_loan, monkeypatch
+):
+    monkeypatch.setattr(services.settings, "late_fee_per_day", 250)
+    response = await auth_client.get(
+        f"{auth_client.base_url}/books/loans/me?limit=10&offset=0"
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["items"][0]["estimated_fine"] == 750
 
 
 @pytest.mark.anyio

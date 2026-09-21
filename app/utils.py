@@ -7,6 +7,8 @@ from pathlib import Path
 
 from fastapi import UploadFile
 
+from app.core.config import settings
+
 logger = Logger(__name__)
 
 PROFILE_PIC_DIR = "profile-pics"
@@ -48,6 +50,13 @@ def safe_datetime_compare(dt1: datetime, dt2: datetime) -> bool:
     elif dt1.tzinfo is not None and dt2.tzinfo is None:
         dt2 = dt2.replace(tzinfo=UTC)
     return dt1 > dt2
+
+
+def estimate_late_fine(due_at: datetime, *, now: datetime | None = None) -> int:
+    now = now or datetime.now(UTC)
+    if not safe_datetime_compare(now, due_at):
+        return 0
+    return settings.late_fee_per_day * (now.date() - due_at.date()).days
 
 
 def generate_book_copy_barcode(base_barcode, serial):

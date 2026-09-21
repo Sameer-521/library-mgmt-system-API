@@ -5,7 +5,6 @@ import { $, showAlert, hideAlert, setSubmitting } from "../../utils/dom.js";
 import { formatDateTime, formatMoney } from "../../utils/format.js";
 
 const PAGE_SIZE = 20;
-const LATE_FEE_PER_DAY = 100; // client-side estimate, matches backend fine rule
 
 const params = new URLSearchParams(window.location.search);
 const state = {
@@ -62,7 +61,7 @@ function statusCellContent(loan) {
     badge.textContent = `${late} ${late === 1 ? "day" : "days"} overdue`;
     const fine = document.createElement("p");
     fine.className = "muted cell-sub cell-sub--stack";
-    fine.textContent = `est. fine ${formatMoney(late * LATE_FEE_PER_DAY)}`;
+    fine.textContent = `est. fine ${formatMoney(loan.estimated_fine)}`;
     cell.append(badge, fine);
   } else {
     const badge = document.createElement("span");
@@ -294,7 +293,7 @@ returnForm.addEventListener("submit", async (event) => {
       `Copy ${bk_copy_barcode}`,
       ...(late > 0
         ? [
-            `Overdue by ${late} ${late === 1 ? "day" : "days"} - est. fine ${formatMoney(late * LATE_FEE_PER_DAY)}.`,
+            `Overdue by ${late} ${late === 1 ? "day" : "days"} - est. fine ${formatMoney(known.estimated_fine)}.`,
           ]
         : ["Returned copies move to IN_CHECK for staff inspection."])
     ),
