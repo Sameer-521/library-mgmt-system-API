@@ -505,7 +505,7 @@ async def return_book_loan_service(
         if safe_datetime_compare(returned_at, loan.due_at):  # overdue
             loan_status = LoanStatus.RETURNED_LATE
             days_deltas = (returned_at.date() - loan.due_at.date()).days
-            fine = 100 * days_deltas
+            fine = settings.late_fee_per_day * days_deltas
             fine_fee = fine
             user = await crud.get_user_by_uid(db, loan.user_uid)
             if not user:

@@ -2,6 +2,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
+from app import services
 from app.models import BkCopySchedule, BkCopyStatus, Book, BookCopy, Loan, LoanStatus
 
 
@@ -297,6 +298,22 @@ async def test_return_overdue_book(admin_auth_client, overdue_loan):
     data = response.json()
     assert data["message"] == "User loan cleared, you have also been fined for delay"
     assert data["fine"] == "300"
+
+
+@pytest.mark.anyio
+async def test_return_overdue_book_custom_fee(
+    admin_auth_client, overdue_loan, monkeypatch
+):
+    monkeypatch.setattr(services.settings, "late_fee_per_day", 250)
+    loan_id, barcode = overdue_loan
+    form_data = {"bk_copy_barcode": barcode, "loan_id": loan_id}
+    response = await admin_auth_client.post(
+        f"{admin_auth_client.base_url}/books/loan-return", data=form_data
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["message"] == "User loan cleared, you have also been fined for delay"
+    assert data["fine"] == "750"
 
 
 @pytest.mark.anyio
