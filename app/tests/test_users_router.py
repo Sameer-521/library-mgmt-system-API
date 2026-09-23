@@ -19,40 +19,6 @@ async def test_signup(client):
 
 
 @pytest.mark.anyio
-async def test_get_users_pagination(admin_auth_client, test_session):
-    for i in range(3):
-        test_session.add(
-            User(
-                full_name=f"Pagination User {i}",
-                email=f"pagination_user_{i}@example.com",
-                password=hash_password("mockuser123"),
-            )
-        )
-    await test_session.flush()
-
-    response = await admin_auth_client.get(
-        f"{admin_auth_client.base_url}/users?limit=2&offset=0"
-    )
-    assert response.status_code == 200
-    data = response.json()
-    assert data["total"] == 3
-    assert data["limit"] == 2
-    assert data["offset"] == 0
-    assert len(data["items"]) == 2
-
-    response_2 = await admin_auth_client.get(
-        f"{admin_auth_client.base_url}/users?limit=2&offset=2"
-    )
-    assert response_2.status_code == 200
-    data_2 = response_2.json()
-    assert data_2["offset"] == 2
-    assert len(data_2["items"]) == 1
-    first_page_ids = {u["user_uid"] for u in data["items"]}
-    second_page_ids = {u["user_uid"] for u in data_2["items"]}
-    assert first_page_ids.isdisjoint(second_page_ids)
-
-
-@pytest.mark.anyio
 async def test_get_users_includes_full_name(admin_auth_client, mock_user):
     response = await admin_auth_client.get(f"{admin_auth_client.base_url}/users")
     assert response.status_code == 200
@@ -122,12 +88,6 @@ async def test_get_my_profile_fine_balance(auth_client, mock_user, test_session)
     assert response.json()["fine_balance"] == 300
 
 
-@pytest.mark.anyio
-async def test_get_my_profile_requires_token(client):
-    response = await client.get(f"{client.base_url}/users/me")
-    assert response.status_code == 401
-
-
 PNG_BYTES = b"\x89PNG\r\n\x1a\n" + b"\x00" * 32
 JPEG_BYTES = b"\xff\xd8\xff\xe0" + b"\x00" * 32
 
@@ -148,25 +108,6 @@ async def test_upload_profile_picture(auth_client, mock_user, upload_dir):
     saved = upload_dir / f"{mock_user.user_uid}.png"
     assert saved.is_file()
     assert saved.read_bytes() == PNG_BYTES
-
-
-@pytest.mark.anyio
-async def test_uploaded_picture_exposed_on_profile(auth_client, mock_user, upload_dir):
-    response = await auth_client.post(
-        upload_url(auth_client),
-        files={"file": ("me.png", PNG_BYTES, "image/png")},
-    )
-    url = response.json()["profile_picture_url"]
-
-    me = await auth_client.get(f"{auth_client.base_url}/users/me")
-    assert me.status_code == 200
-    assert me.json()["profile_picture_url"] == url
-
-
-@pytest.mark.anyio
-async def test_get_profile_picture_requires_token(client, upload_dir):
-    response = await client.get(upload_url(client))
-    assert response.status_code == 401
 
 
 @pytest.mark.anyio

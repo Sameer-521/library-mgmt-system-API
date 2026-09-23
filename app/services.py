@@ -80,7 +80,6 @@ book_copy_integrity_exception = HTTPException(
 )
 
 
-# tested
 async def create_new_book_service(
     request: Request,
     db: AsyncSession,
@@ -103,7 +102,6 @@ async def create_new_book_service(
         await db.commit()
 
 
-# tested
 async def get_book_by_isbn_service(request: Request, db: AsyncSession, isbn: str):
     try:
         book = await crud.get_book_by_isbn(db, isbn)
@@ -151,7 +149,6 @@ async def soft_delete_book_by_isbn_service(
         return book
 
 
-# tested
 async def update_book_service(
     request: Request, db: AsyncSession, update_data: dict, isbn: str, current_user: User
 ):
@@ -179,7 +176,6 @@ async def update_book_service(
         return current_user
 
 
-# tested
 async def add_book_copies_service(
     request: Request,
     db: AsyncSession,
@@ -224,7 +220,6 @@ async def add_book_copies_service(
         return msg
 
 
-# tested
 async def loan_book_service(
     request: Request, db: AsyncSession, isbn: str, user_uid: str
 ):
@@ -318,7 +313,6 @@ async def loan_book_service(
         }
 
 
-# tested
 async def create_user_service(
     request: Request,
     db: AsyncSession,
@@ -345,7 +339,6 @@ async def create_user_service(
         return {"message": "User created successfully", "user_uid": user.user_uid}
 
 
-# tested
 async def login_user_service(
     request: Request,
     db: AsyncSession,
@@ -540,7 +533,6 @@ async def return_book_loan_service(
         )
 
 
-# tested
 async def schedule_book_copy_service(
     request: Request, db: AsyncSession, isbn: str, current_user: User
 ):
@@ -750,7 +742,6 @@ async def get_user_profile_service(user: User) -> tuple[Path, str]:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Profile pic not found")
     base = get_profile_pic_dir()
     file_path = (base / user.profile_pic).resolve()
-    print(file_path)
     if not file_path.is_relative_to(base) or not file_path.is_file():
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Profile pic not found")
     media_type = IMAGE_MIME_BY_EXT.get(

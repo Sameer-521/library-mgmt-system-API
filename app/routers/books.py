@@ -25,7 +25,6 @@ from app.schemas.book import (
     FullScheduleInfo,
     ListBkUpdate,
     LoanForm,
-    LoanResponse,
     LoanReturnForm,
     MyLoanItem,
 )
@@ -45,7 +44,6 @@ async def get_all_books(
     return await services.get_all_books_service(request, db, title, author, isbn)
 
 
-# tested
 @books_router.get("/fetch", response_model=BookResponse, tags=["user"])
 async def get_book_by_ISBN(
     request: Request,
@@ -57,7 +55,6 @@ async def get_book_by_ISBN(
     return book
 
 
-# tested
 @books_router.post("", status_code=status.HTTP_201_CREATED, tags=["staff"])
 async def create_book(
     request: Request,
@@ -70,7 +67,6 @@ async def create_book(
     return {"message": "Created new book successully"}
 
 
-# tested
 @books_router.put("/{isbn}", status_code=status.HTTP_204_NO_CONTENT, tags=["staff"])
 async def update_book(
     request: Request,
@@ -83,7 +79,6 @@ async def update_book(
     await services.update_book_service(request, db, book_update_data, isbn, staff_user)
 
 
-# tested
 @books_router.post(
     "/generate-copies", status_code=status.HTTP_201_CREATED, tags=["staff"]
 )
@@ -122,7 +117,6 @@ async def return_book_loan(
     return message
 
 
-# tested
 @books_router.post(
     "/loan-book",
     response_model=BkCopyLoanResponse,

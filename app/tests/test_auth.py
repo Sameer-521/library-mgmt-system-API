@@ -2,8 +2,20 @@ import pytest
 
 
 @pytest.mark.anyio
-async def test_protected_route_requires_token(client):
-    response = await client.get(f"{client.base_url}/books/fetch?isbn=11223344")
+@pytest.mark.parametrize(
+    "path",
+    [
+        "/books/fetch?isbn=11223344",
+        "/users/me",
+        "/users/me/profile-picture",
+        "/books/schedules/me",
+        "/books/loans/active",
+        "/books/bk-copies",
+        "/books/loans/me",
+    ],
+)
+async def test_protected_route_requires_token(client, path):
+    response = await client.get(f"{client.base_url}{path}")
     assert response.status_code == 401
 
 

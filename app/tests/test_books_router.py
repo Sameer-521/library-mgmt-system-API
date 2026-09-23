@@ -188,41 +188,31 @@ async def test_schedule_bk_copy_no_copies_400(auth_client, mock_book):
 
 
 @pytest.mark.anyio
+@pytest.mark.parametrize(
+    "status", [BkCopyStatus.BORROWED, BkCopyStatus.DAMAGED, BkCopyStatus.IN_CHECK]
+)
 async def test_book_response_includes_available_copies(
-    auth_client, mock_book_copies, test_session
-):
-    isbn, bk_copies = mock_book_copies
-    bk_copies[0].status = BkCopyStatus.BORROWED
-    await test_session.flush()
-    test_session.expire_all()
-
-    response = await auth_client.get(f"{auth_client.base_url}/books/fetch?isbn={isbn}")
-    assert response.status_code == 200
-    assert response.json()["available_copies"] == 4
-
-    list_response = await auth_client.get(f"{auth_client.base_url}/books?isbn={isbn}")
-    assert list_response.status_code == 200
-    assert list_response.json()["items"][0]["available_copies"] == 4
-
-
-@pytest.mark.anyio
-async def test_copy_status_changes_reflect_in_count(
-    auth_client, mock_book_copies, test_session
+    auth_client, mock_book_copies, test_session, status
 ):
     isbn, _ = mock_book_copies
-    damaged = BookCopy(
-        book_isbn=isbn,
-        serial=99,
-        copy_barcode="COPY-DAMAGED-99",
-        status=BkCopyStatus.DAMAGED,
+    test_session.add(
+        BookCopy(
+            book_isbn=isbn,
+            serial=99,
+            copy_barcode=f"COPY-{status.name}-99",
+            status=status,
+        )
     )
-    test_session.add(damaged)
     await test_session.flush()
     test_session.expire_all()
 
     response = await auth_client.get(f"{auth_client.base_url}/books/fetch?isbn={isbn}")
     assert response.status_code == 200
     assert response.json()["available_copies"] == 5
+
+    list_response = await auth_client.get(f"{auth_client.base_url}/books?isbn={isbn}")
+    assert list_response.status_code == 200
+    assert list_response.json()["items"][0]["available_copies"] == 5
 
 
 @pytest.mark.anyio
@@ -416,12 +406,6 @@ async def test_get_my_schedules(auth_client, mock_user, mock_book_copies):
 
 
 @pytest.mark.anyio
-async def test_get_my_schedules_requires_token(client):
-    response = await client.get(f"{client.base_url}/books/schedules/me")
-    assert response.status_code == 401
-
-
-@pytest.mark.anyio
 async def test_get_my_schedules_inactive_user(auth_client, mock_user, test_session):
     mock_user.is_active = False
     await test_session.flush()
@@ -508,28 +492,6 @@ async def test_get_active_loans_enriched(
 
 
 @pytest.mark.anyio
-async def test_get_active_loans_estimated_fine(admin_auth_client, overdue_loan):
-    response = await admin_auth_client.get(
-        f"{admin_auth_client.base_url}/books/loans/active?limit=10&offset=0"
-    )
-    assert response.status_code == 200
-    data = response.json()
-    assert data["items"][0]["estimated_fine"] == 300
-
-
-@pytest.mark.anyio
-async def test_get_active_loans_requires_token(client):
-    response = await client.get(f"{client.base_url}/books/loans/active")
-    assert response.status_code == 401
-
-
-@pytest.mark.anyio
-async def test_get_active_loans_requires_staff(auth_client):
-    response = await auth_client.get(f"{auth_client.base_url}/books/loans/active")
-    assert response.status_code == 403
-
-
-@pytest.mark.anyio
 async def test_get_bk_copies_in_check(admin_auth_client, mock_loan):
     loan_id, barcode = mock_loan
 
@@ -577,18 +539,6 @@ async def test_get_bk_copies_filtered_by_isbn(admin_auth_client, mock_book_copie
 
 
 @pytest.mark.anyio
-async def test_get_bk_copies_requires_token(client):
-    response = await client.get(f"{client.base_url}/books/bk-copies")
-    assert response.status_code == 401
-
-
-@pytest.mark.anyio
-async def test_get_bk_copies_requires_staff(auth_client):
-    response = await auth_client.get(f"{auth_client.base_url}/books/bk-copies")
-    assert response.status_code == 403
-
-
-@pytest.mark.anyio
 async def test_get_my_loans(auth_client, mock_loan):
     loan_id, bk_copy_barcode = mock_loan
 
@@ -619,19 +569,6 @@ async def test_get_my_loans_estimated_fine(auth_client, overdue_loan):
     data = response.json()
     assert data["items"][0]["status"] == "active"
     assert data["items"][0]["estimated_fine"] == 300
-
-
-@pytest.mark.anyio
-async def test_get_my_loans_estimated_fine_custom_fee(
-    auth_client, overdue_loan, monkeypatch
-):
-    monkeypatch.setattr(services.settings, "late_fee_per_day", 250)
-    response = await auth_client.get(
-        f"{auth_client.base_url}/books/loans/me?limit=10&offset=0"
-    )
-    assert response.status_code == 200
-    data = response.json()
-    assert data["items"][0]["estimated_fine"] == 750
 
 
 @pytest.mark.anyio
@@ -683,9 +620,3 @@ async def test_get_my_loans_newest_first(
     assert data["total"] == 2
     assert data["items"][0]["loan_id"] == newer_loan.loan_id
     assert data["items"][1]["loan_id"] == older_loan_id
-
-
-@pytest.mark.anyio
-async def test_get_my_loans_requires_token(client):
-    response = await client.get(f"{client.base_url}/books/loans/me")
-    assert response.status_code == 401

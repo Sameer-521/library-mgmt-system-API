@@ -5,7 +5,6 @@ from fastapi import (
     Depends,
     File,
     Form,
-    HTTPException,
     Query,
     Request,
     UploadFile,
@@ -18,7 +17,6 @@ from app import services
 from app.core.auth import (
     get_current_active_user,
     get_current_admin_user,
-    get_current_staff_user,
 )
 from app.core.database import AsyncSession, get_session
 from app.models import User
@@ -45,11 +43,9 @@ async def get_my_profile(
 async def get_all_non_staff_users(
     request: Request,
     role: Annotated[Literal["staff"] | None, Query()] = None,
-    staff_user: User = Depends(get_current_staff_user),
+    admin_user: User = Depends(get_current_admin_user),
     db: AsyncSession = Depends(get_session),
 ):
-    if role == "staff" and not staff_user.is_superuser:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Not enough privileges")
     return await services.get_all_non_staff_users_service(request, db, role)
 
 
